@@ -1,0 +1,43 @@
+import { headers } from "next/headers";
+import { createSsrClient } from "./supabase/ssr";
+import { createServiceSupabaseClient } from "./supabase/admin";
+
+/**
+ * Resolves the current tenant slug in a request context.
+ *
+ * Priority:
+ *  1. x-tenant-slug header injected by middleware (subdomain-based)
+ *  2. Logged-in user email → tenants.owner_email lookup
+ *  3. NEXT_PUBLIC_BOOKIDO_TENANT_SLUG env var (localhost dev)
+ *  4. Hardcoded fallback "yorbana"
+ */
+export async function getTenantSlug(): Promise<string> {
+  try {
+    const h = await headers();
+    const slug = h.get("x-tenant-slug");
+    if (slug) return slug;
+  } catch {
+    // Not in a request context (build time, static generation)
+  }
+
+  // Priority 2: resolve by logged-in user's email
+  try {
+    const ssrClient = await createSsrClient();
+    const { data: { user } } = await ssrClient.auth.getUser();
+    if (user?.email) {
+      const adminClient = createServiceSupabaseClient();
+      if (adminClient) {
+        const { data } = await adminClient
+          .from("tenants")
+          .select("slug")
+          .eq("owner_email", user.email)
+          .maybeSingle();
+        if (data?.slug) return data.slug;
+      }
+    }
+  } catch {
+    // Non-critical: fall through to env/default
+  }
+
+  return process.env.NEXT_PUBLIC_BOOKIDO_TENANT_SLUG ?? "yorbana";
+}

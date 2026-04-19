@@ -1,0 +1,243 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  /* ── Tenant theme defaults — overridden per-page via <style> injection ── */
+  --primary:     20 241 149;   /* R G B — usage: rgb(var(--primary) / 0.x)  */
+  --primary-hex: #14F195;     /* usage: var(--primary-hex)                  */
+  --hero:        20 241 149;   /* landing hero accent                         */
+  --hero-hex:    #14F195;
+}
+
+body {
+  @apply bg-ink-950 text-zinc-100 antialiased;
+}
+
+::selection {
+  @apply bg-[#14F195]/20 text-white;
+}
+
+@layer components {
+  /* Cabecera: vidrio neutro */
+  .header-yorbana-glass {
+    @apply border-b border-white/[0.08] bg-ink-950/70 backdrop-blur-2xl;
+    box-shadow:
+      0 8px 48px -12px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(20, 241, 149, 0.08),
+      inset 0 -1px 0 0 rgba(20, 241, 149, 0.05);
+  }
+
+  .neon-border-soft {
+    @apply border border-[#14F195]/20 bg-white/[0.03] backdrop-blur-sm;
+    box-shadow:
+      0 0 32px -6px rgba(20, 241, 149, 0.2),
+      0 0 64px -16px rgba(20, 241, 149, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .btn-whatsapp-neon {
+    @apply relative overflow-hidden rounded-2xl border border-[#14F195]/30 bg-[#14F195] px-10 py-5 text-lg font-semibold tracking-wide text-[#0A0A0F] transition duration-300;
+    box-shadow:
+      0 0 48px -8px rgba(20, 241, 149, 0.4),
+      0 0 96px -24px rgba(20, 241, 149, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .btn-whatsapp-neon:hover {
+    box-shadow:
+      0 0 56px -4px rgba(20, 241, 149, 0.55),
+      0 0 110px -20px rgba(20, 241, 149, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    filter: brightness(1.06);
+  }
+
+  .btn-whatsapp-neon-sm {
+    @apply relative inline-flex items-center justify-center rounded-full border border-[#14F195]/25 bg-[#14F195] px-6 py-2.5 text-sm font-semibold tracking-wide text-[#0A0A0F] transition duration-300;
+    box-shadow:
+      0 0 28px -2px rgba(20, 241, 149, 0.32),
+      0 0 48px -12px rgba(20, 241, 149, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .btn-whatsapp-neon-sm:hover {
+    box-shadow:
+      0 0 38px 0 rgba(20, 241, 149, 0.48),
+      0 0 56px -8px rgba(20, 241, 149, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    filter: brightness(1.07);
+  }
+
+  /* Bloque contacto CTA */
+  .panel-contact-glass {
+    @apply rounded-[2rem] border border-[#14F195]/10 bg-gradient-to-br from-ink-800/90 via-[#14F195]/[0.03] to-ink-950 p-10 md:p-16;
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    box-shadow:
+      0 0 32px -6px rgba(20, 241, 149, 0.15),
+      0 0 64px -16px rgba(20, 241, 149, 0.08),
+      0 0 0 1px rgba(20, 241, 149, 0.07),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  }
+
+  /* Tarjetas de servicios */
+  .card-service-glass {
+    @apply relative isolate overflow-hidden rounded-2xl p-8;
+    background: linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.04) 42%,
+      rgba(255, 255, 255, 0.07) 100%
+    );
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+      0 8px 32px -12px rgba(0, 0, 0, 0.45);
+    transition:
+      border-color 0.35s ease,
+      box-shadow 0.35s ease,
+      background 0.35s ease;
+  }
+
+  .card-service-glass:hover {
+    border-color: rgba(20, 241, 149, 0.3);
+    background: linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.05) 42%,
+      rgba(20, 241, 149, 0.04) 100%
+    );
+    box-shadow:
+      0 0 40px -6px rgba(20, 241, 149, 0.18),
+      0 0 24px -4px rgba(20, 241, 149, 0.12),
+      0 0 0 1px rgba(20, 241, 149, 0.1),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+  }
+}
+
+/* ── Help Center prose ────────────────────────────────────────────────────── */
+.help-prose { color: #a1a1aa; font-size: 0.9375rem; line-height: 1.75; }
+
+.help-prose h2 {
+  font-family: var(--font-syne), var(--font-geist-sans), system-ui;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fafafa;
+  margin: 2.2rem 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  letter-spacing: -0.01em;
+}
+.help-prose h2:first-child { margin-top: 0; }
+
+.help-prose h3 {
+  font-family: var(--font-syne), var(--font-geist-sans), system-ui;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e4e4e7;
+  margin: 1.6rem 0 0.5rem;
+}
+
+.help-prose p { margin: 0.85rem 0; }
+.help-prose p:first-child { margin-top: 0; }
+
+.help-prose strong { color: #f4f4f5; font-weight: 600; }
+.help-prose em { color: #d4d4d8; font-style: italic; }
+
+.help-prose a { color: #14F195; text-decoration: underline; text-decoration-color: rgba(20,241,149,0.3); text-underline-offset: 3px; }
+.help-prose a:hover { color: #4ade80; }
+
+.help-prose ul { list-style: none; margin: 0.85rem 0; padding: 0; }
+.help-prose ul li { position: relative; padding-left: 1.25rem; margin: 0.35rem 0; }
+.help-prose ul li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0.65em;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14F195, #0ea5e9);
+}
+
+.help-prose ol { list-style: none; margin: 0.85rem 0; padding: 0; counter-reset: ol-counter; }
+.help-prose ol li { position: relative; padding-left: 1.75rem; margin: 0.4rem 0; counter-increment: ol-counter; }
+.help-prose ol li::before {
+  content: counter(ol-counter);
+  position: absolute; left: 0; top: 0.05em;
+  width: 1.25rem; height: 1.25rem; border-radius: 4px;
+  background: rgba(20,241,149,0.08);
+  border: 1px solid rgba(20,241,149,0.18);
+  color: #14F195; font-size: 0.7rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.help-prose code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.82em;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 5px; padding: 0.15em 0.42em; color: #86efac;
+}
+
+.help-prose pre {
+  margin: 1.25rem 0; padding: 1.1rem 1.25rem;
+  background: #0d0d10;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px; overflow-x: auto;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+}
+.help-prose pre code {
+  background: none; border: none; padding: 0;
+  color: #d4d4d8; font-size: 0.83rem; line-height: 1.65;
+}
+
+.help-prose blockquote {
+  margin: 1.25rem 0; padding: 0.75rem 1.1rem;
+  background: rgba(20,241,149,0.04);
+  border-left: 3px solid rgba(20,241,149,0.3);
+  border-radius: 0 8px 8px 0; color: #d4d4d8; font-style: italic;
+}
+
+/* react-day-picker (página /reserva) — uses tenant --primary CSS var */
+.bookido-calendar.rdp-root {
+  --rdp-accent-color: rgb(var(--primary) / 0.85);
+  --rdp-accent-background-color: rgb(var(--primary) / 0.12);
+  --rdp-day-height: 40px;
+  --rdp-day-width: 40px;
+  --rdp-day_button-height: 38px;
+  --rdp-day_button-width: 38px;
+  color: #d4d4d8;
+  margin: 0;
+}
+
+.bookido-calendar .rdp-weekday {
+  color: #71717a;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.bookido-calendar .rdp-caption_label {
+  font-family: var(--font-display), ui-serif, serif;
+  font-size: 1.05rem;
+  color: #fafafa;
+}
+
+.bookido-calendar .rdp-nav_button {
+  color: #a1a1aa;
+}
+
+.bookido-calendar .rdp-nav_button:hover {
+  color: #14F195;
+}
+
+.bookido-calendar .rdp-day_button {
+  color: #e4e4e7;
+}
+
+.bookido-calendar .rdp-disabled .rdp-day_button {
+  color: #52525b;
+}
