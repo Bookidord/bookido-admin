@@ -25,7 +25,7 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "Yorbana Nail Estudio | Santo Domingo, RD",
+  title: "Bookido",
   description:
     "Nail estudio en Gustavo Mejía Ricart, Santo Domingo: manicura, pedicura y nail art. Elegancia futurista. Reserva por WhatsApp o BookiDo.",
 };

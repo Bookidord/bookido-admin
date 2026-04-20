@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Bookido · Admin",
+  description: "Panel de administración de Bookido.",
+};
+
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifySessionToken, ADMIN_COOKIE } from "@/lib/admin-session";

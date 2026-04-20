@@ -412,7 +412,7 @@ function TabMensajes({ initialTemplates }: { initialTemplates: MessageTemplate[]
     .replace(/\{servicio\}/g, "Manicura gel")
     .replace(/\{fecha\}/g, "25/04/2026")
     .replace(/\{hora\}/g, "10:00 AM")
-    .replace(/\{negocio\}/g, "Yorbana Nail")
+    .replace(/\{negocio\}/g, "Mi Negocio")
     .replace(/\{duracion\}/g, "60")
     .replace(/\{precio\}/g, "800")
     .replace(/\{direccion\}/g, "Santo Domingo, RD");

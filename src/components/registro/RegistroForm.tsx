@@ -151,7 +151,7 @@ export function RegistroForm() {
           type="text"
           required
           autoComplete="organization"
-          placeholder="Yorbana Nail Estudio"
+          placeholder="Mi Negocio Belleza"
           value={businessName}
           onChange={(e) => handleBusinessNameChange(e.target.value)}
           className="w-full rounded-xl border border-white/[0.08] bg-ink-900/60 px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none transition focus:border-[#14F195]/30 focus:ring-1 focus:ring-[#14F195]/20"

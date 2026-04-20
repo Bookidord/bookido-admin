@@ -13,7 +13,7 @@ function resolveTenantSlug(hostname: string, pathname: string): string | null {
   // /admin paths on localhost are for the master admin panel — no tenant
   if (host === "localhost" || host.startsWith("127.") || host === "::1") {
     if (pathname.startsWith("/admin")) return null;
-    return process.env.NEXT_PUBLIC_BOOKIDO_TENANT_SLUG ?? "yorbana";
+    return process.env.NEXT_PUBLIC_BOOKIDO_TENANT_SLUG ?? "bookido-demo";
   }
 
   // Apex domain or www — no tenant (marketing / registration)

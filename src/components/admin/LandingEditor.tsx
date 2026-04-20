@@ -226,7 +226,7 @@ export function LandingEditor({ slug, landing, baseDomain }: Props) {
                 className={inputCls}
                 value={form.business_name}
                 onChange={set("business_name")}
-                placeholder="Yorbana Nail Estudio"
+                placeholder="Mi Negocio Belleza"
               />
             </Field>
             <Field label="Tagline" hint="Una frase corta y memorable (máx. 80 chars)">
@@ -286,7 +286,7 @@ export function LandingEditor({ slug, landing, baseDomain }: Props) {
                 className={inputCls}
                 value={form.instagram_url}
                 onChange={set("instagram_url")}
-                placeholder="https://instagram.com/yorbananails"
+                placeholder="https://instagram.com/minegocio"
                 type="url"
               />
             </Field>
@@ -295,7 +295,7 @@ export function LandingEditor({ slug, landing, baseDomain }: Props) {
                 className={inputCls}
                 value={form.tiktok_url}
                 onChange={set("tiktok_url")}
-                placeholder="https://tiktok.com/@yorbananails"
+                placeholder="https://tiktok.com/@minegocio"
                 type="url"
               />
             </Field>
@@ -304,7 +304,7 @@ export function LandingEditor({ slug, landing, baseDomain }: Props) {
                 className={inputCls}
                 value={form.facebook_url}
                 onChange={set("facebook_url")}
-                placeholder="https://facebook.com/yorbananails"
+                placeholder="https://facebook.com/minegocio"
                 type="url"
               />
             </Field>

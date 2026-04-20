@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Reservar cita | Yorbana Nail Estudio · BookiDo",
-  description: "Elige día y hora para tu cita en Yorbana Nail Estudio.",
+  title: "Reservar cita · Bookido",
+  description: "Elige día y hora para tu cita.",
 };
 
 export default function ReservaLayout({
