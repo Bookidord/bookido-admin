@@ -1,11 +1,31 @@
+# Dependencies
 node_modules/
+
+# Next.js build
+.next/
+out/
+
+# Environment
 .env
 .env.*
 !.env.example
+
+# Logs
 *.log
-.next/
+dev-server.log
+
+# Builds
 dist/
-*.db
-*.sqlite
-auth_info_*/
+build/
+
+# OS
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Screenshots generadas (no son código)
+*.png
+*.jpg
+screenshot*.mjs
+screenshots.js
