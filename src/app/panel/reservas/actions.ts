@@ -5,6 +5,7 @@ import { createServiceSupabaseClient } from "@/lib/supabase/admin";
 import { createSsrClient } from "@/lib/supabase/ssr";
 import { getTenantSlug } from "@/lib/tenant";
 import { deleteCalendarEvent, createCalendarEvent } from "@/lib/google-calendar";
+import { sendBookingConfirmation } from "@/lib/email";
 
 async function requireAuth() {
   const supabase = await createSsrClient();
@@ -115,6 +116,56 @@ export async function restoreBookingAction(
 
     revalidatePath("/panel");
     revalidatePath("/panel/reservas");
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+export async function resendBookingEmailAction(
+  id: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    await requireAuth();
+    const admin = createServiceSupabaseClient();
+    if (!admin) return { ok: false, error: "Supabase no configurado." };
+
+    const tenant = await getTenantSlug();
+
+    const { data: booking } = await admin
+      .from("bookido_bookings")
+      .select("customer_name, customer_email, notes, starts_at, service_id")
+      .eq("id", id)
+      .eq("tenant_slug", tenant)
+      .maybeSingle();
+
+    if (!booking) return { ok: false, error: "Reserva no encontrada." };
+
+    let serviceName = "Cita";
+    try {
+      const { data: svc } = await admin
+        .from("bookido_services")
+        .select("name")
+        .eq("id", booking.service_id)
+        .maybeSingle();
+      if (svc?.name) serviceName = svc.name;
+    } catch { /* ignore */ }
+
+    const { data: tenantRow } = await admin
+      .from("tenants")
+      .select("name")
+      .eq("slug", tenant)
+      .maybeSingle();
+
+    await sendBookingConfirmation({
+      to: booking.customer_email,
+      customerName: booking.customer_name,
+      businessName: tenantRow?.name ?? tenant,
+      serviceName,
+      startsAt: new Date(booking.starts_at),
+      notes: booking.notes ?? null,
+    });
+
     return { ok: true };
   } catch (e) {
     return { ok: false, error: (e as Error).message };

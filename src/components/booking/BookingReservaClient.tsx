@@ -91,6 +91,11 @@ export function BookingReservaClient({
   const [notes, setNotes] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [bookedDetails, setBookedDetails] = useState<{
+    serviceName: string;
+    startsAt: Date;
+    customerName: string;
+  } | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const service = useMemo(
@@ -149,6 +154,11 @@ export function BookingReservaClient({
         notes: notes || undefined,
       });
       if (res.ok) {
+        setBookedDetails({
+          serviceName: service.name,
+          startsAt: selectedSlot,
+          customerName: name.trim(),
+        });
         setSuccess(true);
         setName("");
         setEmail("");
@@ -197,30 +207,61 @@ export function BookingReservaClient({
     );
   }
 
-  if (success) {
+  if (success && bookedDetails) {
+    const { serviceName, startsAt, customerName } = bookedDetails;
+    const dateLabel = format(startsAt, "EEEE d 'de' MMMM", { locale: es });
+    const timeLabel = format(startsAt, "HH:mm", { locale: es });
+    const dateCap = dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1);
+
     return (
-      <div className="mx-auto max-w-lg rounded-2xl border border-emerald-500/20 bg-emerald-950/30 p-10 text-center">
-        <p className="text-sm font-medium uppercase tracking-widest text-emerald-400/90">
-          Listo
-        </p>
-        <h1 className="mt-3 font-display text-2xl text-white">
-          Cita solicitada
-        </h1>
-        <p className="mt-4 text-sm text-zinc-400">
-          Te hemos guardado la reserva. Si necesitas cambiar algo, contacta con
-          el estudio.
-        </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+      <div className="mx-auto max-w-lg">
+        {/* Header */}
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/20 px-8 py-10 text-center">
+          {/* Check icon */}
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10">
+            <svg className="h-7 w-7 text-emerald-400" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400/80">
+            Confirmada
+          </p>
+          <h1 className="mt-2 font-display text-2xl text-white">
+            ¡Hasta pronto, {customerName.split(" ")[0]}!
+          </h1>
+          <p className="mt-2 text-sm text-zinc-400">
+            Tu cita ha sido registrada.
+          </p>
+        </div>
+
+        {/* Booking details */}
+        <div className="mt-3 rounded-2xl border border-white/[0.07] bg-ink-900/50 divide-y divide-white/[0.06]">
+          <div className="flex items-center justify-between px-6 py-4">
+            <span className="text-xs uppercase tracking-wider text-zinc-500">Servicio</span>
+            <span className="text-sm font-medium text-zinc-100">{serviceName}</span>
+          </div>
+          <div className="flex items-center justify-between px-6 py-4">
+            <span className="text-xs uppercase tracking-wider text-zinc-500">Fecha</span>
+            <span className="text-sm font-medium text-zinc-100">{dateCap}</span>
+          </div>
+          <div className="flex items-center justify-between px-6 py-4">
+            <span className="text-xs uppercase tracking-wider text-zinc-500">Hora</span>
+            <span className="text-sm font-medium text-zinc-100">{timeLabel}</span>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            onClick={() => setSuccess(false)}
-            className="rounded-full border border-white/15 px-6 py-2.5 text-sm text-zinc-200 hover:bg-white/5"
+            onClick={() => { setSuccess(false); setBookedDetails(null); }}
+            className="flex-1 rounded-full border border-white/15 py-3 text-sm text-zinc-200 hover:bg-white/5 transition"
           >
             Nueva reserva
           </button>
           <Link
             href="/"
-            className="rounded-full bg-[#14F195] px-6 py-2.5 text-center text-sm font-semibold text-ink-950"
+            className="flex-1 rounded-full bg-[#14F195] py-3 text-center text-sm font-semibold text-ink-950 hover:opacity-90 transition"
           >
             Volver al inicio
           </Link>

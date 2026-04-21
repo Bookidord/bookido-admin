@@ -1,9 +1,9 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { cancelBookingAction, restoreBookingAction } from "@/app/panel/reservas/actions";
+import { cancelBookingAction, restoreBookingAction, resendBookingEmailAction } from "@/app/panel/reservas/actions";
 
 type Booking = {
   id: string;
@@ -42,6 +42,7 @@ function StatusBadge({ status }: { status: string }) {
 
 export function BookingCard({ b }: { b: Booking }) {
   const [pending, startTransition] = useTransition();
+  const [emailState, setEmailState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const start = new Date(b.starts_at);
   const confirmed = b.status === "confirmed";
   const cancelled = b.status === "cancelled";
@@ -51,6 +52,13 @@ export function BookingCard({ b }: { b: Booking }) {
       if (confirmed) await cancelBookingAction(b.id);
       else await restoreBookingAction(b.id);
     });
+  }
+
+  async function resendEmail() {
+    setEmailState("sending");
+    const res = await resendBookingEmailAction(b.id);
+    setEmailState(res.ok ? "sent" : "error");
+    setTimeout(() => setEmailState("idle"), 3000);
   }
 
   return (
@@ -90,7 +98,26 @@ export function BookingCard({ b }: { b: Booking }) {
             WhatsApp
           </a>
         )}
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-1">
+          <button
+            type="button"
+            onClick={resendEmail}
+            disabled={emailState === "sending"}
+            title="Reenviar email de confirmación"
+            className={`rounded-lg px-2 py-1.5 text-xs font-medium transition disabled:opacity-40 ${
+              emailState === "sent"
+                ? "text-emerald-400"
+                : emailState === "error"
+                ? "text-red-400"
+                : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
+            }`}
+          >
+            {emailState === "sending" ? "…" : emailState === "sent" ? "✓ Email" : emailState === "error" ? "Error" : (
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            )}
+          </button>
           <button
             type="button"
             onClick={toggle}

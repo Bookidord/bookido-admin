@@ -16,12 +16,27 @@ function SaveBadge({ show }: { show: boolean }) {
   );
 }
 
+type SystemStatus = {
+  sqlite: { ok: boolean; businesses: number; reservas: number; leads: number } | null;
+  supabase: boolean;
+  wa: { connected: boolean; user: string } | null;
+  resend: boolean;
+  timestamp: string;
+};
+
 interface Props {
   alertDays: number;
   adminEmail: string;
+  systemStatus?: SystemStatus;
 }
 
-export function AdminConfigClient({ alertDays, adminEmail }: Props) {
+function StatusDot({ ok }: { ok: boolean }) {
+  return (
+    <span className={`inline-block h-2 w-2 rounded-full ${ok ? "bg-emerald-400" : "bg-red-400"}`} />
+  );
+}
+
+export function AdminConfigClient({ alertDays, adminEmail, systemStatus }: Props) {
   const [pwState, pwAction, pwPending] = useActionState(changeAdminPasswordAction, null);
   const [daysState, daysAction, daysPending] = useActionState(updateAlertDaysAction, null);
 
@@ -175,6 +190,54 @@ export function AdminConfigClient({ alertDays, adminEmail }: Props) {
           </p>
         )}
       </div>
+
+      {/* System status */}
+      {systemStatus && (
+        <div className="rounded-xl border border-white/[0.06] bg-ink-900/40 p-5">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600 mb-4">
+            Estado del sistema
+          </p>
+          <div className="space-y-3">
+            {[
+              {
+                label: "SQLite (bookido-v2)",
+                ok: systemStatus.sqlite?.ok ?? false,
+                detail: systemStatus.sqlite
+                  ? `${systemStatus.sqlite.businesses} negocios · ${systemStatus.sqlite.reservas} reservas · ${systemStatus.sqlite.leads} leads`
+                  : "Sin conexión",
+              },
+              {
+                label: "Supabase (auth + admin DB)",
+                ok: systemStatus.supabase,
+                detail: systemStatus.supabase ? "Conectado" : "Sin conexión",
+              },
+              {
+                label: "WhatsApp Gateway",
+                ok: systemStatus.wa?.connected ?? false,
+                detail: systemStatus.wa?.connected
+                  ? `Conectado · ${systemStatus.wa.user}`
+                  : "Desconectado",
+              },
+              {
+                label: "Resend (email API)",
+                ok: systemStatus.resend,
+                detail: systemStatus.resend ? "API key válida" : "No disponible",
+              },
+            ].map(row => (
+              <div key={row.label} className="flex items-center gap-3">
+                <StatusDot ok={row.ok} />
+                <div className="flex-1">
+                  <p className="text-sm text-zinc-300">{row.label}</p>
+                  <p className="text-xs text-zinc-600">{row.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-[10px] text-zinc-700 font-mono">
+            Actualizado: {new Date(systemStatus.timestamp).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" })}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

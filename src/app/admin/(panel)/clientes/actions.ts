@@ -152,6 +152,35 @@ export async function renovarAction(input: {
   }
 }
 
+export async function impersonarAction(
+  slug: string,
+): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
+  try {
+    await requireAdmin();
+    const admin = createServiceSupabaseClient();
+    if (!admin) return { ok: false, error: "Supabase no configurado." };
+
+    const { data: tenant } = await admin
+      .from("tenants")
+      .select("owner_email")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (!tenant) return { ok: false, error: "Tenant no encontrado." };
+
+    const { data, error } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: tenant.owner_email,
+      options: { redirectTo: `https://${slug}.bookido.online/panel` },
+    });
+    if (error || !data?.properties?.action_link)
+      return { ok: false, error: error?.message ?? "No se pudo generar el enlace." };
+
+    return { ok: true, url: data.properties.action_link };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
 export async function suspenderAction(
   subscription_id: string,
   suspend: boolean,

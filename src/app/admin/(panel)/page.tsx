@@ -1,103 +1,54 @@
-import { createServiceSupabaseClient } from "@/lib/supabase/admin";
-import { format, addDays } from "date-fns";
+import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Link from "next/link";
+import { createServiceSupabaseClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
-function daysRemaining(endDate: string): number {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const end = new Date(endDate + "T00:00:00");
-  return Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+async function getCounts() {
+  const admin = createServiceSupabaseClient();
+  if (!admin) return { total: 0, active: 0, inactive: 0 };
+
+  const { count } = await admin
+    .from("tenants")
+    .select("slug", { count: "exact", head: true });
+
+  const total = count ?? 0;
+  return { total, active: total, inactive: 0 };
 }
 
 export default async function AdminDashboard() {
-  const admin = createServiceSupabaseClient();
-  const today = new Date().toISOString().split("T")[0];
-  const week7 = addDays(new Date(), 7).toISOString().split("T")[0];
-
-  let totalActivos = 0;
-  let expiringSoon = 0;
-  let suspendidos = 0;
-  let ingresosEsteMes = 0;
-  const alertRows: {
-    slug: string;
-    business_name: string;
-    plan_name: string;
-    end_date: string;
-    subscription_id: string;
-    days: number;
-  }[] = [];
-
-  if (admin) {
-    const [
-      { data: subs },
-      { data: plans },
-      { data: tenants },
-      { data: config },
-    ] = await Promise.all([
-      admin.from("bookido_subscriptions").select("id, tenant_slug, plan_id, end_date, status"),
-      admin.from("bookido_plans").select("id, name, duration_days, price_rd"),
-      admin.from("tenants").select("slug, business_name"),
-      admin.from("bookido_admin_config").select("alert_days").eq("id", 1).single(),
-    ]);
-
-    const alertDays: number = (config as { alert_days?: number } | null)?.alert_days ?? 15;
-    const alertCutoff = addDays(new Date(), alertDays).toISOString().split("T")[0];
-
-    const planMap: Record<string, { name: string; price_rd: number | null }> = {};
-    plans?.forEach(p => { planMap[p.id] = { name: p.name, price_rd: p.price_rd }; });
-
-    const tenantMap: Record<string, string> = {};
-    tenants?.forEach(t => { tenantMap[t.slug] = t.business_name; });
-
-    subs?.forEach(s => {
-      if (s.status === "suspended") { suspendidos++; return; }
-      if (s.end_date < today) return; // expired, skip
-
-      totalActivos++;
-      if (s.end_date <= week7) expiringSoon++;
-
-      // Income: count active subscription's plan price
-      const price = planMap[s.plan_id]?.price_rd ?? 0;
-      ingresosEsteMes += price;
-
-      // Alert list
-      if (s.end_date <= alertCutoff) {
-        alertRows.push({
-          slug: s.tenant_slug,
-          business_name: tenantMap[s.tenant_slug] ?? s.tenant_slug,
-          plan_name: planMap[s.plan_id]?.name ?? "—",
-          end_date: s.end_date,
-          subscription_id: s.id,
-          days: daysRemaining(s.end_date),
-        });
-      }
-    });
-
-    alertRows.sort((a, b) => a.days - b.days);
-  }
+  const counts = await getCounts();
 
   const stats = [
-    { label: "Clientes activos", value: totalActivos, accent: "emerald" },
+    {
+      label: "Clientes activos",
+      value: counts.active,
+      sub: `${counts.total} en total`,
+      accent: "emerald",
+    },
     {
       label: "Vencen esta semana",
-      value: expiringSoon,
-      accent: expiringSoon > 0 ? "red" : "zinc",
+      value: "—",
+      sub: "Próximamente",
+      accent: "zinc",
     },
     {
       label: "Ingresos este mes",
-      value: ingresosEsteMes > 0 ? `RD$ ${ingresosEsteMes.toLocaleString()}` : "—",
-      accent: "indigo",
+      value: "—",
+      sub: "Próximamente",
+      accent: "zinc",
     },
-    { label: "Suspendidos", value: suspendidos, accent: suspendidos > 0 ? "amber" : "zinc" },
+    {
+      label: "Suspendidos",
+      value: counts.inactive,
+      sub: "negocios inactivos",
+      accent: counts.inactive > 0 ? "amber" : "zinc",
+    },
   ];
 
   const accentMap: Record<string, string> = {
     emerald: "text-[#14F195]",
-    red: "text-red-400",
-    indigo: "text-indigo-300",
     amber: "text-amber-300",
     zinc: "text-zinc-500",
   };
@@ -112,84 +63,54 @@ export default async function AdminDashboard() {
           Dashboard
         </h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Resumen de clientes y suscripciones.
+          Resumen de clientes y estado del sistema.
         </p>
       </div>
 
       {/* Stats */}
-      <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map(s => (
           <div key={s.label} className="rounded-xl border border-white/[0.06] bg-ink-900/40 p-4">
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-600">{s.label}</p>
             <p className={`mt-2 font-mono text-2xl font-semibold tabular-nums ${accentMap[s.accent]}`}>
               {s.value}
             </p>
+            <p className="mt-1 text-[11px] text-zinc-600">{s.sub}</p>
           </div>
         ))}
       </div>
 
-      {/* Alert section */}
+      {/* Subscription metrics notice */}
+      <div className="mb-8 flex items-center gap-3 rounded-xl border border-indigo-400/15 bg-indigo-500/[0.06] px-5 py-4">
+        <span className="text-indigo-400">ℹ</span>
+        <p className="text-sm text-indigo-300/70">
+          Métricas de suscripción disponibles próximamente — ingresos, vencimientos y renovaciones se activarán al integrar el módulo de pagos.
+        </p>
+      </div>
+
+      {/* Quick links */}
       <div className="rounded-xl border border-white/[0.07] bg-ink-900/40">
         <div className="flex items-center justify-between border-b border-white/[0.07] px-5 py-4">
           <h2 className="font-future text-base font-semibold text-white">
-            Vencimientos próximos
+            Accesos rápidos
           </h2>
-          <Link
-            href="/admin/clientes"
-            className="text-xs text-indigo-300/70 transition hover:text-indigo-200"
-          >
-            Ver todos →
-          </Link>
         </div>
-
-        {alertRows.length === 0 ? (
-          <div className="px-5 py-12 text-center">
-            <p className="text-2xl">✅</p>
-            <p className="mt-3 text-sm text-zinc-500">
-              No hay suscripciones por vencer pronto.
-            </p>
-          </div>
-        ) : (
-          <ul className="divide-y divide-white/[0.04]">
-            {alertRows.map(row => (
-              <li
-                key={row.subscription_id}
-                className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:gap-0"
-              >
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-zinc-100">{row.business_name}</p>
-                  <p className="text-xs text-zinc-600 font-mono">{row.slug}.bookido.online</p>
-                </div>
-                <div className="flex items-center gap-3 sm:ml-auto">
-                  <span className="rounded-full border border-indigo-400/20 bg-indigo-500/10 px-2.5 py-0.5 text-xs text-indigo-300">
-                    {row.plan_name}
-                  </span>
-                  <span
-                    className={`min-w-[80px] text-right text-sm font-semibold tabular-nums ${
-                      row.days <= 0
-                        ? "text-red-400"
-                        : row.days <= 5
-                        ? "text-red-300"
-                        : "text-amber-300"
-                    }`}
-                  >
-                    {row.days <= 0
-                      ? "Expirado"
-                      : row.days === 1
-                      ? "1 día"
-                      : `${row.days} días`}
-                  </span>
-                  <Link
-                    href="/admin/clientes"
-                    className="rounded-lg border border-indigo-400/20 bg-indigo-500/10 px-3 py-1 text-xs text-indigo-300 transition hover:bg-indigo-500/20"
-                  >
-                    Renovar
-                  </Link>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="grid gap-3 p-5 sm:grid-cols-3">
+          {[
+            { href: "/admin/clientes", label: "Ver clientes", desc: `${counts.total} negocios registrados` },
+            { href: "/admin/planes", label: "Gestionar planes", desc: "Precios y configuración" },
+            { href: "/admin/configuracion", label: "Estado del sistema", desc: "PM2, APIs, DB" },
+          ].map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-xl border border-white/[0.06] bg-ink-950/40 p-4 transition hover:border-white/[0.12] hover:bg-ink-900/60"
+            >
+              <p className="text-sm font-medium text-zinc-100">{link.label}</p>
+              <p className="mt-1 text-xs text-zinc-600">{link.desc}</p>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

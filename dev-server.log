@@ -1,0 +1,63 @@
+   ▲ Next.js 15.5.15
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.1.88:3001
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1214ms
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 513ms (173 modules)
+ ○ Compiling /admin/login ...
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (215kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled /admin/login in 2.6s (699 modules)
+ GET /admin/login 200 in 2845ms
+ ✓ Compiled in 523ms (242 modules)
+ ○ Compiling /admin/clientes/[slug]/landing ...
+ ✓ Compiled /admin/clientes/[slug]/landing in 989ms (839 modules)
+ GET /admin/clientes/yorbana-nail-estudio/landing 307 in 2033ms
+ GET /admin/login 200 in 49ms
+ ○ Compiling /admin ...
+ ✓ Compiled /admin in 806ms (1407 modules)
+ GET /admin 200 in 336ms
+ GET /admin 200 in 1414ms
+ POST /admin/login 303 in 1659ms
+ GET /admin/clientes/yorbana-nail-estudio/landing 404 in 174ms
+ ✓ Compiled / in 351ms (1396 modules)
+ GET / 307 in 634ms
+ ○ Compiling /reserva ...
+ ✓ Compiled /reserva in 793ms (3308 modules)
+ GET /reserva 200 in 1103ms
+ GET /admin/login 200 in 48ms
+ GET /admin 200 in 354ms
+ POST /admin/login 303 in 657ms
+ GET /admin/clientes/yorbana-nail-estudio/landing 404 in 165ms
+ GET / 307 in 162ms
+ GET /reserva 200 in 162ms
+ ✓ Compiled in 565ms (3322 modules)
+ GET /admin/login 200 in 141ms
+ GET /admin 200 in 377ms
+ POST /admin/login 303 in 630ms
+[landing/page] tenant error: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column tenants.business_name does not exist'
+}
+ GET /admin/clientes/yorbana-nail-estudio/landing 404 in 161ms
+ ⨯ Failed to generate static paths for /admin/clientes/[slug]/landing:
+TypeError: __webpack_modules__[moduleId] is not a function
+    at eval (webpack-internal:///(rsc)/./src/app/admin/(panel)/layout.tsx:7:70)
+    at <unknown> (rsc)/./src/app/admin/(panel)/layout.tsx (C:\Users\debai\bookido\.next\server\app\admin\(panel)\clientes\[slug]\landing\page.js:139:1) {
+  type: 'TypeError'
+}
+ GET / 307 in 153ms
+ GET /reserva 200 in 192ms
+ ⨯ TypeError: __webpack_modules__[moduleId] is not a function
+    at eval (webpack-internal:///(rsc)/./src/app/admin/(panel)/layout.tsx:7:70)
+    at <unknown> (rsc)/./src/app/admin/(panel)/layout.tsx (C:\Users\debai\bookido\.next\server\app\admin\(panel)\clientes\[slug]\landing\page.js:139:1) {
+  type: 'TypeError',
+  page: '/admin/clientes/yorbana-nail-estudio/landing'
+}
+ ✓ Compiled /_error in 404ms (3654 modules)
+ GET /admin/clientes/yorbana-nail-estudio/landing 500 in 1061ms
+[?25h

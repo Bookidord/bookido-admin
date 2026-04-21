@@ -73,15 +73,8 @@ export async function POST(request: NextRequest) {
     // ── Create tenant row ────────────────────────────────────────────────────
     const { error: tenantError } = await admin.from("tenants").insert({
       slug: cleanSlug,
-      business_name: business_name.trim(),
-      email: owner_email.trim().toLowerCase(),
-      plan: "basic",
-      is_active: true,
-      whatsapp: "",
-      open_hour: 9,
-      close_hour: 19,
-      description: "",
-      primary_color: "#be185d",
+      name: business_name.trim(),
+      owner_email: owner_email.trim().toLowerCase(),
     });
 
     if (tenantError) {

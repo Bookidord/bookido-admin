@@ -3,6 +3,7 @@
 import { addMinutes } from "date-fns";
 import { createServiceSupabaseClient } from "@/lib/supabase/admin";
 import { createCalendarEvent } from "@/lib/google-calendar";
+import { sendBookingConfirmation } from "@/lib/email";
 
 const SERVICES = "bookido_services";
 const BOOKINGS = "bookido_bookings";
@@ -125,6 +126,29 @@ export async function createBookingAction(input: {
 
   if (insertErr) {
     return { ok: false, error: insertErr.message };
+  }
+
+  // ── Email de confirmación (non-blocking) ─────────────────────────────────
+  if (newBooking?.id) {
+    (async () => {
+      try {
+        const { data: tenant } = await admin
+          .from("tenants")
+          .select("name")
+          .eq("slug", input.tenantSlug)
+          .maybeSingle();
+        await sendBookingConfirmation({
+          to: email,
+          customerName: name,
+          businessName: tenant?.name ?? input.tenantSlug,
+          serviceName: svc.name,
+          startsAt,
+          notes: input.notes ?? null,
+        });
+      } catch (err) {
+        console.error("[reserva] Email confirmation failed:", err);
+      }
+    })();
   }
 
   // ── Google Calendar sync (non-blocking) ───────────────────────────────────

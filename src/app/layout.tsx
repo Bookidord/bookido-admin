@@ -26,8 +26,7 @@ const syne = Syne({
 
 export const metadata: Metadata = {
   title: "Bookido",
-  description:
-    "Nail estudio en Gustavo Mejía Ricart, Santo Domingo: manicura, pedicura y nail art. Elegancia futurista. Reserva por WhatsApp o BookiDo.",
+  description: "Gestión de reservas online para negocios de belleza y servicios.",
 };
 
 export default function RootLayout({

@@ -31,19 +31,21 @@ export async function getSettings(): Promise<BusinessSettings> {
     const slug = await getTenantSlug();
     const { data } = await admin
       .from("tenants")
-      .select("business_name, whatsapp, open_hour, close_hour, description, primary_color")
+      .select("name, settings")
       .eq("slug", slug)
       .single();
 
     if (!data) return { ...DEFAULTS };
 
+    const s = (data.settings ?? {}) as Record<string, unknown>;
+
     return {
-      business_name: data.business_name ?? DEFAULTS.business_name,
-      whatsapp:       data.whatsapp      ?? DEFAULTS.whatsapp,
-      open_hour:      data.open_hour     ?? DEFAULTS.open_hour,
-      close_hour:     data.close_hour    ?? DEFAULTS.close_hour,
-      description:    data.description   ?? DEFAULTS.description,
-      primary_color:  data.primary_color ?? DEFAULTS.primary_color,
+      business_name: (data.name as string)              ?? DEFAULTS.business_name,
+      whatsapp:      (s.whatsapp as string)              ?? DEFAULTS.whatsapp,
+      open_hour:     (s.open_hour as number)             ?? DEFAULTS.open_hour,
+      close_hour:    (s.close_hour as number)            ?? DEFAULTS.close_hour,
+      description:   (s.description as string)           ?? DEFAULTS.description,
+      primary_color: (s.primary_color as string)         ?? DEFAULTS.primary_color,
     };
   } catch {
     return { ...DEFAULTS };
