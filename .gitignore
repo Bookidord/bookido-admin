@@ -1,0 +1,49 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# env files — NEVER commit secrets
+.env
+.env.local
+.env.production
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+*.log
+dev-server.log
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# misc
+.DS_Store
+*.pem
+.vercel
+
+# screenshots / media artifacts
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.zip
+screenshot*.mjs
+screenshots.js
+screenshot*.js
+
+# testing
+/coverage
+.env.production
