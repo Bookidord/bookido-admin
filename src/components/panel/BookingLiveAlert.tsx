@@ -131,12 +131,14 @@ export function BookingLiveAlert({ tenantSlug }: Props) {
       .on("postgres_changes", {
         event: "INSERT", schema: "public",
         table: "bookido_bookings",
-        filter: `tenant_slug=eq.${tenantSlug}`,
       }, async (payload) => {
         const row = payload.new as {
           id: string; customer_name: string; customer_phone: string | null;
           service_id: string; starts_at: string; notes: string | null;
+          tenant_slug: string;
         };
+        // Filter client-side (server filter requires REPLICA IDENTITY FULL)
+        if (row.tenant_slug !== tenantSlug) return;
         let serviceName = "Reserva";
         try {
           const { data } = await supabase.from("bookido_services").select("name").eq("id", row.service_id).maybeSingle();
