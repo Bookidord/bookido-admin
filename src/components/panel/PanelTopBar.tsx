@@ -28,11 +28,18 @@ function weatherTheme(code: number | null): { bg: string; glow: string; emoji: s
   return                     { bg: "from-purple-950/60 via-slate-900/60 to-ink-950/80", glow: "shadow-[0_1px_12px_0_rgba(192,132,252,0.15)]", emoji: "⛈️", label: "Tormenta" };
 }
 
+function parseDate(iso: string) {
+  return new Date(iso.replace(" ", "T"));
+}
 function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString("es-DO", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Santo_Domingo" });
+  const d = parseDate(iso);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleTimeString("es-DO", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Santo_Domingo" });
 }
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("es-DO", { day: "numeric", month: "short", timeZone: "America/Santo_Domingo" });
+  const d = parseDate(iso);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("es-DO", { day: "numeric", month: "short", timeZone: "America/Santo_Domingo" });
 }
 
 const STORAGE_KEY = (slug: string) => `bookido_notif_seen_${slug}`;
