@@ -58,11 +58,25 @@ export default async function ConfiguracionPage() {
       }
       if (sdRes.data) specialDays = sdRes.data;
       if (tenantRes.data) tenantExtra = tenantRes.data;
-      // Load landing config from Storage JSON (no DB columns needed)
+      // Load landing config from Storage JSON (photos, bio, diplomas, stats)
       try {
         const { data: blob } = await admin.storage.from("bookido-media").download(`config/${tenant}.json`);
         if (blob) { const text = await blob.text(); landingConfig = JSON.parse(text); }
       } catch { /* no config yet */ }
+      // Merge social fields from bookido_landings
+      try {
+        const { data: social } = await admin.from("bookido_landings")
+          .select("instagram_url, tiktok_url, facebook_url")
+          .eq("tenant_slug", tenant).maybeSingle();
+        if (social) {
+          landingConfig = {
+            ...(landingConfig ?? {} as import("@/app/panel/configuracion/actions").LandingConfig),
+            instagram_url: social.instagram_url ?? null,
+            tiktok_url:    social.tiktok_url    ?? null,
+            facebook_url:  social.facebook_url  ?? null,
+          } as import("@/app/panel/configuracion/actions").LandingConfig;
+        }
+      } catch { /* landing row may not exist */ }
     } catch { /* tables may not exist yet — use defaults */ }
   }
 

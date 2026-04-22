@@ -212,6 +212,38 @@ export function LandingTab({ config, tenant }: { config: LandingConfig; tenant: 
         </div>
       </div>
 
+      {/* ── Redes sociales ───────────────────────────────────────────── */}
+      <div>
+        <h3 className="mb-1 text-sm font-semibold text-white">Redes sociales</h3>
+        <p className="mb-5 text-xs text-zinc-500">Aparecen como botones en tu landing. Deja en blanco para ocultar.</p>
+        <div className="flex flex-col gap-4">
+          <div>
+            <Label>Instagram</Label>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">📸</span>
+              <input type="url" value={c.instagram_url ?? ""} onChange={e => set("instagram_url", e.target.value || null)}
+                placeholder="https://instagram.com/tunegocio" className={INPUT_CLS} />
+            </div>
+          </div>
+          <div>
+            <Label>TikTok</Label>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🎵</span>
+              <input type="url" value={c.tiktok_url ?? ""} onChange={e => set("tiktok_url", e.target.value || null)}
+                placeholder="https://tiktok.com/@tunegocio" className={INPUT_CLS} />
+            </div>
+          </div>
+          <div>
+            <Label>Facebook</Label>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">👥</span>
+              <input type="url" value={c.facebook_url ?? ""} onChange={e => set("facebook_url", e.target.value || null)}
+                placeholder="https://facebook.com/tunegocio" className={INPUT_CLS} />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ── Footer ───────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between gap-4 border-t border-white/[0.06] pt-6">
         <a href={previewUrl} target="_blank" rel="noopener noreferrer"

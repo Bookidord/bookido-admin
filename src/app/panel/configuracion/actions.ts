@@ -54,6 +54,9 @@ export type LandingConfig = {
   diploma_urls: string[] | null;
   stats_years: number | null;
   stats_clients: number | null;
+  instagram_url: string | null;
+  tiktok_url: string | null;
+  facebook_url: string | null;
 };
 
 export async function saveLandingAction(
@@ -65,7 +68,7 @@ export async function saveLandingAction(
     if (!admin) return { ok: false, error: "Supabase no configurado." };
     const slug = await getTenantSlug();
 
-    // Store extended config in Supabase Storage (no DB migration needed)
+    // Store extended config in Supabase Storage (photos, bio, diplomas, stats)
     const json = JSON.stringify(data);
     const blob = new Blob([json], { type: "application/json" });
     const { error } = await admin.storage
@@ -73,6 +76,14 @@ export async function saveLandingAction(
       .upload(`config/${slug}.json`, blob, { contentType: "application/json", upsert: true });
 
     if (error) return { ok: false, error: error.message };
+
+    // Save social media fields to bookido_landings table
+    await admin.from("bookido_landings").update({
+      instagram_url: data.instagram_url || null,
+      tiktok_url:    data.tiktok_url    || null,
+      facebook_url:  data.facebook_url  || null,
+    }).eq("tenant_slug", slug);
+
     revalidatePath("/");
     revalidatePath("/panel/configuracion");
     return { ok: true };
