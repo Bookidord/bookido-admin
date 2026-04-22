@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { createSsrClient } from "@/lib/supabase/ssr";
 import { createServiceSupabaseClient } from "@/lib/supabase/admin";
 import { getTenantSlug } from "@/lib/tenant";
+import { getSettings } from "@/lib/settings";
 import { Sidebar } from "@/components/panel/Sidebar";
 import { PanelTopBar } from "@/components/panel/PanelTopBar";
 import { BookingLiveAlert } from "@/components/panel/BookingLiveAlert";
@@ -67,7 +68,7 @@ export default async function PanelLayout({
   children: React.ReactNode;
 }) {
   const tenantSlug = await getTenantSlug();
-  const newsItems = await fetchNewsItems();
+  const [newsItems, settings] = await Promise.all([fetchNewsItems(), getSettings()]);
 
   // Allow superadmin impersonation (cookie set by /api/imp)
   const cookieStore = await cookies();
@@ -85,7 +86,7 @@ export default async function PanelLayout({
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-ink-950 lg:flex-row">
-      <Sidebar userEmail={userEmail ?? "superadmin"} />
+      <Sidebar userEmail={userEmail ?? "superadmin"} instagram={settings.instagram} facebook={settings.facebook} whatsapp={settings.whatsapp} />
       <div className="flex flex-1 flex-col overflow-hidden relative">
         {/* Ambient background orbs */}
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">

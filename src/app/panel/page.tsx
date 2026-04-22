@@ -464,41 +464,6 @@ export default async function PanelPage() {
         )}
       </div>
 
-      {/* Weekly summary */}
-      <div className="mt-6 rounded-xl border border-white/[0.07] bg-ink-900/40 p-5">
-        <h2 className="mb-4 font-future text-base font-semibold text-white">
-          Resumen de la semana
-        </h2>
-        <div className="flex items-end gap-2" style={{ height: 64 }}>
-          {weekDayLabels.map((label, i) => {
-            const count = weekDayCounts[i];
-            // Min 60% for days with bookings, scale proportionally above that
-            const rawPct = Math.round((count / maxWeekDay) * 100);
-            const barPct = count > 0 ? Math.max(60, rawPct) : 6;
-            const isToday = i === (getDay(now) === 0 ? 6 : getDay(now) - 1);
-            return (
-              <div key={label} className="flex flex-1 flex-col items-center gap-1.5">
-                <span className="text-[10px] text-zinc-500 leading-none" style={{ minHeight: 14 }}>
-                  {count > 0 ? count : ""}
-                </span>
-                <div className="flex w-full flex-col justify-end flex-1">
-                  <div
-                    className={`w-full rounded-md transition-all ${isToday ? "bg-[#14F195]/60" : count > 0 ? "bg-white/20" : "bg-white/[0.05]"}`}
-                    style={{ height: `${barPct}%` }}
-                  />
-                </div>
-                <span className={`text-[10px] font-medium uppercase tracking-wide leading-none ${isToday ? "text-[#14F195]" : "text-zinc-600"}`}>
-                  {label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-        <p className="mt-3 text-xs text-zinc-600">
-          {statsWeek} {statsWeek === 1 ? "reserva confirmada" : "reservas confirmadas"} esta semana
-        </p>
-      </div>
-
       {/* Peak hour + Top clients */}
       <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {/* Hora pico */}

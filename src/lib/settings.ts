@@ -8,6 +8,8 @@ export type BusinessSettings = {
   close_hour: number;
   description: string;
   primary_color: string;
+  instagram: string;
+  facebook: string;
 };
 
 const DEFAULTS: BusinessSettings = {
@@ -17,6 +19,8 @@ const DEFAULTS: BusinessSettings = {
   close_hour: 20,
   description: "",
   primary_color: "#14F195",
+  instagram: "",
+  facebook: "",
 };
 
 /**
@@ -46,6 +50,8 @@ export async function getSettings(): Promise<BusinessSettings> {
       close_hour:    (s.close_hour as number)            ?? DEFAULTS.close_hour,
       description:   (s.description as string)           ?? DEFAULTS.description,
       primary_color: (s.primary_color as string)         ?? DEFAULTS.primary_color,
+      instagram:     (s.instagram as string)              ?? DEFAULTS.instagram,
+      facebook:      (s.facebook as string)               ?? DEFAULTS.facebook,
     };
   } catch {
     return { ...DEFAULTS };

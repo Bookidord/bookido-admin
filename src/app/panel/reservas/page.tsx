@@ -3,6 +3,7 @@ import { getTenantSlug } from "@/lib/tenant";
 import { BookingRow } from "@/components/panel/BookingRow";
 import { BookingCard } from "@/components/panel/BookingCard";
 import Link from "next/link";
+import { startOfWeek, endOfWeek, getDay } from "date-fns";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,10 @@ export default async function ReservasPage({
   const { status = "all", days = "30" } = await searchParams;
   const admin = createServiceSupabaseClient();
   const tenant = await getTenantSlug();
+
+  const now = new Date();
+  const weekDayCounts: number[] = [0, 0, 0, 0, 0, 0, 0];
+  let statsWeek = 0;
 
   let bookings: {
     id: string;
@@ -33,6 +38,23 @@ export default async function ReservasPage({
   let total = 0;
 
   if (admin) {
+    // Week bar chart data
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+    const { data: weekBookings } = await admin
+      .from("bookido_bookings")
+      .select("starts_at")
+      .eq("tenant_slug", tenant)
+      .eq("status", "confirmed")
+      .gte("starts_at", weekStart.toISOString())
+      .lte("starts_at", weekEnd.toISOString());
+    statsWeek = weekBookings?.length ?? 0;
+    weekBookings?.forEach((b) => {
+      const d = getDay(new Date(b.starts_at));
+      const idx = d === 0 ? 6 : d - 1;
+      weekDayCounts[idx]++;
+    });
+
     const since = new Date();
     since.setDate(since.getDate() - parseInt(days, 10));
 
@@ -123,6 +145,44 @@ export default async function ReservasPage({
           ))}
         </div>
       </div>
+
+      {/* Weekly summary chart */}
+      {(() => {
+        const weekDayLabels = ["L", "M", "X", "J", "V", "S", "D"];
+        const maxWeekDay = Math.max(...weekDayCounts, 1);
+        return (
+          <div className="mb-6 rounded-xl border border-white/[0.07] bg-ink-900/40 p-5">
+            <h2 className="mb-4 font-future text-base font-semibold text-white">Resumen de la semana</h2>
+            <div className="flex items-end gap-2" style={{ height: 64 }}>
+              {weekDayLabels.map((label, i) => {
+                const count = weekDayCounts[i];
+                const rawPct = Math.round((count / maxWeekDay) * 100);
+                const barPct = count > 0 ? Math.max(60, rawPct) : 6;
+                const isToday = i === (getDay(now) === 0 ? 6 : getDay(now) - 1);
+                return (
+                  <div key={label} className="flex flex-1 flex-col items-center gap-1.5">
+                    <span className="text-[10px] text-zinc-500 leading-none" style={{ minHeight: 14 }}>
+                      {count > 0 ? count : ""}
+                    </span>
+                    <div className="flex w-full flex-col justify-end flex-1">
+                      <div
+                        className={`w-full rounded-md transition-all ${isToday ? "bg-[#14F195]/60" : count > 0 ? "bg-white/20" : "bg-white/[0.05]"}`}
+                        style={{ height: `${barPct}%` }}
+                      />
+                    </div>
+                    <span className={`text-[10px] font-medium uppercase tracking-wide leading-none ${isToday ? "text-[#14F195]" : "text-zinc-600"}`}>
+                      {label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-xs text-zinc-600">
+              {statsWeek} {statsWeek === 1 ? "reserva confirmada" : "reservas confirmadas"} esta semana
+            </p>
+          </div>
+        );
+      })()}
 
       {/* Mobile card list (< sm) */}
       <div className="sm:hidden space-y-3">
