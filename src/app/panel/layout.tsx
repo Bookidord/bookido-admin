@@ -7,20 +7,25 @@ import { Sidebar } from "@/components/panel/Sidebar";
 import { PanelTopBar } from "@/components/panel/PanelTopBar";
 
 async function fetchNewsItems(): Promise<string[]> {
-  try {
-    const res = await fetch("https://listindiario.com/rss", {
-      next: { revalidate: 600 },
-    });
-    if (!res.ok) return [];
-    const xml = await res.text();
-    const matches = [...xml.matchAll(/<item>[\s\S]*?<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/gm)];
-    return matches
-      .map((m) => m[1].replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#039;/g, "'").trim())
-      .filter(Boolean)
-      .slice(0, 10);
-  } catch {
-    return [];
+  const feeds = [
+    "https://listindiario.com/rss",
+    "https://diariolibre.com/rss",
+    "https://elnacional.com.do/feed/",
+  ];
+  for (const url of feeds) {
+    try {
+      const res = await fetch(url, { next: { revalidate: 600 }, signal: AbortSignal.timeout(4000) });
+      if (!res.ok) continue;
+      const xml = await res.text();
+      const matches = [...xml.matchAll(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/gm)];
+      const items = matches
+        .map((m) => m[1].replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/<[^>]+>/g, "").trim())
+        .filter((t) => t.length > 15 && !t.toLowerCase().includes("listín") && !t.toLowerCase().includes("diario libre") && !t.toLowerCase().includes("el nacional"))
+        .slice(0, 12);
+      if (items.length >= 3) return items;
+    } catch { /* try next */ }
   }
+  return [];
 }
 
 async function getSubscriptionBanner(tenantSlug: string) {
