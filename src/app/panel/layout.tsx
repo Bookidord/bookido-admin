@@ -5,6 +5,7 @@ import { createServiceSupabaseClient } from "@/lib/supabase/admin";
 import { getTenantSlug } from "@/lib/tenant";
 import { Sidebar } from "@/components/panel/Sidebar";
 import { PanelTopBar } from "@/components/panel/PanelTopBar";
+import { BookingLiveAlert } from "@/components/panel/BookingLiveAlert";
 
 async function fetchNewsItems(): Promise<string[]> {
   const feeds = [
@@ -85,10 +86,17 @@ export default async function PanelLayout({
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-ink-950 lg:flex-row">
       <Sidebar userEmail={userEmail ?? "superadmin"} />
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden relative">
+        {/* Ambient background orbs */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -top-32 -left-32 h-80 w-80 rounded-full bg-emerald-500/5 blur-3xl animate-[pulse_8s_ease-in-out_infinite]" />
+          <div className="absolute top-1/3 -right-24 h-72 w-72 rounded-full bg-violet-500/5 blur-3xl animate-[pulse_11s_ease-in-out_infinite_2s]" />
+          <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-cyan-500/4 blur-3xl animate-[pulse_14s_ease-in-out_infinite_4s]" />
+        </div>
         {banner && <SubscriptionBanner banner={banner} />}
         <PanelTopBar newsItems={newsItems} tenantSlug={tenantSlug} />
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto relative">{children}</main>
+        <BookingLiveAlert tenantSlug={tenantSlug} />
       </div>
     </div>
   );
