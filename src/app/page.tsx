@@ -8,10 +8,10 @@ export const dynamic = "force-dynamic";
 
 function computeIsOpenNow(hours: { day_of_week: number; open_time: string; close_time: string; is_closed: boolean }[]): boolean | null {
   if (!hours.length) return null;
-  const now = new Date();
-  // Use UTC as proxy — no tenant TZ stored yet
-  const day = now.getUTCDay(); // 0=Sun
-  const hhmm = now.getUTCHours() * 60 + now.getUTCMinutes();
+  // Use Santo Domingo timezone (UTC-4) — where all tenants are based
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Santo_Domingo" }));
+  const day  = now.getDay();
+  const hhmm = now.getHours() * 60 + now.getMinutes();
   const today = hours.find((h) => h.day_of_week === day);
   if (!today) return null;
   if (today.is_closed) return false;

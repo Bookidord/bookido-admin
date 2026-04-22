@@ -265,7 +265,7 @@ function Gallery({ photos }: { photos: string[] }) {
           onClick={() => setOpen(null)}
         >
           <button
-            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
             onClick={() => setOpen(null)}
           >
             ✕
@@ -273,11 +273,11 @@ function Gallery({ photos }: { photos: string[] }) {
           {photos.length > 1 && (
             <>
               <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+                className="absolute left-2 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition hover:bg-white/20 sm:left-4"
                 onClick={(e) => { e.stopPropagation(); setOpen((open - 1 + photos.length) % photos.length); }}
               >‹</button>
               <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+                className="absolute right-2 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-2xl text-white transition hover:bg-white/20 sm:right-4"
                 onClick={(e) => { e.stopPropagation(); setOpen((open + 1) % photos.length); }}
               >›</button>
             </>
@@ -375,15 +375,17 @@ export function LandingPage({
   const vidId = landing.owner_video_url ? youtubeId(landing.owner_video_url) : null;
   const hasOwner = !!(landing.owner_name || landing.owner_photo_url || landing.owner_bio);
   const hasDiplomas = diplomas.length > 0;
-  const hasStats = !!(landing.stats_years || landing.stats_clients);
+  const hasStats = !!(landing.stats_years || landing.stats_clients || services.length);
   const hasServices = services.length > 0;
 
   const fomoLabel = fomoLastMinutes !== null
-    ? fomoLastMinutes < 60
-      ? `Última reserva hace ${fomoLastMinutes} min`
-      : fomoLastMinutes < 1440
-        ? `Última reserva hace ${Math.floor(fomoLastMinutes / 60)}h`
-        : null
+    ? fomoLastMinutes < 2
+      ? "Reserva hace instantes"
+      : fomoLastMinutes < 60
+        ? `Última reserva hace ${fomoLastMinutes} min`
+        : fomoLastMinutes < 1440
+          ? `Última reserva hace ${Math.floor(fomoLastMinutes / 60)}h`
+          : null
     : null;
 
   return (
