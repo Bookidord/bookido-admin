@@ -186,7 +186,18 @@ export function DashboardExtras({
               </p>
             </>
           ) : (
-            <p className="text-sm text-zinc-600">Sin reservas confirmadas hoy</p>
+            <div className="mt-1">
+              <p className="text-sm text-zinc-500">Agenda disponible hoy</p>
+              <a
+                href="/panel/reservas/nueva"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-pink-500/10 px-3 py-1.5 text-xs font-medium text-pink-300 transition hover:bg-pink-500/20"
+              >
+                <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Agregar reserva
+              </a>
+            </div>
           )}
         </div>
 

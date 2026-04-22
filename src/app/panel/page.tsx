@@ -321,14 +321,21 @@ export default async function PanelPage() {
   return (
     <div className="mx-auto max-w-5xl px-5 py-8 lg:px-8 lg:py-10">
       {/* Header */}
-      <div className="mb-8">
-        <p className="text-xs font-medium text-zinc-500">{dateLabel}</p>
-        <h1 className="mt-1 font-future text-2xl font-semibold text-white md:text-3xl">
-          {greeting.emoji} {greeting.text}
-        </h1>
-        {phraseOfDay && (
-          <p className="mt-1 text-sm text-zinc-500 italic">{phraseOfDay}</p>
-        )}
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-medium text-zinc-500">{dateLabel}</p>
+          <h1 className="mt-1 font-future text-2xl font-semibold text-white md:text-3xl">
+            {greeting.emoji} {greeting.text}
+          </h1>
+          {phraseOfDay && (
+            <p className="mt-1 text-sm text-zinc-500 italic">{phraseOfDay}</p>
+          )}
+        </div>
+        <CopyLinkButton bookingUrl={
+          process.env.NODE_ENV === "production"
+            ? `https://${tenant}.bookido.online/reserva`
+            : "/reserva"
+        } />
       </div>
 
       {/* Stats row — 6 cards */}
@@ -532,38 +539,6 @@ export default async function PanelPage() {
             <p className="mt-4 text-sm text-zinc-600">Sin reservas este mes</p>
           )}
         </div>
-      </div>
-
-      {/* Quick actions */}
-      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        {/* Nueva reserva — primary */}
-        <Link
-          href="/panel/reservas/nueva"
-          className="flex items-center gap-3 rounded-xl bg-[#14F195] px-4 py-3.5 text-sm font-semibold text-[#0A0A0F] transition hover:opacity-90"
-        >
-          <svg className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          Nueva reserva
-        </Link>
-
-        {/* Ver reservas de hoy */}
-        <Link
-          href="/panel/reservas"
-          className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-ink-900/40 px-4 py-3.5 text-sm text-zinc-300 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
-        >
-          <svg className="h-4 w-4 flex-shrink-0 text-zinc-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          Ver reservas de hoy
-        </Link>
-
-        {/* Compartir enlace */}
-        <CopyLinkButton bookingUrl={
-          process.env.NODE_ENV === "production"
-            ? `https://${tenant}.bookido.online/reserva`
-            : "/reserva"
-        } />
       </div>
 
       {/* ── Dashboard extras (módulos 7-13) ─────────────────────────────── */}
