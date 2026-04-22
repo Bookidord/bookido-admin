@@ -321,6 +321,32 @@ function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
   );
 }
 
+// ── Back to top ───────────────────────────────────────────────────────────────
+function BackToTop() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 400);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <button
+      aria-label="Volver arriba"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="fixed bottom-24 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-full text-xl shadow-lg transition-all duration-300"
+      style={{
+        background: "linear-gradient(135deg, rgb(var(--hero) / 0.9), rgb(var(--hero) / 0.6))",
+        boxShadow: "0 4px 20px rgb(var(--hero) / 0.45)",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0) scale(1)" : "translateY(12px) scale(0.8)",
+        pointerEvents: visible ? "auto" : "none",
+      }}
+    >
+      💅
+    </button>
+  );
+}
+
 // ── Mesh gradient hero background ─────────────────────────────────────────────
 function MeshGradient() {
   return (
@@ -390,6 +416,9 @@ export function LandingPage({
 
   return (
     <div className="min-h-dvh overflow-x-hidden bg-zinc-950 text-white">
+
+      {/* ── Back to top ───────────────────────────────────────────────── */}
+      <BackToTop />
 
       {/* ── Floating WhatsApp ──────────────────────────────────────────── */}
       {waLink && (
