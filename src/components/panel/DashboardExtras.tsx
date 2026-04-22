@@ -64,11 +64,6 @@ export function DashboardExtras({
   return (
     <div className="space-y-4 mt-6">
 
-      {/* ── Frase motivacional ──────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-white/[0.06] bg-gradient-to-r from-violet-950/40 to-ink-900/40 px-5 py-3">
-        <p className="text-sm font-medium text-violet-200">{phraseOfDay}</p>
-      </div>
-
       {/* ── Row 1: Próximo turno + Racha / Récord ──────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 

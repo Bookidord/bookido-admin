@@ -326,9 +326,9 @@ export default async function PanelPage() {
         <h1 className="mt-1 font-future text-2xl font-semibold text-white md:text-3xl">
           {greeting.emoji} {greeting.text}
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Aquí tienes el resumen del día.
-        </p>
+        {phraseOfDay && (
+          <p className="mt-1 text-sm text-zinc-500 italic">{phraseOfDay}</p>
+        )}
       </div>
 
       {/* Stats row — 6 cards */}
