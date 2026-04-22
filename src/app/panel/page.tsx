@@ -295,14 +295,6 @@ export default async function PanelPage() {
       accent: "emerald",
     },
     {
-      label: "Próximo turno",
-      value: nextBooking ? format(new Date(nextBooking.starts_at), "HH:mm") : "—",
-      sub: nextBooking
-        ? `${nextBooking.customer_name}${!nextBooking.is_today ? " · " + format(new Date(nextBooking.starts_at), "d MMM", { locale: es }) : ""}`
-        : null,
-      accent: "blue",
-    },
-    {
       label: "Por confirmar",
       value: statsPending,
       sub: statsPending === 1 ? "pendiente" : "pendientes",

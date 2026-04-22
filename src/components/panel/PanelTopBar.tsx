@@ -82,14 +82,15 @@ export function PanelTopBar({ newsItems, tenantSlug }: Props) {
     return () => clearInterval(id);
   }, [newsItems.length]);
 
-  // Poll new bookings every 30s
+  // Load missed bookings once on mount (since last visit), then listen for live events
   useEffect(() => {
     const supabase = createBrowserSupabaseClient();
     if (!supabase) return;
 
-    async function fetchNew() {
+    // One-time fetch of what came in while you were away
+    (async () => {
       const lastSeen = localStorage.getItem(STORAGE_KEY(tenantSlug)) ?? new Date(0).toISOString();
-      const { data } = await supabase!
+      const { data } = await supabase
         .from("bookido_bookings")
         .select("id, customer_name, service_id, starts_at, notes, created_at")
         .eq("tenant_slug", tenantSlug)
@@ -97,11 +98,9 @@ export function PanelTopBar({ newsItems, tenantSlug }: Props) {
         .order("created_at", { ascending: false })
         .limit(20);
       if (!data?.length) return;
-
       const serviceIds = [...new Set(data.map((b) => b.service_id).filter(Boolean))];
-      const { data: svcs } = await supabase!.from("bookido_services").select("id, name").in("id", serviceIds);
+      const { data: svcs } = await supabase.from("bookido_services").select("id, name").in("id", serviceIds);
       const svcMap = Object.fromEntries((svcs ?? []).map((s) => [s.id, s.name]));
-
       setNotifs(data.map((b) => ({
         id: b.id,
         customer_name: b.customer_name,
@@ -110,11 +109,15 @@ export function PanelTopBar({ newsItems, tenantSlug }: Props) {
         notes: b.notes ?? null,
         created_at: b.created_at,
       })));
-    }
+    })();
 
-    fetchNew();
-    const id = setInterval(fetchNew, 30_000);
-    return () => clearInterval(id);
+    // Listen for live bookings dispatched by BookingLiveAlert (no duplicate fetch)
+    function onLive(e: Event) {
+      const b = (e as CustomEvent<Notif>).detail;
+      setNotifs((prev) => [b, ...prev.filter((n) => n.id !== b.id)].slice(0, 20));
+    }
+    window.addEventListener("bookido:newbooking", onLive);
+    return () => window.removeEventListener("bookido:newbooking", onLive);
   }, [tenantSlug]);
 
   // Close dropdown on outside click

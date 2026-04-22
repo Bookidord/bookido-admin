@@ -85,14 +85,17 @@ export function BookingLiveAlert({ tenantSlug }: Props) {
             if (data?.name) serviceName = data.name;
           } catch { /* ignore */ }
 
-          addToast({
+          const booking = {
             id: row.id,
             customer_name: row.customer_name,
             customer_phone: row.customer_phone,
             service_name: serviceName,
             starts_at: row.starts_at,
             notes: row.notes,
-          });
+          };
+          addToast(booking);
+          // Feed the bell counter without a second DB query
+          window.dispatchEvent(new CustomEvent("bookido:newbooking", { detail: booking }));
         }
       )
       .subscribe();
