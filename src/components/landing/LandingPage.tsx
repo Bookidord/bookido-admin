@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { AnimateIn } from "./AnimateIn";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -25,25 +25,91 @@ export type LandingData = {
   facebook_url: string | null;
   show_booking_button: boolean;
   custom_cta_text: string;
-  // Owner
   owner_name: string | null;
   owner_bio: string | null;
   owner_photo_url: string | null;
   owner_video_url: string | null;
-  // Diplomas
   diploma_urls: string[] | null;
-  // Stats
   stats_years: number | null;
   stats_clients: number | null;
 };
 
+export type ServiceItem = {
+  id: string;
+  name: string;
+  duration_minutes: number;
+  price: number | null;
+  description: string | null;
+};
+
 // ── Vertical meta ─────────────────────────────────────────────────────────────
-const TEMPLATE_META: Record<string, { emoji: string; badge: string; ownerTitle: string }> = {
-  nail_studio: { emoji: "💅", badge: "Nail Studio",      ownerTitle: "Especialista" },
-  barbershop:  { emoji: "✂️", badge: "Barbería",          ownerTitle: "Barbero" },
-  spa:         { emoji: "🧖", badge: "Spa & Bienestar",   ownerTitle: "Terapeuta" },
-  salon:       { emoji: "💇", badge: "Salón de Belleza",  ownerTitle: "Estilista" },
-  restaurant:  { emoji: "🍽️", badge: "Restaurante",       ownerTitle: "Chef" },
+const TEMPLATE_META: Record<string, {
+  emoji: string;
+  badge: string;
+  ownerTitle: string;
+  ctaLine: string;
+  faq: { q: string; a: string }[];
+}> = {
+  nail_studio: {
+    emoji: "💅",
+    badge: "Nail Studio",
+    ownerTitle: "Especialista en uñas",
+    ctaLine: "¿Lista para tus uñas de ensueño?",
+    faq: [
+      { q: "¿Con cuánto tiempo debo reservar?", a: "Recomendamos reservar con al menos 24 horas de anticipación para garantizar tu horario favorito." },
+      { q: "¿Cuánto dura el servicio?", a: "Depende del diseño. Los servicios básicos toman 45–60 min. Los diseños elaborados pueden tomar hasta 2 horas." },
+      { q: "¿Puedo traer mis propias referencias?", a: "¡Claro! Puedes enviarlas por WhatsApp antes de tu cita o mostrárnoslas el día de tu visita." },
+      { q: "¿Cómo cancelo o reprogramo?", a: "Escríbenos por WhatsApp con al menos 12 horas de anticipación y con gusto buscamos otro horario para ti." },
+    ],
+  },
+  barbershop: {
+    emoji: "✂️",
+    badge: "Barbería",
+    ownerTitle: "Barbero",
+    ctaLine: "¿Listo para un corte que te defina?",
+    faq: [
+      { q: "¿Necesito reservar o acepto walk-ins?", a: "Recomendamos reservar para garantizar tu turno. Aceptamos walk-ins sujetos a disponibilidad." },
+      { q: "¿Qué incluye el servicio de barba?", a: "Incluye recorte, perfilado, toalla caliente y productos hidratantes post-servicio." },
+      { q: "¿Tienen estacionamiento?", a: "Sí, hay parqueo disponible justo frente al local sin costo adicional." },
+      { q: "¿Atienden niños?", a: "¡Por supuesto! Contamos con servicio especial para los más pequeños." },
+    ],
+  },
+  spa: {
+    emoji: "🧖",
+    badge: "Spa & Bienestar",
+    ownerTitle: "Terapeuta",
+    ctaLine: "Mereces un momento para ti.",
+    faq: [
+      { q: "¿Debo llegar antes de mi cita?", a: "Recomendamos llegar 10 minutos antes para completar tu ficha de salud y prepararte mentalmente para la experiencia." },
+      { q: "¿Qué debo traer?", a: "Solo tú. Nosotros proveemos todo lo necesario: bata, toallas, productos y un ambiente de paz total." },
+      { q: "¿Tienen paquetes para parejas?", a: "Sí, ofrecemos experiencias para dos personas con descuento especial. Escríbenos para más detalles." },
+      { q: "¿Es seguro si estoy embarazada?", a: "Tenemos terapias adaptadas para embarazadas. Por favor indícalo al reservar para asignarte el tratamiento correcto." },
+    ],
+  },
+  salon: {
+    emoji: "💇",
+    badge: "Salón de Belleza",
+    ownerTitle: "Estilista",
+    ctaLine: "Tu mejor versión te está esperando.",
+    faq: [
+      { q: "¿Hacen consulta de color gratis?", a: "Sí, ofrecemos una consulta inicial gratuita para entender exactamente el resultado que deseas antes de aplicar cualquier color." },
+      { q: "¿Usan productos sin amoniaco?", a: "Contamos con líneas de coloración sin amoniaco y alternativas naturales. Cuéntanos tus preferencias al reservar." },
+      { q: "¿Qué pasa si no me gusta el resultado?", a: "Tu satisfacción es nuestra prioridad. Contáctanos dentro de los 7 días y hacemos los ajustes necesarios sin costo." },
+      { q: "¿Aceptan grupos para eventos?", a: "¡Sí! Hacemos paquetes para bodas, quinceañeras y eventos especiales. Escríbenos para cotizar." },
+    ],
+  },
+  clinica: {
+    emoji: "🏥",
+    badge: "Clínica",
+    ownerTitle: "Especialista",
+    ctaLine: "Tu salud es nuestra prioridad.",
+    faq: [
+      { q: "¿Necesito traer mis exámenes previos?", a: "Si tienes exámenes recientes (menos de 6 meses), tráelos para que el especialista los evalúe junto contigo." },
+      { q: "¿Aceptan seguro médico?", a: "Trabajamos con los principales seguros del país. Contáctanos para verificar la cobertura de tu plan." },
+      { q: "¿Cuánto dura la consulta?", a: "La primera consulta toma entre 30 y 45 minutos. Las consultas de seguimiento generalmente 15–20 minutos." },
+      { q: "¿Puedo cancelar mi cita?", a: "Sí, con al menos 24 horas de anticipación. Llámanos o escríbenos por WhatsApp." },
+    ],
+  },
 };
 
 // ── Count-up hook ─────────────────────────────────────────────────────────────
@@ -54,7 +120,7 @@ function useCountUp(target: number, active: boolean, duration = 1500) {
     const start = performance.now();
     const tick = (now: number) => {
       const pct = Math.min((now - start) / duration, 1);
-      setVal(Math.round(pct * pct * target)); // ease-in
+      setVal(Math.round(pct * pct * target));
       if (pct < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -62,7 +128,7 @@ function useCountUp(target: number, active: boolean, duration = 1500) {
   return val;
 }
 
-// ── Stats bar (client — count-up) ─────────────────────────────────────────────
+// ── Stats bar ─────────────────────────────────────────────────────────────────
 function StatsBar({ years, clients, services }: { years: number; clients: number; services: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
@@ -87,9 +153,7 @@ function StatsBar({ years, clients, services }: { years: number; clients: number
       <div className="mx-auto flex max-w-3xl divide-x divide-white/[0.06]">
         {items.map((it) => (
           <div key={it.lbl} className="flex flex-1 flex-col items-center gap-0.5 py-6 px-4 text-center">
-            <span className="font-future text-3xl font-bold" style={{ color: "var(--hero-hex)" }}>
-              {it.val}
-            </span>
+            <span className="font-future text-3xl font-bold" style={{ color: "var(--hero-hex)" }}>{it.val}</span>
             <span className="text-xs uppercase tracking-widest text-zinc-500">{it.lbl}</span>
           </div>
         ))}
@@ -98,10 +162,175 @@ function StatsBar({ years, clients, services }: { years: number; clients: number
   );
 }
 
-// ── YouTube embed helper ──────────────────────────────────────────────────────
-function youtubeId(url: string): string | null {
-  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^&?/\s]{11})/);
-  return m?.[1] ?? null;
+// ── Service card (3D tilt) ────────────────────────────────────────────────────
+function ServiceCard({ svc, bookingUrl }: { svc: ServiceItem; bookingUrl: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const { left, top, width, height } = el.getBoundingClientRect();
+    const x = ((e.clientX - left) / width - 0.5) * 14;
+    const y = ((e.clientY - top) / height - 0.5) * -14;
+    el.style.transform = `perspective(600px) rotateX(${y}deg) rotateY(${x}deg) scale(1.02)`;
+  }, []);
+  const handleLeave = useCallback(() => {
+    if (ref.current) ref.current.style.transform = "perspective(600px) rotateX(0) rotateY(0) scale(1)";
+  }, []);
+
+  const hours = Math.floor(svc.duration_minutes / 60);
+  const mins  = svc.duration_minutes % 60;
+  const durLabel = hours > 0
+    ? mins > 0 ? `${hours}h ${mins}min` : `${hours}h`
+    : `${mins}min`;
+
+  return (
+    <div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      className="group relative flex flex-col rounded-2xl border border-white/[0.08] bg-zinc-900 p-5 transition-all duration-200 will-change-transform"
+      style={{ transformStyle: "preserve-3d" }}
+    >
+      {/* Glow on hover */}
+      <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{ background: "radial-gradient(circle at 50% 0%, rgb(var(--hero) / 0.12), transparent 70%)" }} />
+
+      <div className="relative z-10 flex flex-1 flex-col">
+        <h3 className="text-base font-semibold text-white">{svc.name}</h3>
+        {svc.description && (
+          <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-zinc-400">{svc.description}</p>
+        )}
+        <div className="mt-auto pt-4 flex items-end justify-between gap-2">
+          <div className="flex flex-col gap-0.5">
+            {svc.price !== null && (
+              <span className="text-xl font-bold" style={{ color: "var(--hero-hex)" }}>
+                RD${svc.price.toLocaleString("es-DO")}
+              </span>
+            )}
+            <span className="text-xs text-zinc-500">⏱ {durLabel}</span>
+          </div>
+          <Link
+            href={`${bookingUrl}?service=${svc.id}`}
+            className="inline-flex items-center gap-1 rounded-xl px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
+            style={{ backgroundColor: "var(--hero-hex)", boxShadow: "0 4px 16px rgb(var(--hero) / 0.35)" }}
+          >
+            Reservar
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Gallery lightbox ──────────────────────────────────────────────────────────
+function Gallery({ photos }: { photos: string[] }) {
+  const [open, setOpen] = useState<number | null>(null);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(null);
+      if (e.key === "ArrowRight" && open !== null) setOpen((open + 1) % photos.length);
+      if (e.key === "ArrowLeft" && open !== null) setOpen((open - 1 + photos.length) % photos.length);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, photos.length]);
+
+  return (
+    <>
+      <div className={`grid gap-3 ${photos.length === 1 ? "" : photos.length === 2 ? "grid-cols-2" : "grid-cols-2 md:grid-cols-3"}`}>
+        {photos.map((url, i) => (
+          <AnimateIn key={i} delay={i * 60}>
+            <button
+              onClick={() => setOpen(i)}
+              className={`group w-full overflow-hidden rounded-2xl focus:outline-none focus-visible:ring-2 ${
+                i === 0 && photos.length >= 4 ? "col-span-2 aspect-video md:col-span-1 md:aspect-square" : "aspect-square"
+              }`}
+            >
+              <img
+                src={url}
+                alt={`Foto ${i + 1}`}
+                className="h-full w-full object-cover transition duration-500 group-hover:scale-105 group-hover:brightness-110"
+                loading="lazy"
+              />
+            </button>
+          </AnimateIn>
+        ))}
+      </div>
+
+      {/* Lightbox */}
+      {open !== null && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          onClick={() => setOpen(null)}
+        >
+          <button
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+            onClick={() => setOpen(null)}
+          >
+            ✕
+          </button>
+          {photos.length > 1 && (
+            <>
+              <button
+                className="absolute left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+                onClick={(e) => { e.stopPropagation(); setOpen((open - 1 + photos.length) % photos.length); }}
+              >‹</button>
+              <button
+                className="absolute right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+                onClick={(e) => { e.stopPropagation(); setOpen((open + 1) % photos.length); }}
+              >›</button>
+            </>
+          )}
+          <img
+            src={photos[open]}
+            alt={`Foto ${open + 1}`}
+            className="max-h-[90vh] max-w-[90vw] rounded-2xl object-contain shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <p className="absolute bottom-4 text-sm text-zinc-500">{open + 1} / {photos.length}</p>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ── FAQ accordion ─────────────────────────────────────────────────────────────
+function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  return (
+    <div className="divide-y divide-white/[0.06]">
+      {items.map((item, i) => (
+        <div key={i}>
+          <button
+            className="flex w-full items-center justify-between py-4 text-left text-sm font-semibold text-white transition hover:text-zinc-200"
+            onClick={() => setOpenIdx(openIdx === i ? null : i)}
+          >
+            <span>{item.q}</span>
+            <span
+              className="ml-4 flex-shrink-0 text-lg transition-transform duration-200"
+              style={{ transform: openIdx === i ? "rotate(45deg)" : "rotate(0deg)", color: "var(--hero-hex)" }}
+            >+</span>
+          </button>
+          {openIdx === i && (
+            <p className="pb-4 text-sm leading-relaxed text-zinc-400">{item.a}</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Mesh gradient hero background ─────────────────────────────────────────────
+function MeshGradient() {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="blob blob-1" />
+      <div className="blob blob-2" />
+      <div className="blob blob-3" />
+      <div className="absolute inset-0 bg-zinc-950/70" />
+    </div>
+  );
 }
 
 // ── SVGs ─────────────────────────────────────────────────────────────────────
@@ -113,8 +342,28 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
+// ── YouTube embed helper ──────────────────────────────────────────────────────
+function youtubeId(url: string): string | null {
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^&?/\s]{11})/);
+  return m?.[1] ?? null;
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
-export function LandingPage({ landing, bookingUrl }: { landing: LandingData; bookingUrl: string }) {
+export function LandingPage({
+  landing,
+  bookingUrl,
+  services = [],
+  isOpenNow = null,
+  fomoLastMinutes = null,
+  fomoWeekCount = 0,
+}: {
+  landing: LandingData;
+  bookingUrl: string;
+  services?: ServiceItem[];
+  isOpenNow?: boolean | null;
+  fomoLastMinutes?: number | null;
+  fomoWeekCount?: number;
+}) {
   const meta = TEMPLATE_META[landing.template] ?? TEMPLATE_META.nail_studio;
   const waNumber = landing.whatsapp?.replace(/\D/g, "") ?? "";
   const waLink = waNumber ? `https://wa.me/${waNumber}` : null;
@@ -127,6 +376,15 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
   const hasOwner = !!(landing.owner_name || landing.owner_photo_url || landing.owner_bio);
   const hasDiplomas = diplomas.length > 0;
   const hasStats = !!(landing.stats_years || landing.stats_clients);
+  const hasServices = services.length > 0;
+
+  const fomoLabel = fomoLastMinutes !== null
+    ? fomoLastMinutes < 60
+      ? `Última reserva hace ${fomoLastMinutes} min`
+      : fomoLastMinutes < 1440
+        ? `Última reserva hace ${Math.floor(fomoLastMinutes / 60)}h`
+        : null
+    : null;
 
   return (
     <div className="min-h-dvh overflow-x-hidden bg-zinc-950 text-white">
@@ -143,22 +401,40 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
       <section className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-24 text-center">
         {/* Background */}
         {landing.photo_url_1 ? (
-          <img src={landing.photo_url_1} alt="" className="absolute inset-0 h-full w-full object-cover" loading="eager" />
+          <>
+            <img src={landing.photo_url_1} alt="" className="absolute inset-0 h-full w-full object-cover" loading="eager" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/75" />
+          </>
         ) : (
-          <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 80% 80% at 50% -20%, rgb(var(--hero) / 0.35) 0%, transparent 60%), linear-gradient(180deg, #09090b 0%, #09090b 100%)` }} />
+          <>
+            <MeshGradient />
+            <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 80% 80% at 50% -20%, rgb(var(--hero) / 0.3) 0%, transparent 60%)` }} />
+          </>
         )}
-        {/* Overlay */}
-        <div className="absolute inset-0" style={{ background: landing.photo_url_1 ? "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 100%)" : "rgba(0,0,0,0.2)" }} />
         {/* Grain */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E\")" }} />
+        <div className="absolute inset-0 opacity-[0.025]"
+          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
 
-        {/* Content — CSS animation on load */}
+        {/* Content */}
         <div className="relative z-10 mx-auto max-w-xl" style={{ animation: "heroFadeIn 0.9s ease both" }}>
-          <span className="mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest"
-            style={{ borderColor: "rgb(var(--hero) / 0.5)", backgroundColor: "rgb(var(--hero) / 0.12)", color: "white" }}>
-            <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: "var(--hero-hex)" }} />
-            {meta.emoji} {meta.badge}
-          </span>
+          {/* Open/Closed + vertical badge row */}
+          <div className="mb-5 flex flex-wrap items-center justify-center gap-2">
+            {isOpenNow !== null && (
+              <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-widest ${
+                isOpenNow
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                  : "border-red-500/40 bg-red-500/10 text-red-400"
+              }`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${isOpenNow ? "animate-pulse bg-emerald-400" : "bg-red-400"}`} />
+                {isOpenNow ? "Abierto ahora" : "Cerrado ahora"}
+              </span>
+            )}
+            <span className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest"
+              style={{ borderColor: "rgb(var(--hero) / 0.5)", backgroundColor: "rgb(var(--hero) / 0.12)", color: "white" }}>
+              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: "var(--hero-hex)" }} />
+              {meta.emoji} {meta.badge}
+            </span>
+          </div>
 
           <h1 className="font-future text-5xl font-bold leading-[1.05] text-white drop-shadow-xl sm:text-6xl md:text-7xl">
             {landing.business_name}
@@ -183,6 +459,24 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
               </a>
             )}
           </div>
+
+          {/* FOMO indicators */}
+          {(fomoLabel || fomoWeekCount > 0) && (
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              {fomoWeekCount > 0 && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.07] px-3 py-1 text-xs text-zinc-300 backdrop-blur-sm">
+                  <span className="text-base">🔥</span>
+                  <strong style={{ color: "var(--hero-hex)" }}>{fomoWeekCount}</strong> reservas esta semana
+                </span>
+              )}
+              {fomoLabel && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.07] px-3 py-1 text-xs text-zinc-300 backdrop-blur-sm">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+                  {fomoLabel}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Scroll indicator */}
@@ -198,8 +492,29 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
         <StatsBar
           years={landing.stats_years ?? 0}
           clients={landing.stats_clients ?? 0}
-          services={0}
+          services={services.length}
         />
+      )}
+
+      {/* ── SERVICIOS ─────────────────────────────────────────────────── */}
+      {hasServices && (
+        <section className="border-t border-white/[0.06] bg-zinc-950 px-6 py-20">
+          <div className="mx-auto max-w-4xl">
+            <AnimateIn>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--hero-hex)" }}>
+                Servicios
+              </p>
+              <h2 className="mb-8 text-3xl font-bold text-white">¿Qué deseas hoy?</h2>
+            </AnimateIn>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {services.map((svc, i) => (
+                <AnimateIn key={svc.id} delay={i * 60}>
+                  <ServiceCard svc={svc} bookingUrl={bookingUrl} />
+                </AnimateIn>
+              ))}
+            </div>
+          </div>
+        </section>
       )}
 
       {/* ── SOBRE NOSOTROS ────────────────────────────────────────────── */}
@@ -248,38 +563,7 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
               </p>
               <h2 className="mb-8 text-3xl font-bold text-white">Nuestro trabajo</h2>
             </AnimateIn>
-
-            {photos.length === 1 && (
-              <AnimateIn delay={100}>
-                <div className="aspect-video overflow-hidden rounded-2xl">
-                  <img src={photos[0]} alt="Galería" className="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy" />
-                </div>
-              </AnimateIn>
-            )}
-
-            {photos.length === 2 && (
-              <div className="grid grid-cols-2 gap-3">
-                {photos.map((url, i) => (
-                  <AnimateIn key={i} delay={i * 80}>
-                    <div className="aspect-square overflow-hidden rounded-2xl">
-                      <img src={url} alt={`Foto ${i + 1}`} className="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy" />
-                    </div>
-                  </AnimateIn>
-                ))}
-              </div>
-            )}
-
-            {photos.length >= 3 && (
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                {photos.map((url, i) => (
-                  <AnimateIn key={i} delay={i * 60}>
-                    <div className={`overflow-hidden rounded-2xl ${i === 0 && photos.length >= 4 ? "col-span-2 aspect-video md:col-span-1 md:aspect-square" : "aspect-square"}`}>
-                      <img src={url} alt={`Foto ${i + 1}`} className="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy" />
-                    </div>
-                  </AnimateIn>
-                ))}
-              </div>
-            )}
+            <Gallery photos={photos} />
           </div>
         </section>
       )}
@@ -292,17 +576,17 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
               <p className="mb-2 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--hero-hex)" }}>
                 El equipo
               </p>
-              <h2 className="mb-10 text-3xl font-bold text-white">Conoce a {landing.owner_name ?? "nuestra especialista"}</h2>
+              <h2 className="mb-10 text-3xl font-bold text-white">
+                Conoce a {landing.owner_name ?? "nuestra especialista"}
+              </h2>
             </AnimateIn>
 
             <div className={`grid gap-10 ${vidId ? "lg:grid-cols-2" : "sm:grid-cols-[auto_1fr]"} items-start`}>
-              {/* Left: photo + info */}
               <AnimateIn delay={80} className="flex flex-col items-center gap-5 sm:flex-row sm:items-start sm:gap-6 lg:flex-col lg:items-center">
                 {landing.owner_photo_url ? (
-                  <div className="relative flex-shrink-0">
-                    <div className="h-40 w-40 overflow-hidden rounded-full" style={{ boxShadow: `0 0 0 4px var(--hero-hex)` }}>
-                      <img src={landing.owner_photo_url} alt={landing.owner_name ?? "Dueña"} className="h-full w-full object-cover" loading="lazy" />
-                    </div>
+                  <div className="h-40 w-40 flex-shrink-0 overflow-hidden rounded-full"
+                    style={{ boxShadow: `0 0 0 4px var(--hero-hex)` }}>
+                    <img src={landing.owner_photo_url} alt={landing.owner_name ?? "Dueña"} className="h-full w-full object-cover" loading="lazy" />
                   </div>
                 ) : (
                   <div className="flex h-40 w-40 flex-shrink-0 items-center justify-center rounded-full bg-zinc-800 text-6xl">
@@ -310,9 +594,7 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
                   </div>
                 )}
                 <div className={vidId ? "text-center lg:text-center" : "sm:text-left"}>
-                  {landing.owner_name && (
-                    <p className="text-xl font-bold text-white">{landing.owner_name}</p>
-                  )}
+                  {landing.owner_name && <p className="text-xl font-bold text-white">{landing.owner_name}</p>}
                   <p className="text-sm" style={{ color: "var(--hero-hex)" }}>{meta.ownerTitle}</p>
                   {landing.owner_bio && !vidId && (
                     <p className="mt-3 text-sm leading-relaxed text-zinc-400">{landing.owner_bio}</p>
@@ -320,7 +602,6 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
                 </div>
               </AnimateIn>
 
-              {/* Right: bio + video */}
               <AnimateIn delay={160}>
                 {landing.owner_bio && (
                   <p className="mb-6 text-base leading-relaxed text-zinc-300">{landing.owner_bio}</p>
@@ -356,13 +637,7 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
               {diplomas.map((url, i) => (
                 <AnimateIn key={i} delay={i * 80}>
                   <div className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-zinc-900">
-                    <img
-                      src={url}
-                      alt={`Certificación ${i + 1}`}
-                      className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
-                      style={{ maxHeight: 280 }}
-                      loading="lazy"
-                    />
+                    <img src={url} alt={`Certificación ${i + 1}`} className="h-full w-full object-contain transition duration-500 group-hover:scale-105" style={{ maxHeight: 280 }} loading="lazy" />
                   </div>
                 </AnimateIn>
               ))}
@@ -371,33 +646,48 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
         </section>
       )}
 
+      {/* ── FAQ ───────────────────────────────────────────────────────── */}
+      <section className="border-t border-white/[0.06] bg-zinc-900 px-6 py-20">
+        <div className="mx-auto max-w-2xl">
+          <AnimateIn>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--hero-hex)" }}>
+              Preguntas frecuentes
+            </p>
+            <h2 className="mb-8 text-3xl font-bold text-white">¿Tienes dudas?</h2>
+          </AnimateIn>
+          <AnimateIn delay={80}>
+            <FaqAccordion items={meta.faq} />
+          </AnimateIn>
+        </div>
+      </section>
+
       {/* ── REDES SOCIALES ────────────────────────────────────────────── */}
       {(landing.instagram_url || landing.tiktok_url || landing.facebook_url) && (
-        <section className="border-t border-white/[0.06] bg-zinc-900 px-6 py-12">
+        <section className="border-t border-white/[0.06] bg-zinc-950 px-6 py-12">
           <div className="mx-auto max-w-lg text-center">
             <AnimateIn>
               <p className="mb-5 text-sm uppercase tracking-widest text-zinc-500">Síguenos</p>
               <div className="flex items-center justify-center gap-4">
                 {landing.instagram_url && (
                   <a href={landing.instagram_url} target="_blank" rel="noopener noreferrer" aria-label="Instagram"
-                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.08] bg-zinc-800 transition hover:border-white/20 hover:bg-zinc-700">
-                    <svg className="h-5 w-5 text-zinc-300" viewBox="0 0 24 24" fill="currentColor">
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.08] bg-zinc-800 transition hover:border-pink-500/40 hover:bg-pink-500/10 hover:text-pink-400">
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                     </svg>
                   </a>
                 )}
                 {landing.tiktok_url && (
                   <a href={landing.tiktok_url} target="_blank" rel="noopener noreferrer" aria-label="TikTok"
-                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.08] bg-zinc-800 transition hover:border-white/20 hover:bg-zinc-700">
-                    <svg className="h-5 w-5 text-zinc-300" viewBox="0 0 24 24" fill="currentColor">
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.08] bg-zinc-800 text-zinc-300 transition hover:border-white/20 hover:bg-zinc-700">
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.2 8.2 0 004.79 1.53V6.75a4.85 4.85 0 01-1.02-.06z"/>
                     </svg>
                   </a>
                 )}
                 {landing.facebook_url && (
                   <a href={landing.facebook_url} target="_blank" rel="noopener noreferrer" aria-label="Facebook"
-                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.08] bg-zinc-800 transition hover:border-white/20 hover:bg-zinc-700">
-                    <svg className="h-5 w-5 text-zinc-300" viewBox="0 0 24 24" fill="currentColor">
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.08] bg-zinc-800 text-zinc-300 transition hover:border-blue-500/40 hover:bg-blue-500/10 hover:text-blue-400">
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                     </svg>
                   </a>
@@ -409,19 +699,20 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
       )}
 
       {/* ── CTA ───────────────────────────────────────────────────────── */}
-      <section className="px-6 py-24 text-center" style={{ background: `linear-gradient(135deg, rgb(var(--hero) / 0.18) 0%, transparent 60%)`, borderTop: "1px solid rgb(var(--hero) / 0.2)" }}>
+      <section className="px-6 py-24 text-center" style={{
+        background: `linear-gradient(135deg, rgb(var(--hero) / 0.2) 0%, rgb(var(--hero) / 0.05) 60%, transparent 100%)`,
+        borderTop: "1px solid rgb(var(--hero) / 0.2)",
+      }}>
         <AnimateIn>
           <div className="mx-auto max-w-lg">
             <p className="mb-3 text-5xl">{meta.emoji}</p>
-            <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl">
-              ¿Lista para tu próxima cita?
-            </h2>
+            <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl">{meta.ctaLine}</h2>
             <p className="mb-8 text-zinc-400">Reserva en línea en menos de 2 minutos.</p>
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               {landing.show_booking_button && (
                 <Link href={bookingUrl}
                   className="inline-flex w-full min-w-[200px] items-center justify-center rounded-2xl px-8 py-4 text-base font-bold text-white shadow-lg transition hover:brightness-110 sm:w-auto"
-                  style={{ backgroundColor: "var(--hero-hex)", boxShadow: "0 8px 32px rgb(var(--hero) / 0.4)" }}>
+                  style={{ backgroundColor: "var(--hero-hex)", boxShadow: "0 8px 32px rgb(var(--hero) / 0.45)" }}>
                   {landing.custom_cta_text}
                 </Link>
               )}
@@ -451,6 +742,43 @@ export function LandingPage({ landing, bookingUrl }: { landing: LandingData; boo
         @keyframes heroFadeIn {
           from { opacity: 0; transform: translateY(20px); }
           to   { opacity: 1; transform: translateY(0); }
+        }
+        .blob {
+          position: absolute;
+          border-radius: 9999px;
+          filter: blur(80px);
+          opacity: 0.25;
+          background: var(--hero-hex, #ec4899);
+        }
+        .blob-1 {
+          width: 500px; height: 500px;
+          top: -100px; left: -100px;
+          animation: blobMove1 12s ease-in-out infinite alternate;
+        }
+        .blob-2 {
+          width: 400px; height: 400px;
+          bottom: -80px; right: -80px;
+          opacity: 0.18;
+          animation: blobMove2 14s ease-in-out infinite alternate;
+        }
+        .blob-3 {
+          width: 300px; height: 300px;
+          top: 40%; left: 50%;
+          transform: translateX(-50%);
+          opacity: 0.12;
+          animation: blobMove3 10s ease-in-out infinite alternate;
+        }
+        @keyframes blobMove1 {
+          from { transform: translate(0, 0) scale(1); }
+          to   { transform: translate(60px, 40px) scale(1.15); }
+        }
+        @keyframes blobMove2 {
+          from { transform: translate(0, 0) scale(1); }
+          to   { transform: translate(-50px, -30px) scale(1.1); }
+        }
+        @keyframes blobMove3 {
+          from { transform: translateX(-50%) scale(1); }
+          to   { transform: translateX(-40%) scale(1.2); }
         }
       `}</style>
     </div>
