@@ -63,17 +63,26 @@ export default async function ConfiguracionPage() {
         const { data: blob } = await admin.storage.from("bookido-media").download(`config/${tenant}.json`);
         if (blob) { const text = await blob.text(); landingConfig = JSON.parse(text); }
       } catch { /* no config yet */ }
-      // Merge social fields from bookido_landings
+      // Merge bookido_landings fields (template, tagline, colors, social, etc.)
       try {
-        const { data: social } = await admin.from("bookido_landings")
-          .select("instagram_url, tiktok_url, facebook_url")
+        const { data: ld } = await admin.from("bookido_landings")
+          .select("template, tagline, description, address, schedule, whatsapp, hero_color, custom_cta_text, show_booking_button, instagram_url, tiktok_url, facebook_url")
           .eq("tenant_slug", tenant).maybeSingle();
-        if (social) {
+        if (ld) {
           landingConfig = {
             ...(landingConfig ?? {} as import("@/app/panel/configuracion/actions").LandingConfig),
-            instagram_url: social.instagram_url ?? null,
-            tiktok_url:    social.tiktok_url    ?? null,
-            facebook_url:  social.facebook_url  ?? null,
+            template:            ld.template            ?? "nail_studio",
+            tagline:             ld.tagline             ?? null,
+            description:         ld.description         ?? null,
+            address:             ld.address             ?? null,
+            schedule:            ld.schedule            ?? null,
+            whatsapp:            ld.whatsapp            ?? null,
+            hero_color:          ld.hero_color          ?? "#14F195",
+            custom_cta_text:     ld.custom_cta_text     ?? "Reservar cita",
+            show_booking_button: ld.show_booking_button ?? true,
+            instagram_url:       ld.instagram_url       ?? null,
+            tiktok_url:          ld.tiktok_url          ?? null,
+            facebook_url:        ld.facebook_url        ?? null,
           } as import("@/app/panel/configuracion/actions").LandingConfig;
         }
       } catch { /* landing row may not exist */ }

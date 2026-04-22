@@ -108,8 +108,95 @@ export function LandingTab({ config, tenant }: { config: LandingConfig; tenant: 
     ? `https://${tenant}.bookido.online`
     : "/";
 
+  const TEMPLATES = [
+    { value: "nail_studio", label: "💅 Nail Studio" },
+    { value: "spa",         label: "✨ Spa & Estética" },
+    { value: "salon",       label: "💇 Salón de Belleza" },
+    { value: "barbershop",  label: "✂️ Barbería" },
+    { value: "clinica",     label: "🏥 Clínica" },
+  ];
+
   return (
     <form onSubmit={submit} className="space-y-10">
+
+      {/* ── Identidad ─────────────────────────────────────────────────── */}
+      <div>
+        <h3 className="mb-1 text-sm font-semibold text-white">Identidad de tu página</h3>
+        <p className="mb-5 text-xs text-zinc-500">Lo que ven tus clientas al entrar.</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* Template */}
+          <div>
+            <Label>Tipo de negocio</Label>
+            <select value={c.template} onChange={e => set("template", e.target.value)}
+              className={INPUT_CLS + " cursor-pointer"}>
+              {TEMPLATES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </select>
+          </div>
+          {/* Color */}
+          <div>
+            <Label>Color de marca</Label>
+            <div className="flex items-center gap-3">
+              <input type="color" value={c.hero_color} onChange={e => set("hero_color", e.target.value)}
+                className="h-11 w-14 cursor-pointer rounded-xl border border-white/[0.08] bg-transparent p-1" />
+              <input type="text" value={c.hero_color} onChange={e => set("hero_color", e.target.value)}
+                placeholder="#14F195" className={INPUT_CLS + " font-mono"} maxLength={7} />
+            </div>
+          </div>
+          {/* Tagline */}
+          <div className="sm:col-span-2">
+            <Label>Frase del hero (debajo del nombre)</Label>
+            <input type="text" value={c.tagline ?? ""} onChange={e => set("tagline", e.target.value || null)}
+              placeholder="Ej: Uñas que hablan por ti" className={INPUT_CLS} maxLength={80} />
+          </div>
+          {/* CTA */}
+          <div>
+            <Label>Texto del botón principal</Label>
+            <input type="text" value={c.custom_cta_text} onChange={e => set("custom_cta_text", e.target.value)}
+              placeholder="Reservar cita" className={INPUT_CLS} maxLength={40} />
+          </div>
+          {/* Show booking button */}
+          <div className="flex items-center gap-3 pt-6">
+            <button type="button"
+              onClick={() => set("show_booking_button", !c.show_booking_button)}
+              className={`relative h-6 w-11 flex-shrink-0 rounded-full transition-colors duration-200 ${c.show_booking_button ? "bg-[#14F195]" : "bg-zinc-700"}`}>
+              <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${c.show_booking_button ? "translate-x-5" : "translate-x-0.5"}`} />
+            </button>
+            <Label>Mostrar botón de reserva</Label>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Descripción y contacto ────────────────────────────────────── */}
+      <div>
+        <h3 className="mb-1 text-sm font-semibold text-white">Descripción y contacto</h3>
+        <p className="mb-5 text-xs text-zinc-500">Aparece en la sección "Sobre nosotros" y en el botón flotante de WhatsApp.</p>
+        <div className="grid gap-4">
+          <div>
+            <Label>Descripción (quiénes somos)</Label>
+            <textarea value={c.description ?? ""} onChange={e => set("description", e.target.value || null)}
+              placeholder="Ej: Somos un estudio de uñas en Santo Domingo con 5 años de experiencia…"
+              rows={3} className={INPUT_CLS + " resize-none"} />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label>Dirección</Label>
+              <input type="text" value={c.address ?? ""} onChange={e => set("address", e.target.value || null)}
+                placeholder="Ej: Calle El Conde 123, Santo Domingo" className={INPUT_CLS} />
+            </div>
+            <div>
+              <Label>WhatsApp (número con código de país)</Label>
+              <input type="tel" value={c.whatsapp ?? ""} onChange={e => set("whatsapp", e.target.value || null)}
+                placeholder="+18095551234" className={INPUT_CLS} />
+            </div>
+            <div className="sm:col-span-2">
+              <Label>Horario (texto libre)</Label>
+              <input type="text" value={c.schedule ?? ""} onChange={e => set("schedule", e.target.value || null)}
+                placeholder="Ej: Lun–Sáb 9am–7pm · Dom cerrado" className={INPUT_CLS} />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ── Fotos del negocio ──────────────────────────────────────────── */}
       <div>
         <h3 className="mb-1 text-sm font-semibold text-white">Fotos del negocio</h3>

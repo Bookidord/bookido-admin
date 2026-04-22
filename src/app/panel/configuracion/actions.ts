@@ -41,6 +41,20 @@ export const saveSettingsAction = saveNegocioAction;
 
 // ─── Tab: Landing ──────────────────────────────────────────────────────────────
 export type LandingConfig = {
+  // bookido_landings fields (editable directly)
+  template: string;
+  tagline: string | null;
+  description: string | null;
+  address: string | null;
+  schedule: string | null;
+  whatsapp: string | null;
+  hero_color: string;
+  custom_cta_text: string;
+  show_booking_button: boolean;
+  instagram_url: string | null;
+  tiktok_url: string | null;
+  facebook_url: string | null;
+  // Storage JSON fields (owner, gallery, diplomas, stats)
   photo_url_1: string | null;
   photo_url_2: string | null;
   photo_url_3: string | null;
@@ -54,9 +68,6 @@ export type LandingConfig = {
   diploma_urls: string[] | null;
   stats_years: number | null;
   stats_clients: number | null;
-  instagram_url: string | null;
-  tiktok_url: string | null;
-  facebook_url: string | null;
 };
 
 export async function saveLandingAction(
@@ -77,11 +88,20 @@ export async function saveLandingAction(
 
     if (error) return { ok: false, error: error.message };
 
-    // Save social media fields to bookido_landings table
+    // Save all bookido_landings fields
     await admin.from("bookido_landings").update({
-      instagram_url: data.instagram_url || null,
-      tiktok_url:    data.tiktok_url    || null,
-      facebook_url:  data.facebook_url  || null,
+      template:            data.template,
+      tagline:             data.tagline             || null,
+      description:         data.description         || null,
+      address:             data.address             || null,
+      schedule:            data.schedule            || null,
+      whatsapp:            data.whatsapp            || null,
+      hero_color:          data.hero_color          || "#14F195",
+      custom_cta_text:     data.custom_cta_text     || "Reservar cita",
+      show_booking_button: data.show_booking_button ?? true,
+      instagram_url:       data.instagram_url       || null,
+      tiktok_url:          data.tiktok_url          || null,
+      facebook_url:        data.facebook_url        || null,
     }).eq("tenant_slug", slug);
 
     revalidatePath("/");

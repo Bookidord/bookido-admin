@@ -679,7 +679,7 @@ export function ConfiguracionTabs({ settings, businessHours, policies, templates
         {tab === "mensajes" && <TabMensajes initialTemplates={templates} />}
         {tab === "landing" && (
           <LandingTab
-            config={landingConfig ?? { photo_url_1: null, photo_url_2: null, photo_url_3: null, photo_url_4: null, photo_url_5: null, photo_url_6: null, owner_name: null, owner_bio: null, owner_photo_url: null, owner_video_url: null, diploma_urls: [], stats_years: null, stats_clients: null, instagram_url: null, tiktok_url: null, facebook_url: null }}
+            config={landingConfig ?? { template: "nail_studio", tagline: null, description: null, address: null, schedule: null, whatsapp: null, hero_color: "#14F195", custom_cta_text: "Reservar cita", show_booking_button: true, instagram_url: null, tiktok_url: null, facebook_url: null, photo_url_1: null, photo_url_2: null, photo_url_3: null, photo_url_4: null, photo_url_5: null, photo_url_6: null, owner_name: null, owner_bio: null, owner_photo_url: null, owner_video_url: null, diploma_urls: [], stats_years: null, stats_clients: null }}
             tenant={tenant}
           />
         )}
