@@ -72,12 +72,15 @@ export function PanelTopBar({ newsItems, tenantSlug }: Props) {
         setWeather({ temp: Math.round(d.current.temperature_2m as number), code: d.current.weather_code as number, city });
       } catch { /* silent */ }
     }
+    const fallback = setTimeout(() => fetchWeather(18.4861, -69.9312, "Santo Domingo"), 5000);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (p) => fetchWeather(p.coords.latitude, p.coords.longitude, ""),
-        () => fetchWeather(18.4861, -69.9312, "Santo Domingo"),
+        (p) => { clearTimeout(fallback); fetchWeather(p.coords.latitude, p.coords.longitude, ""); },
+        () => { clearTimeout(fallback); fetchWeather(18.4861, -69.9312, "Santo Domingo"); },
+        { timeout: 4000 },
       );
     } else {
+      clearTimeout(fallback);
       fetchWeather(18.4861, -69.9312, "Santo Domingo");
     }
   }, []);
