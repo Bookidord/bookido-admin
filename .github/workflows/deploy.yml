@@ -49,7 +49,9 @@ jobs:
           script: |
             cd /root/bookido-admin
             git pull origin main
+            # Sync ADMIN_EMAIL from GitHub Secret → VPS .env.local
+            sed -i "s|^ADMIN_EMAIL=.*|ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}|" .env.local || echo "ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}" >> .env.local
             npm ci --omit=dev
             npm run build
-            pm2 restart bookido-admin
+            pm2 restart bookido-admin --update-env
             echo "Deploy OK $(date)"

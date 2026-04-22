@@ -19,7 +19,7 @@ function validateSlug(slug: string): string | null {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { slug, business_name, owner_email, owner_password } = body ?? {};
+    const { slug, business_name, owner_email } = body ?? {};
 
     // ── Validate inputs ──────────────────────────────────────────────────────
     const slugError = validateSlug(slug?.trim() ?? "");
@@ -31,11 +31,8 @@ export async function POST(request: NextRequest) {
     if (!owner_email?.includes("@"))
       return NextResponse.json({ error: "Correo electrónico inválido." }, { status: 400 });
 
-    if (!owner_password || owner_password.length < 8)
-      return NextResponse.json(
-        { error: "La contraseña debe tener al menos 8 caracteres." },
-        { status: 400 },
-      );
+    // Default PIN 1111 — owner changes it on first login
+    const owner_password = "1111!Bk#";
 
     const admin = createServiceSupabaseClient();
     if (!admin)
