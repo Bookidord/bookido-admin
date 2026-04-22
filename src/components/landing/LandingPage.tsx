@@ -75,15 +75,15 @@ const TEMPLATE_META: Record<string, {
     ],
   },
   spa: {
-    emoji: "🧖",
-    badge: "Spa & Bienestar",
-    ownerTitle: "Terapeuta",
-    ctaLine: "Mereces un momento para ti.",
+    emoji: "✨",
+    badge: "Spa & Estética",
+    ownerTitle: "Especialista en estética",
+    ctaLine: "Tu piel y tu cuerpo merecen lo mejor.",
     faq: [
-      { q: "¿Debo llegar antes de mi cita?", a: "Recomendamos llegar 10 minutos antes para completar tu ficha de salud y prepararte mentalmente para la experiencia." },
-      { q: "¿Qué debo traer?", a: "Solo tú. Nosotros proveemos todo lo necesario: bata, toallas, productos y un ambiente de paz total." },
-      { q: "¿Tienen paquetes para parejas?", a: "Sí, ofrecemos experiencias para dos personas con descuento especial. Escríbenos para más detalles." },
-      { q: "¿Es seguro si estoy embarazada?", a: "Tenemos terapias adaptadas para embarazadas. Por favor indícalo al reservar para asignarte el tratamiento correcto." },
+      { q: "¿Con cuánto tiempo debo reservar?", a: "Recomendamos reservar con al menos 24 horas de anticipación para asegurarte el horario que prefieres." },
+      { q: "¿Los tratamientos faciales tienen contraindicaciones?", a: "Algunos tratamientos requieren que nos avises si tienes piel sensible, acné activo o usas retinol. Indícalo al reservar." },
+      { q: "¿La depilación duele mucho?", a: "Usamos técnicas y productos que minimizan el dolor. Los resultados son duraderos y la piel queda suave desde la primera sesión." },
+      { q: "¿Cómo cancelo o reprogramo?", a: "Escríbenos por WhatsApp con al menos 12 horas de anticipación y con gusto encontramos otro horario para ti." },
     ],
   },
   salon: {
