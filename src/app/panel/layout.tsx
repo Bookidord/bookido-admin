@@ -82,7 +82,7 @@ export default async function PanelLayout({
       <Sidebar userEmail={userEmail ?? "superadmin"} />
       <div className="flex flex-1 flex-col overflow-hidden">
         {banner && <SubscriptionBanner banner={banner} />}
-        <PanelTopBar newsItems={newsItems} />
+        <PanelTopBar newsItems={newsItems} tenantSlug={tenantSlug} />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
