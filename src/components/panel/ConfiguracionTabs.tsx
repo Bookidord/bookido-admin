@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect, useCallback } from "react";
+import { useState, useRef, useTransition, useEffect, useCallback } from "react";
 import {
   saveNegocioAction,
   saveHorariosAction,
@@ -488,6 +488,129 @@ function TabMensajes({ initialTemplates }: { initialTemplates: MessageTemplate[]
 }
 
 // ─── Main tabbed component ─────────────────────────────────────────────────────
+// ─── Tab Seguridad — cambio de PIN ────────────────────────────────────────────
+function TabSeguridad() {
+  const [step, setStep] = useState<"idle" | "success" | "error">("idle");
+  const [loading, setLoading] = useState(false);
+  const [newDigits, setNewDigits]         = useState(["","","",""]);
+  const [confirmDigits, setConfirmDigits] = useState(["","","",""]);
+  const newRefs     = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
+  const confirmRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
+  const PIN_SALT = "!Bk#";
+
+  function handleDigit(
+    index: number,
+    value: string,
+    digits: string[],
+    setDigits: React.Dispatch<React.SetStateAction<string[]>>,
+    refs: React.RefObject<HTMLInputElement | null>[],
+    nextGroupRef?: React.RefObject<HTMLInputElement | null>,
+  ) {
+    if (!/^\d?$/.test(value)) return;
+    const next = [...digits]; next[index] = value; setDigits(next);
+    if (value && index < 3) refs[index + 1]?.current?.focus();
+    else if (value && index === 3 && nextGroupRef) nextGroupRef.current?.focus();
+  }
+
+  function handleBackspace(
+    index: number,
+    e: React.KeyboardEvent,
+    digits: string[],
+    setDigits: React.Dispatch<React.SetStateAction<string[]>>,
+    refs: React.RefObject<HTMLInputElement | null>[],
+  ) {
+    if (e.key === "Backspace" && !digits[index] && index > 0) {
+      const prev = [...digits]; prev[index - 1] = ""; setDigits(prev);
+      refs[index - 1]?.current?.focus();
+    }
+  }
+
+  async function handleSave() {
+    const newPin     = newDigits.join("");
+    const confirmPin = confirmDigits.join("");
+    if (newPin.length < 4 || confirmPin.length < 4) return;
+    if (newPin !== confirmPin) { setStep("error"); return; }
+
+    setLoading(true);
+    try {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      );
+      const { error } = await supabase.auth.updateUser({ password: newPin + PIN_SALT });
+      setStep(error ? "error" : "success");
+      if (!error) { setNewDigits(["","","",""]); setConfirmDigits(["","","",""]); }
+    } catch { setStep("error"); }
+    setLoading(false);
+  }
+
+  const isReady = newDigits.every(Boolean) && confirmDigits.every(Boolean);
+  const mismatch = isReady && newDigits.join("") !== confirmDigits.join("");
+
+  const boxCls = (d: string, mismatch?: boolean) =>
+    `h-14 w-12 rounded-xl border text-center text-2xl font-bold outline-none transition-all duration-150 ${
+      mismatch ? "border-red-500/40 bg-red-500/[0.06] text-white"
+      : d ? "border-[#14F195]/40 bg-[#14F195]/[0.07] text-[#14F195]"
+      : "border-white/[0.09] bg-ink-950 text-white focus:border-white/20"
+    }`;
+
+  return (
+    <div className="max-w-sm space-y-7">
+      <div>
+        <h3 className="font-future text-base font-semibold text-white mb-1">Cambiar PIN de acceso</h3>
+        <p className="text-xs text-zinc-500">Tu PIN tiene 4 dígitos. No lo compartas con nadie.</p>
+      </div>
+
+      {/* New PIN */}
+      <div>
+        <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500 mb-3">Nuevo PIN</p>
+        <div className="flex gap-3">
+          {newDigits.map((d, i) => (
+            <input key={i} ref={newRefs[i]} type="password" inputMode="numeric" maxLength={1} value={d}
+              onChange={e => handleDigit(i, e.target.value, newDigits, setNewDigits, newRefs, confirmRefs[0])}
+              onKeyDown={e => handleBackspace(i, e, newDigits, setNewDigits, newRefs)}
+              className={boxCls(d)} />
+          ))}
+        </div>
+      </div>
+
+      {/* Confirm PIN */}
+      <div>
+        <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500 mb-3">Confirmar PIN</p>
+        <div className="flex gap-3">
+          {confirmDigits.map((d, i) => (
+            <input key={i} ref={confirmRefs[i]} type="password" inputMode="numeric" maxLength={1} value={d}
+              onChange={e => handleDigit(i, e.target.value, confirmDigits, setConfirmDigits, confirmRefs)}
+              onKeyDown={e => handleBackspace(i, e, confirmDigits, setConfirmDigits, confirmRefs)}
+              className={boxCls(d, mismatch)} />
+          ))}
+        </div>
+        {mismatch && <p className="mt-2 text-xs text-red-400">Los PINs no coinciden</p>}
+      </div>
+
+      {/* Feedback */}
+      {step === "success" && (
+        <div className="flex items-center gap-2 rounded-xl border border-[#14F195]/20 bg-[#14F195]/[0.07] px-4 py-3">
+          <span className="text-[#14F195]">✓</span>
+          <p className="text-sm text-[#14F195]">PIN actualizado. Úsalo la próxima vez que entres.</p>
+        </div>
+      )}
+      {step === "error" && (
+        <p className="text-sm text-red-400">No se pudo actualizar. Intenta de nuevo.</p>
+      )}
+
+      <button
+        onClick={handleSave}
+        disabled={!isReady || mismatch || loading}
+        className="flex items-center gap-2 rounded-xl bg-[#14F195] px-5 py-2.5 text-sm font-semibold text-[#0A0A0F] transition hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {loading ? "Guardando…" : "Guardar nuevo PIN"}
+      </button>
+    </div>
+  );
+}
+
 const TABS = [
   { id: "negocio",    label: "Negocio" },
   { id: "horarios",   label: "Horarios" },
@@ -496,6 +619,7 @@ const TABS = [
   { id: "mensajes",   label: "Mensajes" },
   { id: "landing",    label: "Landing" },
   { id: "pagina",     label: "Página" },
+  { id: "seguridad",  label: "🔑 PIN" },
 ];
 
 type Props = {
@@ -559,6 +683,7 @@ export function ConfiguracionTabs({ settings, businessHours, policies, templates
             tenant={tenant}
           />
         )}
+        {tab === "seguridad" && <TabSeguridad />}
         {tab === "pagina" && (
           <div className="space-y-5">
             <div>
