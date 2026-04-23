@@ -13,6 +13,7 @@ import { es } from "date-fns/locale";
 import Link from "next/link";
 import { CopyLinkButton } from "@/components/panel/CopyLinkButton";
 import { DashboardExtras } from "@/components/panel/DashboardExtras";
+import { UpcomingDatesWidget } from "@/components/panel/UpcomingDatesWidget";
 import {
   getGreeting,
   computeStreak,
@@ -77,6 +78,10 @@ export default async function PanelPage() {
   let allDateRows: { starts_at: string }[] = [];
   let totalBookingCount = 0;
   let landingTemplate = "default";
+  let upcomingDates: {
+    id: string; customer_name: string; customer_email: string; customer_phone: string | null;
+    date_type: string; label: string | null; month: number; day: number; daysUntil: number;
+  }[] = [];
 
   // Week per-day breakdown: index 0=Mon … 6=Sun
   const weekDayCounts: number[] = [0, 0, 0, 0, 0, 0, 0];
@@ -241,6 +246,48 @@ export default async function PanelPage() {
     allDateRows = datesRes.data ?? [];
     totalBookingCount = countRes.count ?? 0;
     landingTemplate = landingRes.data?.template ?? "default";
+
+    // ── Upcoming special dates (next 14 days) ────────────────────────────────
+    const { data: datesRaw } = await admin
+      .from("bookido_client_dates")
+      .select("id, customer_name, customer_email, customer_phone, date_type, label, month, day")
+      .eq("tenant_slug", tenant);
+
+    if (datesRaw?.length) {
+      const sdNow = new Date(now.toLocaleString("en-US", { timeZone: "America/Santo_Domingo" }));
+      const todayM = sdNow.getMonth() + 1;
+      const todayD = sdNow.getDate();
+      upcomingDates = (datesRaw as typeof upcomingDates)
+        .map((d) => {
+          // Days until this month/day (ignoring year)
+          const thisYear = sdNow.getFullYear();
+          let next = new Date(thisYear, d.month - 1, d.day);
+          if (next < sdNow) next = new Date(thisYear + 1, d.month - 1, d.day);
+          const daysUntil = Math.round((next.getTime() - new Date(thisYear, todayM - 1, todayD).getTime()) / 86400000);
+          return { ...d, daysUntil };
+        })
+        .filter((d) => d.daysUntil <= 14)
+        .sort((a, b) => a.daysUntil - b.daysUntil);
+    }
+
+    // ── Also join phone from bookings for dates entries without phone ────────
+    if (upcomingDates.length > 0) {
+      const emails = upcomingDates.filter((d) => !d.customer_phone).map((d) => d.customer_email);
+      if (emails.length > 0) {
+        const { data: phones } = await admin
+          .from("bookido_bookings")
+          .select("customer_email, customer_phone")
+          .eq("tenant_slug", tenant)
+          .in("customer_email", emails)
+          .not("customer_phone", "is", null);
+        const phoneMap: Record<string, string> = {};
+        phones?.forEach((p) => { if (p.customer_phone) phoneMap[p.customer_email.toLowerCase()] = p.customer_phone; });
+        upcomingDates = upcomingDates.map((d) => ({
+          ...d,
+          customer_phone: d.customer_phone ?? phoneMap[d.customer_email.toLowerCase()] ?? null,
+        }));
+      }
+    }
   }
 
   const dateLabel = format(now, "EEEE d 'de' MMMM", { locale: es });
@@ -505,6 +552,13 @@ export default async function PanelPage() {
           )}
         </div>
       </div>
+
+      {/* ── Upcoming special dates ───────────────────────────────────────── */}
+      {upcomingDates.length > 0 && (
+        <div className="mb-4">
+          <UpcomingDatesWidget dates={upcomingDates} />
+        </div>
+      )}
 
       {/* ── Dashboard extras (módulos 7-13) ─────────────────────────────── */}
       <DashboardExtras

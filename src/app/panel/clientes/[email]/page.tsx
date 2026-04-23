@@ -4,6 +4,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { notFound } from "next/navigation";
+import { ClientDatesPanel } from "@/components/panel/ClientDatesPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +38,12 @@ export default async function ClienteDetailPage({ params }: { params: Params }) 
     .order("starts_at", { ascending: false });
 
   if (!bookingsRaw || bookingsRaw.length === 0) notFound();
+
+  const { data: clientDates } = await admin
+    .from("bookido_client_dates")
+    .select("id, date_type, label, month, day")
+    .eq("tenant_slug", tenant)
+    .ilike("customer_email", email);
 
   const { data: services } = await admin
     .from("bookido_services")
@@ -197,6 +204,13 @@ export default async function ClienteDetailPage({ params }: { params: Params }) 
           </tbody>
         </table>
       </div>
+
+      {/* Special dates */}
+      <ClientDatesPanel
+        customerEmail={client.email}
+        customerName={client.name}
+        initialDates={clientDates ?? []}
+      />
     </div>
   );
 }

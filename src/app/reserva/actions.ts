@@ -58,6 +58,8 @@ export async function createBookingAction(input: {
   customerEmail: string;
   customerPhone?: string;
   notes?: string;
+  birthdayMonth?: number;
+  birthdayDay?: number;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   const admin = createServiceSupabaseClient();
   if (!admin) {
@@ -221,6 +223,24 @@ export async function createBookingAction(input: {
         }
       })
       .catch((err) => console.error("[reserva] Google sync failed:", err));
+  }
+
+  // ── Birthday / special date (non-blocking) ──────────────────────────────
+  if (input.birthdayMonth && input.birthdayDay) {
+    admin
+      .from("bookido_client_dates")
+      .upsert(
+        {
+          tenant_slug: input.tenantSlug,
+          customer_email: email,
+          customer_name: name,
+          date_type: "birthday",
+          month: input.birthdayMonth,
+          day: input.birthdayDay,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "tenant_slug,customer_email,date_type" }
+      ).then(({ error: e }) => { if (e) console.error("[reserva] Birthday save failed:", e.message); });
   }
 
   return { ok: true };
