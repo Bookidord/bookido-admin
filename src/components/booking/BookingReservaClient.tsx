@@ -34,6 +34,20 @@ function generateSlots(
   return out;
 }
 
+// ── Countries ─────────────────────────────────────────────────────────────────
+const COUNTRIES = [
+  { flag: "🇩🇴", name: "RD",        prefix: "1",   hint: "809/829/849" },
+  { flag: "🇺🇸", name: "USA",       prefix: "1",   hint: "area code" },
+  { flag: "🇵🇷", name: "PR",        prefix: "1",   hint: "787/939" },
+  { flag: "🇬🇧", name: "UK",        prefix: "44",  hint: "07…" },
+  { flag: "🇪🇸", name: "España",    prefix: "34",  hint: "6/7…" },
+  { flag: "🇻🇪", name: "Venezuela", prefix: "58",  hint: "4…" },
+  { flag: "🇲🇽", name: "México",    prefix: "52",  hint: "55…" },
+  { flag: "🇨🇴", name: "Colombia",  prefix: "57",  hint: "3…" },
+  { flag: "🇭🇹", name: "Haití",     prefix: "509", hint: "3…" },
+  { flag: "🇨🇦", name: "Canadá",    prefix: "1",   hint: "area code" },
+];
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Step = "service" | "date" | "time" | "name" | "email" | "phone" | "confirm" | "done";
 type Option = { label: string; value: string; sub?: string };
@@ -53,6 +67,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
   const [pendingOptions, setPendingOptions] = useState<Option[] | null>(null);
   const [showInput, setShowInput] = useState(false);
   const [inputMeta, setInputMeta] = useState<{ placeholder: string; type: string }>({ placeholder: "", type: "text" });
+  const [countryIdx, setCountryIdx] = useState(0); // default RD (index 0)
   const [textInput, setTextInput] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -201,11 +216,13 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
   }
 
   function submitPhone(skip = false) {
-    const val = skip ? "" : textInput.trim();
-    if (!skip && !val) { setFormError("Ingresa tu teléfono."); return; }
+    const local = textInput.replace(/\D/g, "");
+    if (!skip && !local) { setFormError("Ingresa tu teléfono."); return; }
+    const prefix = COUNTRIES[countryIdx].prefix;
+    const full = local ? prefix + local : "";
     setShowInput(false);
-    userSay(val || "Sin teléfono");
-    setPhone(val);
+    userSay(full ? `+${prefix} ${local}` : "Sin teléfono");
+    setPhone(full);
 
     const svc = services.find((s) => s.id === serviceId);
     const d = selectedDate ? format(selectedDate, "EEEE d 'de' MMMM", { locale: es }) : "";
@@ -214,7 +231,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
 
     setStep("confirm");
     botSay(
-      `Listo, aquí está tu reserva:\n\n📌 ${svc?.name}\n📅 ${dCap}\n🕐 ${t}\n👤 ${name}\n📱 ${val}\n\n¿Confirmo?`,
+      `Listo, aquí está tu reserva:\n\n📌 ${svc?.name}\n📅 ${dCap}\n🕐 ${t}\n👤 ${name}\n📱 ${full || "—"}\n\n¿Confirmo?`,
       [
         { label: "✅ Confirmar", value: "confirm" },
         { label: "✏️ Cambiar algo", value: "restart" },
@@ -412,7 +429,32 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
       {/* Text input bar */}
       {showInput && (
         <div className="shrink-0 border-t border-white/[0.07] bg-zinc-950/80 px-4 py-3 backdrop-blur-sm">
+          {/* Country selector — only for phone step */}
+          {step === "phone" && (
+            <div className="mb-2 flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              {COUNTRIES.map((c, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setCountryIdx(i)}
+                  className={`shrink-0 flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs transition ${
+                    countryIdx === i
+                      ? "border-[color:var(--primary-hex,#14F195)]/50 bg-[color:var(--primary-hex,#14F195)]/10 text-white"
+                      : "border-white/[0.08] text-zinc-500 hover:text-zinc-300"
+                  }`}
+                >
+                  <span>{c.flag}</span>
+                  <span>+{c.prefix}</span>
+                </button>
+              ))}
+            </div>
+          )}
           <div className="flex items-center gap-2">
+            {step === "phone" && (
+              <span className="shrink-0 rounded-xl border border-white/[0.08] bg-zinc-800 px-3 py-3 text-sm text-zinc-400">
+                +{COUNTRIES[countryIdx].prefix}
+              </span>
+            )}
             <input
               ref={inputRef}
               type={inputMeta.type}
