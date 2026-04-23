@@ -21,7 +21,6 @@ import "react-day-picker/style.css";
 import {
   createBookingAction,
   getBusyIntervalsAction,
-  checkClientBirthdayAction,
 } from "@/app/reserva/actions";
 import type { ServiceRow } from "@/lib/booking/types";
 
@@ -93,9 +92,6 @@ export function BookingReservaClient({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
-  const [birthdayMonth, setBirthdayMonth] = useState("");
-  const [birthdayDay, setBirthdayDay] = useState("");
-  const [birthdayAlreadySaved, setBirthdayAlreadySaved] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [bookedDetails, setBookedDetails] = useState<{
@@ -140,15 +136,6 @@ export function BookingReservaClient({
     return generateSlots(selectedDate, service.duration_minutes, busy, schedule);
   }, [selectedDate, service, busy, schedule]);
 
-  useEffect(() => {
-    if (!email || !email.includes("@")) { setBirthdayAlreadySaved(false); return; }
-    const timer = setTimeout(async () => {
-      const has = await checkClientBirthdayAction(tenantSlug, email);
-      setBirthdayAlreadySaved(has);
-    }, 600);
-    return () => clearTimeout(timer);
-  }, [email, tenantSlug]);
-
   const todayStart = startOfDay(new Date());
   const maxDay = addDays(todayStart, 60);
 
@@ -168,8 +155,6 @@ export function BookingReservaClient({
         customerEmail: email,
         customerPhone: phone || undefined,
         notes: notes || undefined,
-        birthdayMonth: birthdayMonth ? parseInt(birthdayMonth, 10) : undefined,
-        birthdayDay: birthdayDay ? parseInt(birthdayDay, 10) : undefined,
       });
       if (res.ok) {
         setBookedDetails({
@@ -437,36 +422,6 @@ export function BookingReservaClient({
                   className="mt-1.5 w-full resize-none rounded-xl border border-white/10 bg-ink-950 px-4 py-2.5 text-sm text-white outline-none ring-[#14F195]/25 focus:ring-2"
                 />
               </div>
-              {!birthdayAlreadySaved && (
-                <div className="rounded-xl border border-[#14F195]/10 bg-[#14F195]/[0.04] px-4 py-3.5">
-                  <label className="block text-xs font-medium uppercase tracking-wider text-[#14F195]/70">
-                    🎂 ¿Cuándo es tu cumpleaños? <span className="text-zinc-600 normal-case">(opcional)</span>
-                  </label>
-                  <p className="mt-0.5 text-[11px] text-zinc-600">Para enviarte un detalle especial en tu día.</p>
-                  <div className="mt-3 flex items-center gap-2">
-                    <select
-                      value={birthdayMonth}
-                      onChange={(e) => setBirthdayMonth(e.target.value)}
-                      className="flex-1 rounded-xl border border-white/10 bg-ink-950 px-3 py-2 text-sm text-white outline-none ring-[#14F195]/25 focus:ring-2"
-                    >
-                      <option value="">Mes</option>
-                      {["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"].map((m, i) => (
-                        <option key={i+1} value={i+1}>{m}</option>
-                      ))}
-                    </select>
-                    <select
-                      value={birthdayDay}
-                      onChange={(e) => setBirthdayDay(e.target.value)}
-                      className="w-24 rounded-xl border border-white/10 bg-ink-950 px-3 py-2 text-sm text-white outline-none ring-[#14F195]/25 focus:ring-2"
-                    >
-                      <option value="">Día</option>
-                      {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                        <option key={d} value={d}>{d}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
               {formError && (
                 <p className="text-sm text-red-400">{formError}</p>
               )}
