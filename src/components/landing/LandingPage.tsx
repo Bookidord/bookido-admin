@@ -321,6 +321,121 @@ function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
   );
 }
 
+// ── Testimonials ─────────────────────────────────────────────────────────────
+const TESTIMONIALS: Record<string, { name: string; avatar: string; text: string; stars: number }[]> = {
+  nail_studio: [
+    { name: "María González",   avatar: "MG", text: "Las mejores uñas que me han hecho en mi vida. Valentina es un genio del nail art, cada diseño que le pido lo supera. Ya voy 8 meses siendo cliente fija 💅", stars: 5 },
+    { name: "Karla Reyes",      avatar: "KR", text: "El servicio es impecable, el lugar súper limpio y los productos de primera. Me hice las acrílicas para mi boda y quedaron perfectas. ¡Todas mis amigas preguntaron dónde!", stars: 5 },
+    { name: "Stephanie Marte",  avatar: "SM", text: "Vine por primera vez y ya no voy a ningún otro sitio. La atención personalizada marca la diferencia. Mis uñas nunca se habían visto tan bien.", stars: 5 },
+    { name: "Paola Jiménez",    avatar: "PJ", text: "El pedicure spa es una experiencia de relajación total. Salí con los pies renovados y un diseño hermoso. Los precios son muy justos para la calidad que ofrecen.", stars: 5 },
+    { name: "Lisandra Peña",    avatar: "LP", text: "Reservé en línea en 2 minutos y me confirmaron al instante. El proceso es súper fácil. Y las uñas... una obra de arte. Completamente recomendado 🌟", stars: 5 },
+    { name: "Camila Rosario",   avatar: "CR", text: "Llevo 3 años viniendo y nunca me han fallado. La calidad es consistente, el trato es cálido y siempre hay colores y diseños nuevos. Mi lugar favorito sin duda.", stars: 5 },
+  ],
+  barbershop: [
+    { name: "Carlos Méndez",    avatar: "CM", text: "El mejor corte que me han dado. El barbero sabe exactamente qué me queda bien según mi tipo de cara. Ya no voy a ningún otro lado.", stars: 5 },
+    { name: "Roberto Díaz",     avatar: "RD", text: "Servicio de primera. La toalla caliente y el perfilado de barba son un lujo. Precios justos para la calidad que dan.", stars: 5 },
+    { name: "Andrés Familia",   avatar: "AF", text: "Llevo 2 años viniendo cada dos semanas. Siempre puntual, siempre perfecto. Los recomiendo a ojos cerrados.", stars: 5 },
+    { name: "Miguel Castillo",  avatar: "MC", text: "Vine con mi hijo de 6 años y lo trataron increíble. Salió feliz y con un corte espectacular. ¡Definitivamente volvemos!", stars: 5 },
+    { name: "Luis Fernández",   avatar: "LF", text: "Reservé online y fue rapidísimo. La experiencia en el local es de otra categoría. Ambiente chill, música buena y corte de 10.", stars: 5 },
+    { name: "Pedro Almonte",    avatar: "PA", text: "Me hice la barba completa y quedó perfecta. El aftershave que usan huele increíble. Top tier barbershop.", stars: 5 },
+  ],
+  spa: [
+    { name: "Isabella Torres",  avatar: "IT", text: "El facial que me hicieron fue transformador. Mi piel nunca se había visto tan bien. El equipo es muy profesional y usa productos de primera calidad.", stars: 5 },
+    { name: "Daniela Herrera",  avatar: "DH", text: "Vine estresada del trabajo y salí flotando. El masaje relajante de 60 minutos es exactamente lo que necesitaba. Ya agendé el próximo.", stars: 5 },
+    { name: "Sofía Vargas",     avatar: "SV", text: "La depilación fue rapidísima y sin casi dolor. Se nota que tienen experiencia y usan técnicas modernas. No voy a ningún otro spa.", stars: 5 },
+    { name: "Valentina Cruz",   avatar: "VC", text: "El hidrafacial cambió mi piel por completo. Después de 3 sesiones tengo la piel que siempre quise. Vale cada centavo.", stars: 5 },
+    { name: "Natalia Soto",     avatar: "NS", text: "Atención al cliente excepcional. Desde que reservas hasta que sales, todo es profesional y cálido. Mis amigas y yo venimos juntas cada mes.", stars: 5 },
+    { name: "Andrea Morales",   avatar: "AM", text: "El tratamiento corporal es una experiencia de lujo. El ambiente es relajante, la música perfecta y el resultado dura semanas. Totalmente recomendado.", stars: 5 },
+  ],
+  salon: [
+    { name: "Gabriela Ruiz",    avatar: "GR", text: "Me tiñeron el cabello por primera vez aquí y el resultado fue exactamente lo que quería. La consulta previa marca la diferencia.", stars: 5 },
+    { name: "Alejandra Núñez",  avatar: "AN", text: "El corte y brushing que me hacen aquí dura días. Se nota la calidad de los productos y la técnica. Mi cabello nunca se había visto tan sano.", stars: 5 },
+    { name: "Fernanda López",   avatar: "FL", text: "Vine para mi quinceañera y todo el equipo estuvo increíble. Pelo, maquillaje y manicure para mí y mis amigas. ¡Un servicio completo y perfecto!", stars: 5 },
+    { name: "Mariela Santos",   avatar: "MS", text: "Llevo años de clienta y la calidad siempre es consistente. El trato personalizado hace que uno se sienta especial cada visita.", stars: 5 },
+    { name: "Carolina Reyes",   avatar: "CR", text: "Los mejores colores sin amoniaco que he probado. Mi cabello quedó brillante y el color duró meses. Vale la pena cada peso.", stars: 5 },
+    { name: "Patricia Vega",    avatar: "PV", text: "Fui con el cabello dañado y salí con una melena hermosa. El tratamiento de keratina que hacen es de los mejores de la ciudad.", stars: 5 },
+  ],
+  clinica: [
+    { name: "Dr. Juan Pérez",   avatar: "JP", text: "Excelente atención médica. El especialista se tomó el tiempo necesario para explicarme todo. Muy profesional y humano a la vez.", stars: 5 },
+    { name: "Rosa Martínez",    avatar: "RM", text: "Primera vez que voy al médico y no espero horas. La cita fue puntual y la atención de primera. Muy recomendado.", stars: 5 },
+    { name: "Héctor Suárez",    avatar: "HS", text: "El seguimiento post-consulta fue impresionante. Me llamaron a los días para ver cómo estaba. Eso marca la diferencia.", stars: 5 },
+    { name: "Carmen Flores",    avatar: "CF", text: "Trabajo con el seguro ARS y el proceso fue sencillo. El médico es muy competente y el staff muy amable.", stars: 5 },
+    { name: "Antonio Guerrero", avatar: "AG", text: "Vine con mi madre de 75 años y la trataron con mucho respeto y paciencia. Profesionalismo total.", stars: 5 },
+    { name: "Lucía Mendoza",    avatar: "LM", text: "La consulta fue muy completa. El especialista revisó mis exámenes previos y dio un diagnóstico claro. Sin duda vuelvo.", stars: 5 },
+  ],
+};
+
+function TestimonialsSection({ template }: { template: string }) {
+  const items = TESTIMONIALS[template] ?? TESTIMONIALS.nail_studio;
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll infinite loop
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    let frame: number;
+    let pos = 0;
+    const speed = 0.4;
+    function tick() {
+      pos += speed;
+      const half = track!.scrollWidth / 2;
+      if (pos >= half) pos = 0;
+      track!.style.transform = `translateX(-${pos}px)`;
+      frame = requestAnimationFrame(tick);
+    }
+    frame = requestAnimationFrame(tick);
+    const pause = () => cancelAnimationFrame(frame);
+    const resume = () => { frame = requestAnimationFrame(tick); };
+    track.parentElement?.addEventListener("mouseenter", pause);
+    track.parentElement?.addEventListener("mouseleave", resume);
+    return () => {
+      cancelAnimationFrame(frame);
+      track.parentElement?.removeEventListener("mouseenter", pause);
+      track.parentElement?.removeEventListener("mouseleave", resume);
+    };
+  }, []);
+
+  const doubled = [...items, ...items];
+
+  return (
+    <section className="border-t border-white/[0.06] bg-zinc-900 py-20 overflow-hidden">
+      <div className="mx-auto max-w-4xl px-6">
+        <AnimateIn>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--hero-hex)" }}>
+            ⭐ Reseñas
+          </p>
+          <h2 className="mb-10 text-3xl font-bold text-white">Lo que dicen nuestras clientas</h2>
+        </AnimateIn>
+      </div>
+
+      {/* Scrolling track */}
+      <div className="relative overflow-hidden" style={{ maskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)" }}>
+        <div ref={trackRef} className="flex gap-4 w-max">
+          {doubled.map((t, i) => (
+            <div key={i} className="w-72 flex-shrink-0 rounded-2xl border border-white/[0.07] bg-zinc-950/80 p-5">
+              <div className="mb-3 flex gap-0.5">
+                {Array.from({ length: t.stars }).map((_, s) => (
+                  <svg key={s} className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                ))}
+              </div>
+              <p className="text-sm leading-relaxed text-zinc-300">&ldquo;{t.text}&rdquo;</p>
+              <div className="mt-4 flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ backgroundColor: "rgb(var(--hero) / 0.6)" }}>
+                  {t.avatar}
+                </div>
+                <p className="text-xs font-semibold text-zinc-400">{t.name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── Back to top ───────────────────────────────────────────────────────────────
 function BackToTop() {
   const [visible, setVisible] = useState(false);
@@ -709,6 +824,9 @@ export function LandingPage({
           </div>
         </section>
       )}
+
+      {/* ── TESTIMONIOS ───────────────────────────────────────────────── */}
+      <TestimonialsSection template={landing.template} />
 
       {/* ── FAQ ───────────────────────────────────────────────────────── */}
       <section className="border-t border-white/[0.06] bg-zinc-900 px-6 py-20">
