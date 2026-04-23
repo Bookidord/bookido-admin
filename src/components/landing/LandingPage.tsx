@@ -612,8 +612,8 @@ export function LandingPage({
               </h2>
             </AnimateIn>
 
-            <div className={`grid gap-10 ${vidId ? "lg:grid-cols-2" : "sm:grid-cols-[auto_1fr]"} items-start`}>
-              <AnimateIn delay={80} className="flex flex-col items-center gap-5 sm:flex-row sm:items-start sm:gap-6 lg:flex-col lg:items-center">
+            <div className={`grid gap-10 ${vidId ? "lg:grid-cols-2" : ""} items-start`}>
+              <AnimateIn delay={80} className={`flex flex-col gap-6 ${vidId ? "items-center" : "sm:flex-row sm:items-start"}`}>
                 {landing.owner_photo_url ? (
                   <div className="h-40 w-40 flex-shrink-0 overflow-hidden rounded-full"
                     style={{ boxShadow: `0 0 0 4px var(--hero-hex)` }}>
@@ -624,20 +624,20 @@ export function LandingPage({
                     {meta.emoji}
                   </div>
                 )}
-                <div className={vidId ? "text-center lg:text-center" : "sm:text-left"}>
+                <div>
                   {landing.owner_name && <p className="text-xl font-bold text-white">{landing.owner_name}</p>}
                   <p className="text-sm" style={{ color: "var(--hero-hex)" }}>{meta.ownerTitle}</p>
-                  {landing.owner_bio && !vidId && (
-                    <p className="mt-3 text-sm leading-relaxed text-zinc-400">{landing.owner_bio}</p>
+                  {landing.owner_bio && (
+                    <p className="mt-3 text-base leading-relaxed text-zinc-300">{landing.owner_bio}</p>
                   )}
                 </div>
               </AnimateIn>
 
-              <AnimateIn delay={160}>
-                {landing.owner_bio && (
-                  <p className="mb-6 text-base leading-relaxed text-zinc-300">{landing.owner_bio}</p>
-                )}
-                {vidId && (
+              {vidId && (
+                <AnimateIn delay={160}>
+                  {landing.owner_bio && (
+                    <p className="mb-6 text-base leading-relaxed text-zinc-300">{landing.owner_bio}</p>
+                  )}
                   <div className="overflow-hidden rounded-2xl" style={{ aspectRatio: "16/9" }}>
                     <iframe
                       src={`https://www.youtube.com/embed/${vidId}?rel=0&modestbranding=1`}
@@ -647,8 +647,8 @@ export function LandingPage({
                       className="h-full w-full"
                     />
                   </div>
-                )}
-              </AnimateIn>
+                </AnimateIn>
+              )}
             </div>
           </div>
         </section>
