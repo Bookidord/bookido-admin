@@ -141,12 +141,12 @@ En la sección **Configuración** de tu panel puedes personalizar todo lo que tu
 - **Nombre del negocio** — el nombre que aparece en la página pública de reservas
 - **Descripción** — una línea breve sobre tu negocio (por ejemplo: *"Nail salon en Santo Domingo"*)
 - **WhatsApp** — tu número con código de país, sin guiones ni espacios (ejemplo: *18096106459*)
-- **Horario de apertura y cierre** — las horas en que aceptas citas (se muestra en formato 12 h)
+- **Horario de apertura y cierre** — las horas en que aceptas reservas
 - **Color principal** — el color de acento que aparece en los botones de tu página pública
 
 ## Guardar los cambios
 
-Cuando termines de editar, toca el botón **Guardar cambios**. Verás un mensaje de confirmación y los cambios se aplican de inmediato, sin necesidad de hacer nada más.
+Cuando termines de editar, toca el botón **Guardar cambios**. Verás un mensaje de confirmación y los cambios se aplican de inmediato.
 
 ## Tu enlace público
 
@@ -180,13 +180,13 @@ Tus servicios aparecen en la página pública de reservas para que los clientes 
 
 ## Ocultar un servicio sin borrarlo
 
-Si no quieres ofrecer un servicio por un tiempo (por ejemplo, en vacaciones), puedes **desactivarlo** en lugar de borrarlo. El servicio desaparece de la página de reservas, pero queda guardado por si lo vuelves a necesitar después.
+Si no quieres ofrecer un servicio por un tiempo, puedes **desactivarlo** en lugar de borrarlo. El servicio desaparece de la página de reservas pero queda guardado para después.
 
 Para desactivarlo, toca el interruptor que aparece al lado del servicio en la lista.
 
 ## Eliminar un servicio
 
-Para borrar un servicio permanentemente, toca el botón de eliminar (ícono de basura) al lado del servicio. Las citas ya agendadas para ese servicio no se borran — quedan en tu historial.
+Para borrar un servicio permanentemente, toca el botón de eliminar (ícono de basura) al lado del servicio. Las reservas ya agendadas para ese servicio no se borran — quedan en tu historial.
 
 ## Ordenar los servicios
 
@@ -197,43 +197,144 @@ Los servicios aparecen en la página de reservas en el mismo orden en que los ve
 
   {
     slug: "ver-reservas",
-    title: "Cómo ver tus reservas del día",
-    description: "Consulta, filtra y gestiona todas tus citas desde el panel.",
+    title: "Cómo ver y gestionar tus reservas",
+    description: "Consulta, filtra y actualiza el estado de todas tus reservas.",
     icon: "📅",
     body: `## Dónde ver tus reservas
 
-En el menú de tu panel, toca **Reservas**. Ahí verás todas las citas que tus clientes han agendado, ordenadas de la más reciente a la más próxima.
+En el menú de tu panel, toca **Reservas**. Ahí verás todas las reservas que tus clientes han agendado, ordenadas de la más reciente a la más próxima.
 
-## Información de cada cita
+## Información de cada reserva
 
 Cada reserva te muestra:
 
 - **Nombre del cliente**
-- **Servicio elegido** (manicura, pedicura, etc.)
-- **Día y hora** de la cita
+- **Servicio elegido**
+- **Día y hora**
 - **Teléfono** del cliente (si lo dejó)
-- **Notas** que escribió el cliente al reservar
-- **Estado**: confirmada o cancelada
+- **Notas** que escribió al reservar
+- **Estado**: Confirmada, Completada, Cancelada o No se presentó
 
-## Ver solo las citas de hoy
+## Filtrar reservas
 
-Usa el **filtro de fecha** en la parte superior de la lista para ver únicamente las citas de hoy. Así empiezas el día con una vista limpia de tu agenda.
+Usa los botones de filtro en la parte superior para ver solo las reservas que te interesan:
 
-## Agendar una cita manual
+- **Todas** — muestra el historial completo
+- **Confirmadas** — las que están activas y pendientes
+- **Completadas** — las que ya ocurrieron
+- **No-show** — clientes que no se presentaron
+- **Canceladas** — las que fueron canceladas
 
-Si una clienta te escribe por WhatsApp y quieres registrar su cita tú misma:
+También puedes filtrar por período: últimos **7, 30 o 90 días**.
 
-1. Toca el botón **Nueva cita** en la parte superior de Reservas
+## El menú de acciones ···
+
+Cada reserva tiene un botón **···** (tres puntos) en la parte derecha. Al tocarlo aparecen las opciones disponibles según el estado de la reserva:
+
+Si la reserva está **Confirmada**:
+- **✓ Completada** — marca la cita como realizada
+- **👻 No se presentó** — registra que el cliente no vino
+- **✕ Cancelar** — cancela la reserva
+
+Si la reserva está en cualquier otro estado:
+- **↩ Restaurar** — la vuelve a Confirmada
+
+## Agendar una reserva manual
+
+Si una clienta te escribe por WhatsApp y quieres registrar su reserva tú misma:
+
+1. Toca el botón **Nueva reserva** en la parte superior
 2. Escribe el nombre y teléfono de la clienta
-3. Elige el servicio
-4. Selecciona el día y la hora disponible
-5. Toca **Confirmar cita** — queda registrada y el horario se bloquea automáticamente
+3. Elige el servicio, el día y la hora disponible
+4. Toca **Confirmar** — queda registrada y el horario se bloquea
 
-## Cancelar una cita
+## Reenviar el email de confirmación
 
-Si una clienta te avisa que no puede venir, toca el botón **Cancelar** en su reserva. El horario queda libre de inmediato y otra persona puede reservar ese turno.
+Cada reserva tiene un ícono de sobre ✉ que te permite reenviarle el email de confirmación al cliente con un solo toque.
 
-> **Consejo:** Revisa tus reservas cada mañana antes de empezar. Si ves que alguien tiene una cita en una hora, puedes prepararle los materiales con tiempo.`,
+> **Consejo:** Revisa tus reservas confirmadas cada mañana. Si ves que alguien tiene cita en unas horas, puedes prepararle los materiales con tiempo.`,
+  },
+
+  {
+    slug: "calendario",
+    title: "Cómo usar el Calendario",
+    description: "Ve todas tus reservas del mes en una vista de calendario.",
+    icon: "🗓️",
+    body: `## ¿Qué es el Calendario?
+
+El **Calendario** te da una vista mensual de todas tus reservas. En lugar de ver una lista, ves un cuadrícula con los días del mes donde cada punto de color representa una reserva.
+
+## Cómo acceder
+
+En el menú de tu panel, toca **Calendario**.
+
+## Leer el calendario
+
+Cada día del mes puede mostrar:
+
+- **Puntos de color** — cada punto es una reserva (verde = confirmada, azul = completada, ámbar = no-show, gris = cancelada)
+- **Número en verde** — cuántas reservas confirmadas tiene ese día
+- **Día resaltado** — el día de hoy aparece destacado automáticamente
+
+## Ver el detalle de un día
+
+Toca cualquier día del calendario y en el panel de la derecha (o abajo en el celular) verás la lista completa de reservas de ese día con:
+
+- Hora y duración de cada reserva
+- Nombre del cliente y servicio
+- Estado de la reserva
+- Teléfono con enlace directo a WhatsApp
+
+## Navegar entre meses
+
+Usa las flechas **←** y **→** en la parte superior del calendario para ir al mes anterior o al siguiente. La página se actualiza con las reservas de ese mes.
+
+> **Consejo:** Usa el calendario al inicio de cada semana para tener una foto clara de qué tan ocupados estarás y si hay días con espacio para más reservas.`,
+  },
+
+  {
+    slug: "clientes",
+    title: "Cómo ver el historial de tus clientes",
+    description: "Conoce a tus mejores clientes y revisa su historial de visitas.",
+    icon: "👥",
+    body: `## ¿Qué es la vista de Clientes?
+
+La sección **Clientes** agrupa automáticamente todas las personas que han reservado contigo, mostrando cuántas veces han venido y cuándo fue su última visita. No tienes que hacer nada extra — se construye solo con tus reservas existentes.
+
+## Cómo acceder
+
+En el menú de tu panel, toca **Clientes**.
+
+## La lista de clientes
+
+Verás una tabla con todos tus clientes únicos. Cada fila muestra:
+
+- **Nombre y email** del cliente
+- **Total de reservas** que ha hecho
+- **Tag automático** según su frecuencia:
+  - **Nuevo** — menos de 4 reservas
+  - **Regular** — 4 o más reservas
+  - **VIP ⭐** — 10 o más reservas
+- **Última visita** en tiempo relativo (ej: *hace 3 días*)
+- **Teléfono** con enlace directo a WhatsApp
+
+## Buscar un cliente
+
+Usa el buscador en la parte superior para encontrar a alguien por nombre, email o teléfono.
+
+## Ver el historial completo de un cliente
+
+Toca el botón **Ver historial →** en cualquier fila para abrir la página de detalle del cliente. Ahí verás:
+
+- Sus estadísticas: total de reservas, completadas, confirmadas, canceladas y no-shows
+- Fecha de primera y última visita
+- Historial completo de todas sus reservas con fecha, servicio y estado
+
+## Contactar por WhatsApp
+
+Tanto en la lista como en el detalle, si el cliente dejó su teléfono hay un botón de **WhatsApp** para escribirle directamente.
+
+> **Consejo:** Revisa tus clientes VIP de vez en cuando. Si alguno lleva tiempo sin venir, un mensaje de WhatsApp recordándole que tienes su servicio favorito puede traerlo de vuelta.`,
   },
 
   {
@@ -259,13 +360,9 @@ Tu número de WhatsApp se guarda en **Configuración**. Para cambiarlo:
 
 El botón de WhatsApp en tu página pública se actualiza automáticamente.
 
-## ¿Qué mensaje recibe la clienta?
+## Botón de WhatsApp en cada reserva
 
-El mensaje que aparece pre-escrito en WhatsApp es algo así:
-
-*"Hola, me gustaría reservar una cita en [nombre de tu negocio]."*
-
-La clienta puede editarlo antes de enviarlo si quiere añadir algo más.
+En la lista de reservas, si una clienta dejó su número verás un botón **WA** al lado de su reserva. Al tocarlo se abre WhatsApp con un mensaje pre-escrito que incluye su nombre y la hora de la cita — ideal para recordatorios rápidos.
 
 ## Verificar que funciona
 
@@ -273,55 +370,63 @@ Para probar que todo está bien:
 
 1. Abre tu enlace público de reservas (lo encuentras en Configuración)
 2. Toca el botón **Reservar por WhatsApp**
-3. Comprueba que se abre WhatsApp con tu número correcto y el mensaje pre-escrito
+3. Comprueba que se abre WhatsApp con tu número correcto
 
 Si el número no es el correcto, vuelve a Configuración y corrígelo.
 
-> **Consejo:** Asegúrate de que tu número de WhatsApp tenga la cuenta activa y que puedas recibir mensajes. Pruébalo desde otro celular si tienes dudas.`,
+> **Consejo:** Asegúrate de que tu número de WhatsApp tenga la cuenta activa y puedas recibir mensajes. Pruébalo desde otro celular si tienes dudas.`,
   },
 
   {
     slug: "cancelaciones-no-shows",
     title: "Cómo manejar cancelaciones y no-shows",
-    description: "Cancela citas, libera horarios y reduce las ausencias.",
+    description: "Cancela reservas, registra ausencias y reduce los no-shows.",
     icon: "🚫",
-    body: `## Cancelar una cita desde el panel
+    body: `## Cancelar una reserva
 
 Cuando una clienta te avisa que no puede venir:
 
 1. Ve al menú → **Reservas**
-2. Busca la cita de esa clienta
-3. Toca el botón **Cancelar** en su reserva
-4. Confirma la cancelación
+2. Busca la reserva de esa clienta
+3. Toca el botón **···** (tres puntos) en su reserva
+4. Selecciona **✕ Cancelar**
 
-El horario queda libre de inmediato. Si alguien intenta reservar a esa misma hora, el sistema ya mostrará ese turno disponible.
+El horario queda libre de inmediato y ese turno vuelve a estar disponible para otras reservas.
 
-## ¿Qué es un no-show?
+## Registrar un no-show
 
-Un no-show es cuando la clienta tiene una cita pero no aparece y no avisó. En ese caso:
+Cuando la clienta tenía cita pero no apareció y no avisó:
 
-- Si ya pasó la hora, la cita queda en tu historial como **confirmada**
-- El horario pasado no afecta tu agenda futura — solo los turnos de hoy en adelante están bloqueados
+1. Busca la reserva en la lista
+2. Toca el botón **···**
+3. Selecciona **👻 No se presentó**
 
-Por ahora puedes marcarla mentalmente o escribir una nota en WhatsApp para recordarlo la próxima vez que esa clienta quiera reservar.
+La reserva queda marcada como no-show en tu historial. Esto te ayuda a llevar un registro de clientes que fallan con frecuencia y verlo en su perfil en la sección **Clientes**.
 
-## Cómo reducir las ausencias
+## Marcar una reserva como completada
 
-Estas son las cosas que más ayudan:
+Cuando la cita ya ocurrió y todo fue bien:
 
-- **Pide el teléfono:** cuando una clienta reserva y deja su número, puedes escribirle la noche anterior para recordarle la cita
-- **Recordatorio por WhatsApp:** el día antes de la cita, envíale un mensaje rápido: *"Hola [nombre], te recuerdo que tienes cita mañana a las [hora] en [tu negocio]. ¡Te esperamos!"*
-- **Política clara:** cuando las clientas reservan, puedes pedirles en las notas que avisen si no pueden venir. La mayoría respeta eso si se lo pides amablemente
+1. Toca el botón **···** en la reserva
+2. Selecciona **✓ Completada**
 
-## Restaurar una cita cancelada
+Las reservas completadas aparecen en el historial del cliente y en las estadísticas de tu panel.
 
-Si cancelaste una cita por error o la clienta cambió de opinión:
+## Restaurar una reserva cancelada
 
-1. Busca la reserva cancelada en la lista (puedes verlas cambiando el filtro a "Canceladas")
-2. Toca **Restaurar**
-3. La cita vuelve a estar activa y el horario queda bloqueado nuevamente
+Si cancelaste por error o la clienta cambió de opinión:
 
-> **Consejo:** Si una clienta cancela con frecuencia o no aparece varias veces, considera pedirle que te contacte por WhatsApp para coordinar antes de agendar en línea.`,
+1. Busca la reserva cancelada (filtra por "Canceladas" en la barra de filtros)
+2. Toca **···** → **↩ Restaurar**
+3. La reserva vuelve a estar Confirmada y el horario queda bloqueado
+
+## Cómo reducir los no-shows
+
+- **Recordatorio por WhatsApp:** el día anterior toca el botón **WA** en la reserva para enviarle un mensaje rápido con su horario
+- **Pide confirmación:** en el mensaje de recordatorio pídele que te confirme si viene — así sabes con tiempo si el turno quedará libre
+- **Revisa el historial:** en la sección **Clientes** puedes ver cuántos no-shows tiene cada persona antes de aceptarle una nueva reserva
+
+> **Consejo:** Un recordatorio por WhatsApp la noche anterior reduce los no-shows a casi cero. La mayoría de las clientas agradecen el mensaje y confirman.`,
   },
 
   {
@@ -331,7 +436,7 @@ Si cancelaste una cita por error o la clienta cambió de opinión:
     icon: "📱",
     body: `## El panel funciona en el celular
 
-Bookido está diseñado para usarse cómodamente desde el teléfono. Puedes ver las reservas del día, agendar citas nuevas, cancelar turnos y editar tu configuración — todo sin necesitar una computadora.
+Bookido está diseñado para usarse cómodamente desde el teléfono. Puedes ver las reservas del día, agendar reservas nuevas, cancelar turnos y editar tu configuración — todo sin necesitar una computadora.
 
 ## Añadir el panel a tu pantalla de inicio
 
@@ -355,15 +460,11 @@ Puedes dejar un ícono en tu pantalla como si fuera una app, para entrar con un 
 
 Listo. Ahora tienes el ícono en tu pantalla de inicio y al tocarlo entras directo al panel.
 
-## También puedes agregar la página de reservas
-
-Haz lo mismo con tu **enlace público de reservas** (el que les das a tus clientes). Así puedes ver exactamente lo que ven ellas cuando van a reservar.
-
 ## Consejos para usar el panel en el celular
 
-- **Menú:** en el celular el menú aparece como un ícono de tres líneas arriba a la izquierda. Tócalo para navegar entre Reservas, Servicios y Configuración.
-- **Nueva cita rápida:** desde la pantalla de inicio del panel hay un botón directo a "Nueva cita" para cuando una clienta te llama y quieres registrar la cita al momento.
-- **Gira el teléfono si necesitas espacio:** algunos formularios se ven mejor en horizontal, especialmente cuando hay que elegir una hora.
+- **Menú:** en el celular el menú aparece como un ícono de tres líneas. Tócalo para navegar entre Reservas, Clientes, Calendario, Servicios y Configuración.
+- **Nueva reserva rápida:** desde Reservas hay un botón directo a "Nueva reserva" para cuando una clienta te llama y quieres registrar la cita al momento.
+- **Gira el teléfono si necesitas espacio:** algunos formularios se ven mejor en horizontal cuando hay que elegir una hora.
 
 > **Consejo:** Deja el panel como la primera pantalla que abres en la mañana. Un vistazo rápido y ya sabes cómo estará tu día.`,
   },
