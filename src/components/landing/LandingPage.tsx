@@ -792,14 +792,30 @@ export function LandingPage({
       </section>
 
       {/* ── FOOTER ────────────────────────────────────────────────────── */}
-      <footer className="border-t border-white/[0.06] bg-zinc-950 px-6 py-10 text-center">
+      <footer className="border-t border-white/[0.06] bg-zinc-950 px-6 pt-10 pb-6 text-center">
         <p className="font-future text-lg font-semibold text-white">{landing.business_name}</p>
-        <p className="mt-2 text-xs text-zinc-600">
-          Powered by{" "}
-          <a href="https://bookido.online" target="_blank" rel="noopener noreferrer" className="transition hover:text-zinc-400">
-            Bookido
-          </a>
-        </p>
+
+        {/* Brands strip */}
+        <div className="mt-8 border-t border-white/[0.04] pt-6">
+          <p className="mb-4 text-[10px] font-medium uppercase tracking-widest text-zinc-600">Tecnología que confía en nosotros</p>
+          <div className="flex items-center justify-center gap-8">
+            {/* Bookido */}
+            <a href="https://bookido.online" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 opacity-40 transition hover:opacity-70">
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#14F195]/20 text-[10px] font-bold text-[#14F195]">B</span>
+              <span className="font-future text-sm font-semibold text-white">Bookido</span>
+            </a>
+            <div className="h-4 w-px bg-white/10" />
+            {/* RestaurantOS Pro */}
+            <a href="https://gestiondo.com" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 opacity-40 transition hover:opacity-70">
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-orange-500/20 text-[10px] font-bold text-orange-400">R</span>
+              <span className="font-future text-sm font-semibold text-white">RestaurantOS Pro</span>
+            </a>
+          </div>
+        </div>
+
+        <p className="mt-6 text-[10px] text-zinc-700">© {new Date().getFullYear()} {landing.business_name}. Todos los derechos reservados.</p>
       </footer>
 
       <style>{`
