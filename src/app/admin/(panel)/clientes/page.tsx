@@ -39,10 +39,15 @@ export default async function ClientesPage() {
     );
   }
 
-  const [tenantsResult, plansResult, subsResult] = await Promise.all([
+  const since30 = new Date();
+  since30.setDate(since30.getDate() - 30);
+
+  const [tenantsResult, plansResult, subsResult, servicesResult, bookingsResult] = await Promise.all([
     admin.from("tenants").select("slug, name, owner_email, created_at").order("created_at", { ascending: false }),
     admin.from("bookido_plans").select("id, name, duration_days, price_rd").order("duration_days"),
     admin.from("bookido_subscriptions").select("id, tenant_slug, plan_id, start_date, end_date, status").order("created_at", { ascending: false }),
+    admin.from("bookido_services").select("tenant_slug"),
+    admin.from("bookido_bookings").select("tenant_slug").gte("starts_at", since30.toISOString()),
   ]);
 
   const tenants = (tenantsResult.data ?? []) as unknown as TenantRow[];
@@ -55,6 +60,16 @@ export default async function ClientesPage() {
   const latestSub: Record<string, typeof subs[0]> = {};
   subs.forEach(s => {
     if (!latestSub[s.tenant_slug]) latestSub[s.tenant_slug] = s;
+  });
+
+  // Aggregate counts in JS (avoid N+1)
+  const svcCount: Record<string, number> = {};
+  (servicesResult.data ?? []).forEach(s => {
+    svcCount[s.tenant_slug] = (svcCount[s.tenant_slug] ?? 0) + 1;
+  });
+  const bkCount: Record<string, number> = {};
+  (bookingsResult.data ?? []).forEach(b => {
+    bkCount[b.tenant_slug] = (bkCount[b.tenant_slug] ?? 0) + 1;
   });
 
   const clientes: ClienteRow[] = tenants.map(t => {
@@ -72,8 +87,8 @@ export default async function ClientesPage() {
       is_active: true,
       is_test: false,
       owner_phone: null,
-      service_count: 0,
-      booking_count_30d: 0,
+      service_count: svcCount[t.slug] ?? 0,
+      booking_count_30d: bkCount[t.slug] ?? 0,
       created_at: t.created_at,
     };
   });
