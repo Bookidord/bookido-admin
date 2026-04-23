@@ -141,11 +141,16 @@ function StatsBar({ years, clients, services }: { years: number; clients: number
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
   useEffect(() => {
+    // Trigger immediately if already visible, fallback to IntersectionObserver
     const el = ref.current;
     if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setActive(true); obs.disconnect(); } }, { threshold: 0.3 });
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setActive(true); obs.disconnect(); }
+    }, { threshold: 0, rootMargin: "0px 0px -10% 0px" });
     obs.observe(el);
-    return () => obs.disconnect();
+    // Also fire after 400ms in case element is above fold
+    const t = setTimeout(() => setActive(true), 400);
+    return () => { obs.disconnect(); clearTimeout(t); };
   }, []);
   const y = useCountUp(years, active);
   const c = useCountUp(clients, active);
@@ -375,34 +380,6 @@ const TESTIMONIALS: Record<string, { name: string; avatar: string; text: string;
 
 function TestimonialsSection({ template }: { template: string }) {
   const items = TESTIMONIALS[template] ?? TESTIMONIALS.nail_studio;
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll infinite loop
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    let frame: number;
-    let pos = 0;
-    const speed = 0.4;
-    function tick() {
-      pos += speed;
-      const half = track!.scrollWidth / 2;
-      if (pos >= half) pos = 0;
-      track!.style.transform = `translateX(-${pos}px)`;
-      frame = requestAnimationFrame(tick);
-    }
-    frame = requestAnimationFrame(tick);
-    const pause = () => cancelAnimationFrame(frame);
-    const resume = () => { frame = requestAnimationFrame(tick); };
-    track.parentElement?.addEventListener("mouseenter", pause);
-    track.parentElement?.addEventListener("mouseleave", resume);
-    return () => {
-      cancelAnimationFrame(frame);
-      track.parentElement?.removeEventListener("mouseenter", pause);
-      track.parentElement?.removeEventListener("mouseleave", resume);
-    };
-  }, []);
-
   const doubled = [...items, ...items];
 
   return (
@@ -416,11 +393,11 @@ function TestimonialsSection({ template }: { template: string }) {
         </AnimateIn>
       </div>
 
-      {/* Scrolling track */}
-      <div className="relative overflow-hidden" style={{ maskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)" }}>
-        <div ref={trackRef} className="flex gap-4 w-max">
+      <div className="relative overflow-hidden"
+        style={{ maskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)", WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)" }}>
+        <div className="flex gap-4 w-max" style={{ animation: "testimonialsScroll 40s linear infinite" }}>
           {doubled.map((t, i) => (
-            <div key={i} className="w-72 flex-shrink-0 rounded-2xl border border-white/[0.07] bg-zinc-950/80 p-5">
+            <div key={i} className="w-72 flex-shrink-0 rounded-2xl border border-white/[0.07] bg-zinc-950/80 p-5 hover:[animation-play-state:paused]">
               <div className="mb-3 flex gap-0.5">
                 {Array.from({ length: t.stars }).map((_, s) => (
                   <svg key={s} className="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
@@ -974,30 +951,15 @@ export function LandingPage({
       <footer className="border-t border-white/[0.06] bg-zinc-950 px-6 pt-10 pb-6 text-center">
         <p className="font-future text-lg font-semibold text-white">{landing.business_name}</p>
 
-        {/* Brands strip */}
-        <div className="mt-8 border-t border-white/[0.04] pt-6">
-          <p className="mb-4 text-[10px] font-medium uppercase tracking-widest text-zinc-600">Tecnología que confía en nosotros</p>
-          <div className="flex items-center justify-center gap-8">
-            {/* Bookido */}
-            <a href="https://bookido.online" target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 opacity-40 transition hover:opacity-70">
-              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#14F195]/20 text-[10px] font-bold text-[#14F195]">B</span>
-              <span className="font-future text-sm font-semibold text-white">Bookido</span>
-            </a>
-            <div className="h-4 w-px bg-white/10" />
-            {/* RestaurantOS Pro */}
-            <a href="https://gestiondo.com" target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 opacity-40 transition hover:opacity-70">
-              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-orange-500/20 text-[10px] font-bold text-orange-400">R</span>
-              <span className="font-future text-sm font-semibold text-white">RestaurantOS Pro</span>
-            </a>
-          </div>
-        </div>
-
-        <p className="mt-6 text-[10px] text-zinc-700">© {new Date().getFullYear()} {landing.business_name}. Todos los derechos reservados.</p>
+        <p className="mt-4 text-[10px] text-zinc-700">© {new Date().getFullYear()} {landing.business_name}. Todos los derechos reservados.</p>
+        <p className="mt-1 text-[10px] text-zinc-800">Powered by Bookido</p>
       </footer>
 
       <style>{`
+        @keyframes testimonialsScroll {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
         @keyframes heroFadeIn {
           from { opacity: 0; transform: translateY(20px); }
           to   { opacity: 1; transform: translateY(0); }
