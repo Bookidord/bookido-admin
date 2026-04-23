@@ -3,7 +3,13 @@
 import { useState, useTransition } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { cancelBookingAction, restoreBookingAction, resendBookingEmailAction } from "@/app/panel/reservas/actions";
+import {
+  cancelBookingAction,
+  restoreBookingAction,
+  completeBookingAction,
+  noShowBookingAction,
+  resendBookingEmailAction,
+} from "@/app/panel/reservas/actions";
 
 type Booking = {
   id: string;
@@ -17,18 +23,27 @@ type Booking = {
   service_name: string;
 };
 
+const STATUS_BADGE: Record<string, { label: string; cls: string; dot: string }> = {
+  confirmed: { label: "Confirmada",  cls: "border-emerald-400/20 bg-emerald-400/10 text-emerald-400", dot: "bg-emerald-400" },
+  completed: { label: "Completada",  cls: "border-blue-400/20 bg-blue-400/10 text-blue-400",          dot: "bg-blue-400" },
+  cancelled: { label: "Cancelada",   cls: "border-zinc-600/30 bg-zinc-600/10 text-zinc-500",           dot: "bg-zinc-500" },
+  no_show:   { label: "No se presentó", cls: "border-amber-400/20 bg-amber-400/10 text-amber-400",    dot: "bg-amber-400" },
+};
+
 export function BookingRow({ b }: { b: Booking }) {
   const [pending, startTransition] = useTransition();
   const [emailState, setEmailState] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const start = new Date(b.starts_at);
-  const end = new Date(b.ends_at);
-  const confirmed = b.status === "confirmed";
+  const [open, setOpen] = useState(false);
 
-  function toggle() {
-    startTransition(async () => {
-      if (confirmed) await cancelBookingAction(b.id);
-      else await restoreBookingAction(b.id);
-    });
+  const start = new Date(b.starts_at.replace(" ", "T"));
+  const end   = new Date(b.ends_at.replace(" ", "T"));
+  const isConfirmed = b.status === "confirmed";
+
+  const badge = STATUS_BADGE[b.status] ?? STATUS_BADGE.confirmed;
+
+  function act(action: (id: string) => Promise<{ ok: boolean }>) {
+    setOpen(false);
+    startTransition(() => { action(b.id); });
   }
 
   async function resendEmail() {
@@ -39,7 +54,7 @@ export function BookingRow({ b }: { b: Booking }) {
   }
 
   return (
-    <tr className={`border-b border-white/[0.05] transition hover:bg-white/[0.02] ${!confirmed ? "opacity-50" : ""}`}>
+    <tr className={`border-b border-white/[0.05] transition hover:bg-white/[0.02] ${b.status !== "confirmed" ? "opacity-60" : ""}`}>
       {/* Date / time */}
       <td className="px-4 py-3.5 text-sm">
         <p className="font-mono font-medium text-white">{format(start, "HH:mm")}</p>
@@ -63,12 +78,9 @@ export function BookingRow({ b }: { b: Booking }) {
       {/* Phone */}
       <td className="hidden px-4 py-3.5 lg:table-cell">
         {b.customer_phone ? (
-          <a
-            href={`https://wa.me/${b.customer_phone.replace(/\D/g, "")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-emerald-400 underline underline-offset-2 hover:text-emerald-300 transition"
-          >
+          <a href={`https://wa.me/${b.customer_phone.replace(/\D/g, "")}`}
+            target="_blank" rel="noopener noreferrer"
+            className="text-xs text-emerald-400 underline underline-offset-2 hover:text-emerald-300 transition">
             {b.customer_phone}
           </a>
         ) : (
@@ -78,53 +90,61 @@ export function BookingRow({ b }: { b: Booking }) {
 
       {/* Status */}
       <td className="px-4 py-3.5">
-        {confirmed ? (
-          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2 py-0.5 text-xs font-medium text-emerald-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            Confirmada
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1 rounded-full border border-zinc-600/30 bg-zinc-600/10 px-2 py-0.5 text-xs font-medium text-zinc-500">
-            <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" />
-            Cancelada
-          </span>
-        )}
+        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${badge.cls}`}>
+          <span className={`h-1.5 w-1.5 rounded-full ${badge.dot}`} />
+          {badge.label}
+        </span>
       </td>
 
       {/* Actions */}
       <td className="px-4 py-3.5 text-right">
         <div className="flex items-center justify-end gap-1">
-          <button
-            type="button"
-            onClick={resendEmail}
-            disabled={emailState === "sending"}
-            title="Reenviar email de confirmación"
+          {/* Email resend */}
+          <button type="button" onClick={resendEmail} disabled={emailState === "sending"}
+            title="Reenviar email"
             className={`rounded-lg px-2 py-1.5 text-xs font-medium transition disabled:opacity-40 ${
-              emailState === "sent"
-                ? "text-emerald-400"
-                : emailState === "error"
-                ? "text-red-400"
-                : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
-            }`}
-          >
+              emailState === "sent" ? "text-emerald-400" : emailState === "error" ? "text-red-400" : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
+            }`}>
             {emailState === "sending" ? "…" : emailState === "sent" ? "✓" : emailState === "error" ? "!" : (
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             )}
           </button>
-          <button
-            type="button"
-            onClick={toggle}
-            disabled={pending}
-            className={`rounded-lg px-2.5 py-1.5 text-xs font-medium transition disabled:opacity-40 ${
-              confirmed
-                ? "text-red-400 hover:bg-red-500/10"
-                : "text-emerald-400 hover:bg-emerald-500/10"
-            }`}
-          >
-            {pending ? "…" : confirmed ? "Cancelar" : "Restaurar"}
-          </button>
+
+          {/* Action menu */}
+          <div className="relative">
+            <button type="button" onClick={() => setOpen(o => !o)} disabled={pending}
+              className="rounded-lg px-2 py-1.5 text-xs text-zinc-500 transition hover:bg-white/[0.04] hover:text-zinc-300 disabled:opacity-40">
+              {pending ? "…" : "···"}
+            </button>
+            {open && (
+              <div className="absolute right-0 top-8 z-20 min-w-[160px] rounded-xl border border-white/[0.08] bg-zinc-900 py-1 shadow-2xl">
+                {isConfirmed && (
+                  <>
+                    <button onClick={() => act(completeBookingAction)}
+                      className="flex w-full items-center gap-2 px-4 py-2 text-left text-xs text-blue-400 transition hover:bg-blue-400/10">
+                      ✓ Completada
+                    </button>
+                    <button onClick={() => act(noShowBookingAction)}
+                      className="flex w-full items-center gap-2 px-4 py-2 text-left text-xs text-amber-400 transition hover:bg-amber-400/10">
+                      👻 No se presentó
+                    </button>
+                    <button onClick={() => act(cancelBookingAction)}
+                      className="flex w-full items-center gap-2 px-4 py-2 text-left text-xs text-red-400 transition hover:bg-red-400/10">
+                      ✕ Cancelar
+                    </button>
+                  </>
+                )}
+                {!isConfirmed && (
+                  <button onClick={() => act(restoreBookingAction)}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-left text-xs text-emerald-400 transition hover:bg-emerald-400/10">
+                    ↩ Restaurar
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </td>
     </tr>

@@ -117,6 +117,46 @@ export async function restoreBookingAction(
   }
 }
 
+export async function completeBookingAction(
+  id: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    await requireAuth();
+    const admin = createServiceSupabaseClient();
+    if (!admin) return { ok: false, error: "Supabase no configurado." };
+    const tenant = await getTenantSlug();
+    const { error } = await admin
+      .from("bookido_bookings")
+      .update({ status: "completed" })
+      .eq("id", id)
+      .eq("tenant_slug", tenant);
+    if (error) return { ok: false, error: error.message };
+    revalidatePath("/panel");
+    revalidatePath("/panel/reservas");
+    return { ok: true };
+  } catch (e) { return { ok: false, error: (e as Error).message }; }
+}
+
+export async function noShowBookingAction(
+  id: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    await requireAuth();
+    const admin = createServiceSupabaseClient();
+    if (!admin) return { ok: false, error: "Supabase no configurado." };
+    const tenant = await getTenantSlug();
+    const { error } = await admin
+      .from("bookido_bookings")
+      .update({ status: "no_show" })
+      .eq("id", id)
+      .eq("tenant_slug", tenant);
+    if (error) return { ok: false, error: error.message };
+    revalidatePath("/panel");
+    revalidatePath("/panel/reservas");
+    return { ok: true };
+  } catch (e) { return { ok: false, error: (e as Error).message }; }
+}
+
 export async function resendBookingEmailAction(
   id: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {

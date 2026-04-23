@@ -107,9 +107,11 @@ export default async function ReservasPage({
         {/* Filters */}
         <div className="flex flex-wrap gap-2">
           {[
-            { label: "Todas", value: "all" },
+            { label: "Todas",       value: "all" },
             { label: "Confirmadas", value: "confirmed" },
-            { label: "Canceladas", value: "cancelled" },
+            { label: "Completadas", value: "completed" },
+            { label: "No-show",     value: "no_show" },
+            { label: "Canceladas",  value: "cancelled" },
           ].map((f) => (
             <a
               key={f.value}
