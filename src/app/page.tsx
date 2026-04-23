@@ -54,7 +54,6 @@ export default async function Home() {
     { data: hoursRows },
     { data: lastBooking },
     { count: weekCount },
-    mediaBlob,
   ] = await Promise.all([
     admin.from("bookido_services")
       .select("id, name, duration_minutes, price, description")
@@ -74,16 +73,7 @@ export default async function Home() {
       .select("id", { count: "exact", head: true })
       .eq("tenant_slug", tenantSlug)
       .gte("created_at", sevenDaysAgo),
-    admin.storage.from("bookido-media").download(`config/${tenantSlug}.json`).catch(() => ({ data: null })),
   ]);
-
-  let mediaConfig: Record<string, unknown> = {};
-  try {
-    if (mediaBlob?.data) {
-      const text = await mediaBlob.data.text();
-      mediaConfig = JSON.parse(text);
-    }
-  } catch { /* no config yet */ }
 
   const fomoLastMinutes = lastBooking?.created_at
     ? Math.floor((Date.now() - new Date(lastBooking.created_at).getTime()) / 60000)
@@ -95,7 +85,7 @@ export default async function Home() {
     <>
       <style dangerouslySetInnerHTML={{ __html: buildThemeStyle({ hero: landing.hero_color }) }} />
       <LandingPage
-        landing={{ ...landing, ...mediaConfig }}
+        landing={landing}
         bookingUrl="/reserva"
         services={services ?? []}
         isOpenNow={isOpenNow}

@@ -17,21 +17,21 @@ export type LandingData = {
   photo_url_1: string | null;
   photo_url_2: string | null;
   photo_url_3: string | null;
-  photo_url_4: string | null;
-  photo_url_5: string | null;
-  photo_url_6: string | null;
+  photo_url_4?: string | null;
+  photo_url_5?: string | null;
+  photo_url_6?: string | null;
   instagram_url: string | null;
   tiktok_url: string | null;
   facebook_url: string | null;
   show_booking_button: boolean;
   custom_cta_text: string;
-  owner_name: string | null;
-  owner_bio: string | null;
-  owner_photo_url: string | null;
-  owner_video_url: string | null;
-  diploma_urls: string[] | null;
-  stats_years: number | null;
-  stats_clients: number | null;
+  owner_name?: string | null;
+  owner_bio?: string | null;
+  owner_photo_url?: string | null;
+  owner_video_url?: string | null;
+  diploma_urls?: string[] | null;
+  stats_years?: number | null;
+  stats_clients?: number | null;
 };
 
 export type ServiceItem = {
