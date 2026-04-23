@@ -55,7 +55,7 @@ export async function createBookingAction(input: {
   serviceId: string;
   startsAtISO: string;
   customerName: string;
-  customerEmail: string;
+  customerEmail?: string;
   customerPhone?: string;
   notes?: string;
   birthdayMonth?: number;
@@ -67,12 +67,9 @@ export async function createBookingAction(input: {
   }
 
   const name = input.customerName.trim();
-  const email = input.customerEmail.trim();
+  const email = input.customerEmail?.trim() ?? "";
   if (name.length < 2 || name.length > 120) {
     return { ok: false, error: "Indica un nombre válido." };
-  }
-  if (email.length < 5 || email.length > 254 || !email.includes("@")) {
-    return { ok: false, error: "Indica un correo válido." };
   }
 
   const { data: svc, error: svcErr } = await admin

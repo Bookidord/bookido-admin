@@ -196,22 +196,13 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
     setShowInput(false);
     userSay(val);
     setName(val);
-    setStep("email");
-    botSay("¿Tu correo electrónico?", undefined, true, { placeholder: "correo@ejemplo.com", type: "email" });
-  }
-
-  function submitEmail() {
-    const val = textInput.trim();
-    if (!val || !val.includes("@")) { setFormError("Ingresa un correo válido."); return; }
-    setShowInput(false);
-    userSay(val);
-    setEmail(val);
     setStep("phone");
-    botSay("¿Tu teléfono? (puedes omitirlo)", undefined, true, { placeholder: "8091234567", type: "tel" });
+    botSay("¿Tu número de teléfono?", undefined, true, { placeholder: "8091234567", type: "tel" });
   }
 
   function submitPhone(skip = false) {
     const val = skip ? "" : textInput.trim();
+    if (!skip && !val) { setFormError("Ingresa tu teléfono."); return; }
     setShowInput(false);
     userSay(val || "Sin teléfono");
     setPhone(val);
@@ -223,7 +214,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
 
     setStep("confirm");
     botSay(
-      `Listo, aquí está tu reserva:\n\n📌 ${svc?.name}\n📅 ${dCap}\n🕐 ${t}\n👤 ${name}\n📧 ${email}${val ? `\n📱 ${val}` : ""}\n\n¿Confirmo?`,
+      `Listo, aquí está tu reserva:\n\n📌 ${svc?.name}\n📅 ${dCap}\n🕐 ${t}\n👤 ${name}\n📱 ${val}\n\n¿Confirmo?`,
       [
         { label: "✅ Confirmar", value: "confirm" },
         { label: "✏️ Cambiar algo", value: "restart" },
@@ -293,13 +284,14 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
 
   function handleSend() {
     if (step === "name") submitName();
-    else if (step === "email") submitEmail();
     else if (step === "phone") submitPhone(false);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
   }
+
+  // email step removed — skip it in Step type usage
 
   // ── Options layout ─────────────────────────────────────────────────────────
   function renderOptions() {
@@ -431,12 +423,6 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
               autoComplete={inputMeta.type === "email" ? "email" : inputMeta.type === "tel" ? "tel" : "name"}
               className="flex-1 rounded-xl border border-white/[0.08] bg-zinc-900 px-4 py-3 text-sm text-white outline-none focus:border-[color:var(--primary-hex,#14F195)]/50"
             />
-            {step === "phone" && (
-              <button type="button" onClick={() => submitPhone(true)}
-                className="shrink-0 rounded-xl border border-white/[0.08] px-3 py-3 text-xs text-zinc-500 transition hover:text-zinc-300">
-                Omitir
-              </button>
-            )}
             <button type="button" onClick={handleSend} disabled={isPending}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition hover:opacity-90 disabled:opacity-40"
               style={{ background: "var(--primary-hex, #14F195)" }}>
