@@ -127,6 +127,59 @@ export async function sendBookingConfirmation({
   return sendResend({ to, subject: `Cita confirmada — ${businessName}`, html });
 }
 
+export async function sendCampaignEmail({
+  to,
+  firstName,
+  businessName,
+  subject,
+  message,
+  bookingUrl,
+}: {
+  to: string;
+  firstName: string;
+  businessName: string;
+  subject: string;
+  message: string;
+  bookingUrl: string;
+}) {
+  const safeMsg = message
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>");
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0A0A0F;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0A0A0F;padding:40px 20px;">
+  <tr><td align="center">
+    <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
+      <tr><td style="padding-bottom:32px;">
+        <span style="font-size:20px;font-weight:500;color:#F5F5F7;letter-spacing:-0.3px;">${businessName}</span>
+      </td></tr>
+      <tr><td style="background:#14141F;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:40px;">
+        <p style="font-size:15px;color:#A1A1AA;line-height:1.8;margin:0 0 28px;">${safeMsg}</p>
+        <a href="${bookingUrl}" style="display:inline-block;background:#14F195;color:#0A0A0F;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;">
+          Reservar ahora →
+        </a>
+      </td></tr>
+      <tr><td style="height:1px;background:rgba(255,255,255,0.06);margin-top:24px;"></td></tr>
+      <tr><td style="padding-top:24px;">
+        <p style="font-family:'Courier New',monospace;font-size:11px;color:#71717A;line-height:1.8;margin:0;">
+          ${businessName} &middot; Enviado vía Bookido<br>
+          Si no deseas recibir más mensajes, ignora este correo.
+        </p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+
+  return sendResend({ to, subject, html });
+}
+
 export async function sendWelcomeEmail({
   to,
   businessName,
