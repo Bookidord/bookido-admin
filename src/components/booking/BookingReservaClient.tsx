@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   addDays,
@@ -75,10 +76,12 @@ export function BookingReservaClient({
   tenantSlug,
   schedule,
 }: Props) {
+  const params = useSearchParams();
+  const preselect = params.get("service") ?? "";
+  const initialService = services.find(s => s.id === preselect)?.id ?? services[0]?.id ?? "";
+
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [serviceId, setServiceId] = useState<string>(
-    services[0]?.id ?? "",
-  );
+  const [serviceId, setServiceId] = useState<string>(initialService);
   const [busy, setBusy] = useState<{ starts_at: string; ends_at: string }[]>(
     [],
   );

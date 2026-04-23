@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { BookingReservaClient } from "@/components/booking/BookingReservaClient";
 import { getTenantSlug } from "@/lib/tenant";
 import { getScheduleConfig } from "@/lib/booking/config";
@@ -67,12 +68,14 @@ export default async function ReservaPage() {
         </header>
 
         <main className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-20">
-          <BookingReservaClient
-            services={services}
-            configured={configured}
-            tenantSlug={tenantSlug}
-            schedule={schedule}
-          />
+          <Suspense>
+            <BookingReservaClient
+              services={services}
+              configured={configured}
+              tenantSlug={tenantSlug}
+              schedule={schedule}
+            />
+          </Suspense>
         </main>
 
         <footer className="border-t border-white/[0.06] px-6 py-8 lg:px-8">
