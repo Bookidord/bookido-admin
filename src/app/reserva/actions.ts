@@ -245,3 +245,20 @@ export async function createBookingAction(input: {
 
   return { ok: true };
 }
+
+export async function checkClientBirthdayAction(
+  tenantSlug: string,
+  email: string,
+): Promise<boolean> {
+  if (!email || !email.includes("@")) return false;
+  const admin = createServiceSupabaseClient();
+  if (!admin) return false;
+  const { data } = await admin
+    .from("bookido_client_dates")
+    .select("id")
+    .eq("tenant_slug", tenantSlug)
+    .ilike("customer_email", email.trim())
+    .eq("date_type", "birthday")
+    .maybeSingle();
+  return !!data;
+}
