@@ -35,7 +35,7 @@ export default async function ReservaPage() {
           __html: buildThemeStyle({ primary: settings.primary_color }),
         }}
       />
-      <div className="min-h-dvh bg-ink-950 bg-grid-fade">
+      <div className="flex h-dvh flex-col bg-ink-950 bg-grid-fade">
         {/* Top accent line — uses tenant primary */}
         <div
           className="pointer-events-none fixed inset-x-0 top-0 z-50 h-px"
@@ -67,22 +67,18 @@ export default async function ReservaPage() {
           </div>
         </header>
 
-        <main className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-20">
-          <Suspense>
-            <BookingReservaClient
-              services={services}
-              configured={configured}
-              tenantSlug={tenantSlug}
-              schedule={schedule}
-            />
-          </Suspense>
+        <main className="flex flex-1 flex-col overflow-hidden">
+          <div className="mx-auto flex w-full max-w-lg flex-1 flex-col overflow-hidden">
+            <Suspense>
+              <BookingReservaClient
+                services={services}
+                configured={configured}
+                tenantSlug={tenantSlug}
+                schedule={schedule}
+              />
+            </Suspense>
+          </div>
         </main>
-
-        <footer className="border-t border-white/[0.06] px-6 py-8 lg:px-8">
-          <p className="mx-auto max-w-6xl text-center text-xs text-zinc-600">
-            Reservas con <span className="text-zinc-500">BookiDo</span>
-          </p>
-        </footer>
       </div>
     </>
   );
