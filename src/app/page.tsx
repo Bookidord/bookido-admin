@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createServiceSupabaseClient } from "@/lib/supabase/admin";
-import { LandingPage } from "@/components/landing/LandingPage";
+import { LandingPage, type ProductItem } from "@/components/landing/LandingPage";
 import { buildThemeStyle } from "@/lib/theme";
 
 export const dynamic = "force-dynamic";
@@ -54,6 +54,7 @@ export default async function Home() {
     { data: hoursRows },
     { data: lastBooking },
     { count: weekCount },
+    { data: products },
   ] = await Promise.all([
     admin.from("bookido_services")
       .select("id, name, duration_minutes, price, description")
@@ -73,6 +74,11 @@ export default async function Home() {
       .select("id", { count: "exact", head: true })
       .eq("tenant_slug", tenantSlug)
       .gte("created_at", sevenDaysAgo),
+    admin.from("bookido_products")
+      .select("id, name, description, price, photo_url")
+      .eq("tenant_slug", tenantSlug)
+      .eq("active", true)
+      .order("sort_order"),
   ]);
 
   const fomoLastMinutes = lastBooking?.created_at
@@ -88,6 +94,7 @@ export default async function Home() {
         landing={landing}
         bookingUrl="/reserva"
         services={services ?? []}
+        products={(products ?? []) as ProductItem[]}
         isOpenNow={isOpenNow}
         fomoLastMinutes={fomoLastMinutes}
         fomoWeekCount={weekCount ?? 0}
