@@ -138,15 +138,17 @@ export async function createBookingAction(input: {
           .eq("slug", input.tenantSlug)
           .maybeSingle();
 
-        // Email to customer
-        await sendBookingConfirmation({
-          to: email,
-          customerName: name,
-          businessName: tenant?.name ?? input.tenantSlug,
-          serviceName: svc.name,
-          startsAt,
-          notes: input.notes ?? null,
-        });
+        // Email to customer (only if provided)
+        if (email) {
+          await sendBookingConfirmation({
+            to: email,
+            customerName: name,
+            businessName: tenant?.name ?? input.tenantSlug,
+            serviceName: svc.name,
+            startsAt,
+            notes: input.notes ?? null,
+          });
+        }
 
         // WhatsApp to customer
         if (input.customerPhone) {
