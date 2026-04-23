@@ -28,15 +28,16 @@ function weatherTheme(code: number | null): { bg: string; glow: string; emoji: s
   return                     { bg: "from-purple-950/60 via-slate-900/60 to-ink-950/80", glow: "shadow-[0_1px_12px_0_rgba(192,132,252,0.15)]", emoji: "⛈️", label: "Tormenta" };
 }
 
-function parseDate(iso: string) {
+function parseDate(iso: string | null | undefined) {
+  if (!iso) return new Date(NaN);
   return new Date(iso.replace(" ", "T"));
 }
-function formatTime(iso: string) {
+function formatTime(iso: string | null | undefined) {
   const d = parseDate(iso);
   if (isNaN(d.getTime())) return "";
   return d.toLocaleTimeString("es-DO", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Santo_Domingo" });
 }
-function formatDate(iso: string) {
+function formatDate(iso: string | null | undefined) {
   const d = parseDate(iso);
   if (isNaN(d.getTime())) return "";
   return d.toLocaleDateString("es-DO", { day: "numeric", month: "short", timeZone: "America/Santo_Domingo" });
