@@ -1,0 +1,63 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://xn--gestindo-z3a.com/software-para-negocios-santo-domingo/#localbusiness",
+      "name": "Gestióndo — Software para Negocios en Santo Domingo",
+      "url": "https://xn--gestindo-z3a.com/software-para-negocios-santo-domingo/",
+      "description": "Software de reservaciones y gestión para negocios de servicios en Santo Domingo, República Dominicana.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Santo Domingo",
+        "addressRegion": "Distrito Nacional",
+        "addressCountry": "DO"
+      },
+      "areaServed": {
+        "@type": "City",
+        "name": "Santo Domingo"
+      },
+      "sameAs": [
+        "https://xn--gestindo-z3a.com"
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": "https://xn--gestindo-z3a.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Santo Domingo",
+          "item": "https://xn--gestindo-z3a.com/software-para-negocios-santo-domingo/"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Bookido funciona para negocios en todo Santo Domingo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí. Bookido funciona para negocios en Piantini, Naco, Los Prados, Zona Colonial, Bella Vista y cualquier sector del Distrito Nacional."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuánto cuesta el software para mi negocio en Santo Domingo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Bookido tiene un plan gratuito permanente. Los planes de pago empiezan desde RD$990/mes."
+          }
+        }
+      ]
+    }
+  ]
+}
