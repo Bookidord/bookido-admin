@@ -421,6 +421,35 @@ function TestimonialsSection({ template }: { template: string }) {
   );
 }
 
+// ── Sticky navbar ─────────────────────────────────────────────────────────────
+function StickyNav({ businessName, bookingUrl }: { businessName: string; bookingUrl: string }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 80);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <div
+      className="fixed inset-x-0 top-0 z-50 flex items-center justify-between gap-4 border-b border-white/[0.08] bg-zinc-950/90 px-5 py-3 backdrop-blur-md transition-all duration-300"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(-100%)",
+        pointerEvents: visible ? "auto" : "none",
+      }}
+    >
+      <span className="truncate text-sm font-bold text-white">{businessName}</span>
+      <Link
+        href={bookingUrl}
+        className="flex-shrink-0 rounded-xl px-4 py-2 text-xs font-bold text-white transition hover:brightness-110"
+        style={{ backgroundColor: "var(--hero-hex)" }}
+      >
+        Reservar
+      </Link>
+    </div>
+  );
+}
+
 // ── Back to top ───────────────────────────────────────────────────────────────
 function BackToTop() {
   const [visible, setVisible] = useState(false);
@@ -520,6 +549,9 @@ export function LandingPage({
 
   return (
     <div className="min-h-dvh overflow-x-hidden bg-zinc-950 text-white">
+
+      {/* ── Sticky navbar ─────────────────────────────────────────────── */}
+      <StickyNav businessName={landing.business_name} bookingUrl={bookingUrl} />
 
       {/* ── Back to top ───────────────────────────────────────────────── */}
       <BackToTop />
@@ -702,6 +734,15 @@ export function LandingPage({
                     <div className="rounded-xl border p-4" style={{ borderColor: "rgb(var(--hero) / 0.25)", backgroundColor: "rgb(var(--hero) / 0.07)" }}>
                       <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-zinc-500">📍 Dirección</p>
                       <p className="text-sm text-zinc-200">{landing.address}</p>
+                      <a
+                        href={`https://maps.google.com/?q=${encodeURIComponent(landing.address ?? "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-1 text-xs font-medium transition hover:brightness-125"
+                        style={{ color: "var(--hero-hex)" }}
+                      >
+                        Ver en Maps →
+                      </a>
                     </div>
                   </AnimateIn>
                 )}
