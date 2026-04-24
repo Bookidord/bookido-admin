@@ -138,6 +138,8 @@ export async function createBookingAction(input: {
           .eq("slug", input.tenantSlug)
           .maybeSingle();
 
+        const gatewayUrl = (tenant?.settings as Record<string,string> | null)?.wa_gateway ?? null;
+
         // Email to customer (only if provided)
         if (email) {
           await sendBookingConfirmation({
@@ -167,6 +169,7 @@ export async function createBookingAction(input: {
             `✂️ ${svc.name}\n` +
             `🕐 ${customerDateStr}\n\n` +
             `Si necesitas cambiar o cancelar, contáctanos directamente.`,
+            gatewayUrl,
           );
         }
 
@@ -190,6 +193,7 @@ export async function createBookingAction(input: {
             (input.customerPhone ? `📱 ${input.customerPhone}\n` : "") +
             (input.notes ? `📝 ${input.notes}\n` : "") +
             `\nVer panel: https://${input.tenantSlug}.bookido.online/panel`,
+            gatewayUrl,
           );
         }
       } catch (err) {
