@@ -32,6 +32,7 @@ export type LandingData = {
   diploma_urls?: string[] | null;
   stats_years?: number | null;
   stats_clients?: number | null;
+  logo_url?: string | null;
 };
 
 export type ProductItem = {
@@ -422,7 +423,7 @@ function TestimonialsSection({ template }: { template: string }) {
 }
 
 // ── Sticky navbar ─────────────────────────────────────────────────────────────
-function StickyNav({ businessName, bookingUrl }: { businessName: string; bookingUrl: string }) {
+function StickyNav({ businessName, bookingUrl, logoUrl }: { businessName: string; bookingUrl: string; logoUrl?: string | null }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 80);
@@ -438,7 +439,10 @@ function StickyNav({ businessName, bookingUrl }: { businessName: string; booking
         pointerEvents: visible ? "auto" : "none",
       }}
     >
-      <span className="truncate text-sm font-bold text-white">{businessName}</span>
+      {logoUrl
+        ? <img src={logoUrl} alt={businessName} className="h-8 w-auto object-contain" style={{filter: "invert(1)"}} />
+        : <span className="truncate text-sm font-bold text-white">{businessName}</span>
+      }
       <Link
         href={bookingUrl}
         className="flex-shrink-0 rounded-xl px-4 py-2 text-xs font-bold text-white transition hover:brightness-110"
@@ -551,7 +555,7 @@ export function LandingPage({
     <div className="min-h-dvh overflow-x-hidden bg-zinc-950 text-white">
 
       {/* ── Sticky navbar ─────────────────────────────────────────────── */}
-      <StickyNav businessName={landing.business_name} bookingUrl={bookingUrl} />
+      <StickyNav businessName={landing.business_name} bookingUrl={bookingUrl} logoUrl={landing.logo_url} />
 
       {/* ── Back to top ───────────────────────────────────────────────── */}
       <BackToTop />

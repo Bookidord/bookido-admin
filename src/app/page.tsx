@@ -47,6 +47,14 @@ export default async function Home() {
     redirect("/reserva");
   }
 
+  // Fetch logo from tenants table
+  const { data: tenantMeta } = await admin
+    .from("tenants")
+    .select("logo_url")
+    .eq("slug", tenantSlug)
+    .maybeSingle();
+  const landingWithLogo = { ...landing, logo_url: tenantMeta?.logo_url ?? null };
+
   // Parallel data fetches
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const [
@@ -91,7 +99,7 @@ export default async function Home() {
     <>
       <style dangerouslySetInnerHTML={{ __html: buildThemeStyle({ hero: landing.hero_color }) }} />
       <LandingPage
-        landing={landing}
+        landing={landingWithLogo}
         bookingUrl="/reserva"
         services={services ?? []}
         products={(products ?? []) as ProductItem[]}
