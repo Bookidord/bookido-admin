@@ -2,13 +2,34 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createHash } from "crypto";
+import { createHash, scryptSync, randomBytes, timingSafeEqual } from "crypto";
 import { createServiceSupabaseClient as createAdminClient } from "@/lib/supabase/admin";
 import { createSessionToken, ADMIN_COOKIE } from "@/lib/admin-session";
 
-function hashPassword(pw: string): string {
-  const secret = process.env.ADMIN_SESSION_SECRET ?? "dev";
-  return createHash("sha256").update(pw + secret).digest("hex");
+/** Genera hash scrypt con salt: "salt:hash" */
+export function hashPasswordSecure(pw: string): string {
+  const salt = randomBytes(16).toString("hex");
+  const hash = scryptSync(pw, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
+
+/** Verifica contra hash scrypt ("salt:hash") o SHA256 legacy (64 hex chars sin ":") */
+function verifyPassword(pw: string, stored: string): boolean {
+  if (stored.includes(":")) {
+    // scrypt format: salt:hash
+    const [salt, hashHex] = stored.split(":");
+    try {
+      const derived = scryptSync(pw, salt, 64);
+      return timingSafeEqual(derived, Buffer.from(hashHex, "hex"));
+    } catch {
+      return false;
+    }
+  } else {
+    // Legacy SHA256+secret
+    const secret = process.env.ADMIN_SESSION_SECRET ?? "dev";
+    const legacy = createHash("sha256").update(pw + secret).digest("hex");
+    return timingSafeEqual(Buffer.from(legacy), Buffer.from(stored));
+  }
 }
 
 export async function adminLoginAction(
@@ -35,7 +56,7 @@ export async function adminLoginAction(
         .single();
 
       if (config?.password_hash) {
-        passwordValid = hashPassword(password) === config.password_hash;
+        passwordValid = verifyPassword(password, config.password_hash);
       } else {
         // No custom password set — compare against env var
         passwordValid = password === process.env.ADMIN_PASSWORD;

@@ -213,7 +213,7 @@ export function ClientesTable({ clientes, plans }: Props) {
                             </button>
                           ) : null}
                           <a
-                            href={`https://${row.slug}.bookido.online`}
+                            href={row.subscription_id ? `https://${row.slug}.bookido.online` : `https://bookido.online/${row.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="rounded-lg border border-violet-400/20 bg-violet-500/10 px-2.5 py-1 text-xs text-violet-300 transition hover:bg-violet-500/20"

@@ -49,16 +49,17 @@ const COUNTRIES = [
 ];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-type Step = "service" | "date" | "time" | "name" | "email" | "phone" | "confirm" | "done";
+type Step = "service" | "staff" | "date" | "time" | "name" | "email" | "phone" | "confirm" | "done";
 type Option = { label: string; value: string; sub?: string };
 type ChatMsg = { id: string; from: "bot" | "user" | "typing"; text?: string };
+type StaffMember = { id: string; name: string; role: string; color: string; service_ids: string[] };
 
 let _id = 0;
 const uid = () => String(++_id);
 const BOT_DELAY = 650;
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export function BookingReservaClient({ services, configured, tenantSlug, schedule }: Props) {
+export function BookingReservaClient({ services, staff = [], configured, tenantSlug, schedule }: Props & { staff?: StaffMember[] }) {
   const params = useSearchParams();
   const preselectId = params.get("service") ?? "";
 
@@ -78,6 +79,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [staffId, setStaffId] = useState<string>("any");
 
   const [busy, setBusy] = useState<{ starts_at: string; ends_at: string }[]>([]);
   const [slotLoading, setSlotLoading] = useState(false);
@@ -157,6 +159,27 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
     setPendingOptions(null);
     userSay(label);
     setServiceId(id);
+
+    // If business has staff, filter by service and show selection
+    const eligible = staff.filter((m) => m.service_ids.length === 0 || m.service_ids.includes(id));
+    if (eligible.length > 1) {
+      setStep("staff");
+      const staffOpts: Option[] = [
+        { label: "Cualquier disponible", value: "any", sub: "El primero libre" },
+        ...eligible.map((m) => ({ label: m.name, value: m.id, sub: m.role })),
+      ];
+      botSay("¿Con quién prefieres?", staffOpts);
+    } else {
+      if (eligible.length === 1) setStaffId(eligible[0].id);
+      setStep("date");
+      botSay("¿Qué día te viene bien?", makeDateOptions());
+    }
+  }
+
+  function pickStaff(id: string, label: string) {
+    setPendingOptions(null);
+    userSay(label);
+    setStaffId(id);
     setStep("date");
     botSay("¿Qué día te viene bien?", makeDateOptions());
   }
@@ -253,6 +276,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
       const res = await createBookingAction({
         tenantSlug,
         serviceId: service.id,
+        staffId: staffId !== "any" ? staffId : undefined,
         startsAtISO: selectedSlot.toISOString(),
         customerName: name,
         customerEmail: email,
@@ -293,6 +317,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
 
   function handleOptionClick(opt: Option) {
     if (step === "service") pickService(opt.value, opt.label);
+    else if (step === "staff") pickStaff(opt.value, opt.label);
     else if (step === "date") void pickDate(opt.value, opt.label);
     else if (step === "time") pickTime(opt.value, opt.label);
     else if (step === "confirm") handleConfirmOption(opt.value);

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomBytes } from "crypto";
 import { createServiceSupabaseClient } from "@/lib/supabase/admin";
 
 const RESERVED_SLUGS = new Set([
@@ -28,11 +29,11 @@ export async function POST(request: NextRequest) {
     if (!business_name?.trim())
       return NextResponse.json({ error: "El nombre del negocio es requerido." }, { status: 400 });
 
-    if (!owner_email?.includes("@"))
+    if (!owner_email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(owner_email.trim()))
       return NextResponse.json({ error: "Correo electrónico inválido." }, { status: 400 });
 
-    // Default PIN 1111 — owner changes it on first login
-    const owner_password = "1111!Bk#";
+    // Generate a random temporary password — admin shares it with the client
+    const owner_password = randomBytes(10).toString("base64url");
 
     const admin = createServiceSupabaseClient();
     if (!admin)
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
     }
 
     const subdomain = `https://${cleanSlug}.bookido.online`;
-    return NextResponse.json({ ok: true, subdomain, slug: cleanSlug }, { status: 201 });
+    return NextResponse.json({ ok: true, subdomain, slug: cleanSlug, temp_password: owner_password }, { status: 201 });
   } catch (e) {
     console.error("[/api/tenants/create]", e);
     return NextResponse.json({ error: "Error inesperado. Intenta de nuevo." }, { status: 500 });

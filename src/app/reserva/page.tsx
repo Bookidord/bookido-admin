@@ -18,14 +18,26 @@ export default async function ReservaPage() {
   const settings = await getSettings();
 
   let services: ServiceRow[] = [];
+  let staff: { id: string; name: string; role: string; color: string; service_ids: string[] }[] = [];
+
   if (admin) {
-    const { data } = await admin
-      .from("bookido_services")
-      .select("id, name, duration_minutes")
-      .eq("tenant_slug", tenantSlug)
-      .eq("active", true)
-      .order("sort_order", { ascending: true });
-    services = (data as ServiceRow[] | null) ?? [];
+    const [svcRes, staffRes] = await Promise.all([
+      admin
+        .from("bookido_services")
+        .select("id, name, duration_minutes")
+        .eq("tenant_slug", tenantSlug)
+        .eq("active", true)
+        .order("sort_order", { ascending: true }),
+      admin
+        .from("bookido_staff")
+        .select("id, name, role, color, bookido_staff_services(service_id)")
+        .eq("tenant_slug", tenantSlug)
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true }),
+    ]);
+    services = (svcRes.data as ServiceRow[] | null) ?? [];
+    const rawStaff = (staffRes.data ?? []) as { id: string; name: string; role: string; color: string; bookido_staff_services: { service_id: string }[] }[];
+    staff = rawStaff.map((m) => ({ ...m, service_ids: m.bookido_staff_services.map((r) => r.service_id) }));
   }
 
   return (
@@ -72,6 +84,7 @@ export default async function ReservaPage() {
             <Suspense>
               <BookingReservaClient
                 services={services}
+                staff={staff}
                 configured={configured}
                 tenantSlug={tenantSlug}
                 schedule={schedule}

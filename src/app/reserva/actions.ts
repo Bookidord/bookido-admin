@@ -53,6 +53,7 @@ export async function getBusyIntervalsAction(
 export async function createBookingAction(input: {
   tenantSlug: string;
   serviceId: string;
+  staffId?: string;
   startsAtISO: string;
   customerName: string;
   customerEmail?: string;
@@ -90,13 +91,16 @@ export async function createBookingAction(input: {
 
   const endsAt = addMinutes(startsAt, svc.duration_minutes);
 
-  const { data: conflicts, error: conflictErr } = await admin
+  // When staff is specified, conflicts are per-staff; otherwise global
+  let conflictQuery = admin
     .from(BOOKINGS)
     .select("id")
     .eq("tenant_slug", input.tenantSlug)
     .neq("status", "cancelled")
     .lt("starts_at", endsAt.toISOString())
     .gt("ends_at", startsAt.toISOString());
+  if (input.staffId) conflictQuery = conflictQuery.eq("staff_id", input.staffId);
+  const { data: conflicts, error: conflictErr } = await conflictQuery;
 
   if (conflictErr) {
     return { ok: false, error: conflictErr.message };
@@ -113,6 +117,7 @@ export async function createBookingAction(input: {
     .insert({
       tenant_slug: input.tenantSlug,
       service_id: input.serviceId,
+      staff_id: input.staffId || null,
       starts_at: startsAt.toISOString(),
       ends_at: endsAt.toISOString(),
       customer_name: name,
@@ -181,15 +186,22 @@ export async function createBookingAction(input: {
             hour: "2-digit",
             minute: "2-digit",
           });
+          // Resolve staff name if assigned
+          let staffName = "";
+          if (input.staffId) {
+            const { data: staffRow } = await admin.from("bookido_staff").select("name").eq("id", input.staffId).maybeSingle();
+            if (staffRow?.name) staffName = staffRow.name;
+          }
           await sendWhatsApp(
             ownerPhone,
             `📅 *Nueva reserva en ${tenant?.name ?? input.tenantSlug}*\n\n` +
             `👤 ${name}\n` +
             `✂️ ${svc.name}\n` +
             `🕐 ${dateStr}\n` +
+            (staffName ? `💇 ${staffName}\n` : "") +
             (input.customerPhone ? `📱 ${input.customerPhone}\n` : "") +
             (input.notes ? `📝 ${input.notes}\n` : "") +
-            `\nVer panel: https://${input.tenantSlug}.bookido.online/panel`,
+            `\nVer panel: https://admin.bookido.online/panel`,
           );
         }
       } catch (err) {

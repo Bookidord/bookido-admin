@@ -30,7 +30,7 @@ function resolveTenantSlug(hostname: string, pathname: string): string | null {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const hostname = request.headers.get("host") ?? "";
+  const hostname = (request.headers.get("host") ?? "").toLowerCase();
   const host = hostname.split(":")[0];
 
   // www.bookido.online → redirect to bookido.online
