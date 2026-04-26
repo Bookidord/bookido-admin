@@ -1,0 +1,226 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/admin/clientes/[slug]/landing",
+      "regex": "^/admin/clientes/([^/]+?)/landing(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/admin/clientes/(?<nxtPslug>[^/]+?)/landing(?:/)?$"
+    },
+    {
+      "page": "/panel/clientes/[email]",
+      "regex": "^/panel/clientes/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPemail": "nxtPemail"
+      },
+      "namedRegex": "^/panel/clientes/(?<nxtPemail>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/admin/clientes",
+      "regex": "^/admin/clientes(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/clientes(?:/)?$"
+    },
+    {
+      "page": "/admin/configuracion",
+      "regex": "^/admin/configuracion(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/configuracion(?:/)?$"
+    },
+    {
+      "page": "/admin/login",
+      "regex": "^/admin/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/login(?:/)?$"
+    },
+    {
+      "page": "/admin/planes",
+      "regex": "^/admin/planes(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/planes(?:/)?$"
+    },
+    {
+      "page": "/auth/callback",
+      "regex": "^/auth/callback(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/callback(?:/)?$"
+    },
+    {
+      "page": "/ayuda",
+      "regex": "^/ayuda(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/ayuda(?:/)?$"
+    },
+    {
+      "page": "/empezar/wizard",
+      "regex": "^/empezar/wizard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/empezar/wizard(?:/)?$"
+    },
+    {
+      "page": "/expired",
+      "regex": "^/expired(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/expired(?:/)?$"
+    },
+    {
+      "page": "/forgot-password",
+      "regex": "^/forgot\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/forgot\\-password(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/panel",
+      "regex": "^/panel(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panel(?:/)?$"
+    },
+    {
+      "page": "/panel/calendario",
+      "regex": "^/panel/calendario(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panel/calendario(?:/)?$"
+    },
+    {
+      "page": "/panel/campanas",
+      "regex": "^/panel/campanas(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panel/campanas(?:/)?$"
+    },
+    {
+      "page": "/panel/clientes",
+      "regex": "^/panel/clientes(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panel/clientes(?:/)?$"
+    },
+    {
+      "page": "/panel/configuracion",
+      "regex": "^/panel/configuracion(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panel/configuracion(?:/)?$"
+    },
+    {
+      "page": "/panel/equipo",
+      "regex": "^/panel/equipo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panel/equipo(?:/)?$"
+    },
+    {
+      "page": "/panel/landing",
+      "regex": "^/panel/landing(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panel/landing(?:/)?$"
+    },
+    {
+      "page": "/panel/productos",
+      "regex": "^/panel/productos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panel/productos(?:/)?$"
+    },
+    {
+      "page": "/panel/reservas",
+      "regex": "^/panel/reservas(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panel/reservas(?:/)?$"
+    },
+    {
+      "page": "/panel/reservas/nueva",
+      "regex": "^/panel/reservas/nueva(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panel/reservas/nueva(?:/)?$"
+    },
+    {
+      "page": "/panel/servicios",
+      "regex": "^/panel/servicios(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/panel/servicios(?:/)?$"
+    },
+    {
+      "page": "/registro",
+      "regex": "^/registro(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/registro(?:/)?$"
+    },
+    {
+      "page": "/reserva",
+      "regex": "^/reserva(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/reserva(?:/)?$"
+    },
+    {
+      "page": "/reset-password",
+      "regex": "^/reset\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/reset\\-password(?:/)?$"
+    },
+    {
+      "page": "/suspended",
+      "regex": "^/suspended(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/suspended(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
