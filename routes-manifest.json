@@ -20,6 +20,14 @@
   },
   "dynamicRoutes": [
     {
+      "page": "/admin/clientes/[slug]",
+      "regex": "^/admin/clientes/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPslug": "nxtPslug"
+      },
+      "namedRegex": "^/admin/clientes/(?<nxtPslug>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/admin/clientes/[slug]/landing",
       "regex": "^/admin/clientes/([^/]+?)/landing(?:/)?$",
       "routeKeys": {

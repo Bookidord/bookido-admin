@@ -56,6 +56,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../src/app/admin/(panel)/clientes/[slug]/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/admin/clientes/[slug]">> = Specific
+  const handler = {} as typeof import("../../src/app/admin/(panel)/clientes/[slug]/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../src/app/admin/(panel)/clientes/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/admin/clientes">> = Specific
@@ -357,6 +366,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/landing-config">> = Specific
   const handler = {} as typeof import("../../src/app/api/landing-config/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../src/app/api/panel/whatsapp/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/panel/whatsapp">> = Specific
+  const handler = {} as typeof import("../../src/app/api/panel/whatsapp/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check
