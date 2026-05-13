@@ -26,7 +26,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/forgot-password": {
+    "/admin/login": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -39,8 +39,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/forgot-password",
-      "dataRoute": "/forgot-password.rsc",
+      "srcRoute": "/admin/login",
+      "dataRoute": "/admin/login.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -74,7 +74,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/admin/login": {
+    "/forgot-password": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -87,8 +87,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/login",
-      "dataRoute": "/admin/login.rsc",
+      "srcRoute": "/forgot-password",
+      "dataRoute": "/forgot-password.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
