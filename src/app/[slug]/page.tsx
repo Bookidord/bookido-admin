@@ -1,10 +1,23 @@
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import type { Metadata } from "next";
 import { createServiceSupabaseClient } from "@/lib/supabase/admin";
 import { LandingPage, type ProductItem } from "@/components/landing/LandingPage";
 import { buildThemeStyle } from "@/lib/theme";
 
 export const dynamic = "force-dynamic";
+
+/** Cached so generateMetadata and the page share one Supabase round-trip. */
+const getLandingMeta = cache(async (slug: string) => {
+  const admin = createServiceSupabaseClient();
+  if (!admin) return null;
+  const { data } = await admin
+    .from("bookido_landings")
+    .select("business_name, tagline, description, photo_url_1, is_active")
+    .eq("tenant_slug", slug)
+    .maybeSingle();
+  return data;
+});
 
 /** Slugs that belong to Next.js routes — never treat as tenant. */
 const RESERVED_SLUGS = new Set([
@@ -32,8 +45,27 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const BASE = process.env.NEXT_PUBLIC_BASE_DOMAIN ?? "bookido.online";
+  const canonical = `https://${BASE}/${slug}`;
+  const meta = await getLandingMeta(slug);
+  if (!meta?.is_active) return { alternates: { canonical } };
+
+  const title = `${meta.business_name} · Bookido`;
+  const description =
+    meta.description ??
+    meta.tagline ??
+    `Reserva online en ${meta.business_name}. Elige servicio, fecha y hora en segundos.`;
+
   return {
-    alternates: { canonical: `https://${BASE}/${slug}` },
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      type: "website",
+      ...(meta.photo_url_1 ? { images: [{ url: meta.photo_url_1 }] } : {}),
+    },
   };
 }
 

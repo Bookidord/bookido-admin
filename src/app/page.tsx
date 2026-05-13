@@ -12,7 +12,37 @@ export async function generateMetadata(): Promise<Metadata> {
   const slug = h.get("x-tenant-slug") ?? process.env.NEXT_PUBLIC_BOOKIDO_TENANT_SLUG;
   const BASE = process.env.NEXT_PUBLIC_BASE_DOMAIN ?? "bookido.online";
   if (!slug) return {};
-  return { alternates: { canonical: `https://${BASE}/${slug}` } };
+  const canonical = `https://${BASE}/${slug}`;
+
+  const admin = createServiceSupabaseClient();
+  if (!admin) return { alternates: { canonical } };
+
+  const { data: meta } = await admin
+    .from("bookido_landings")
+    .select("business_name, tagline, description, photo_url_1")
+    .eq("tenant_slug", slug)
+    .maybeSingle();
+
+  if (!meta) return { alternates: { canonical } };
+
+  const title = `${meta.business_name} · Bookido`;
+  const description =
+    meta.description ??
+    meta.tagline ??
+    `Reserva online en ${meta.business_name}. Elige servicio, fecha y hora en segundos.`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      type: "website",
+      ...(meta.photo_url_1 ? { images: [{ url: meta.photo_url_1 }] } : {}),
+    },
+  };
 }
 
 function computeIsOpenNow(hours: { day_of_week: number; is_open: boolean; slots: { open: string; close: string }[] }[]): boolean | null {
