@@ -1,0 +1,75 @@
+/* ══════════════════════════════════════════════
+   Bookido Design Tokens — Sprint 2 V2
+   Source of truth for panel-v2 visual system
+   ══════════════════════════════════════════════ */
+
+:root {
+  /* ── Accent (default Bookido Volt) ── */
+  --accent: 0 248 160;
+  --accent-hex: #00F8A0;
+
+  /* ── Ink palette ── */
+  --ink-950: #08080C;
+  --ink-900: #0E0E14;
+  --ink-800: #15151E;
+  --ink-700: #1E1E2A;
+  --ink-600: #2A2A3A;
+  --ink-500: #3A3A4E;
+  --ink-400: #52526A;
+  --ink-300: #7A7A96;
+  --ink-200: #A8A8BE;
+  --ink-100: #D0D0E0;
+
+  /* ── Typography ── */
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-body: "Manrope", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* ── Easings ── */
+  --ease-snap: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Sidebar ── */
+  --sidebar-w: 256px;
+  --sidebar-w-collapsed: 64px;
+  --sidebar-transition: 280ms var(--ease-snap);
+
+  /* ── Shadows ── */
+  --shadow-glow: 0 0 20px -4px rgb(var(--accent) / 0.25);
+  --shadow-card: 0 4px 24px -8px rgba(0,0,0,0.4);
+
+  /* ── Radius ── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+}
+
+/* ── Per-tenant theming ── */
+body[data-tenant="yorbana"],
+body[data-tenant="yorbana-nail"],
+body[data-tenant="yorbananails"] {
+  --accent: 190 24 93;
+  --accent-hex: #BE185D;
+}
+
+body[data-tenant="balance-spa"],
+body[data-tenant="balance"] {
+  --accent: 20 184 166;
+  --accent-hex: #14B8A6;
+}
+
+/* ── WhatsApp pulse animation ── */
+@keyframes wa-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.15); }
+}
+
+.wa-dot {
+  width: 8px; height: 8px;
+  background: #25D366;
+  border-radius: 50%;
+  animation: wa-pulse 2s ease-in-out infinite;
+}

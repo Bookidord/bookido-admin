@@ -39,7 +39,7 @@ export default async function ExpiredPage() {
         </p>
 
         <a
-          href={`https://wa.me/18096106459?text=${encodeURIComponent(`Hola, soy de ${businessName}. Quisiera renovar mi suscripción en Bookido.`)}`}
+          href={`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "447586255903"}?text=${encodeURIComponent(`Hola, soy de ${businessName}. Quisiera renovar mi suscripción en Bookido.`)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-8 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110"

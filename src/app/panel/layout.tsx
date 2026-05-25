@@ -36,13 +36,15 @@ async function getSubscriptionBanner(tenantSlug: string) {
 
   const { data: sub } = await admin
     .from("bookido_subscriptions")
-    .select("status, end_date")
+    .select("status, end_date, is_courtesy")
     .eq("tenant_slug", tenantSlug)
     .order("end_date", { ascending: false })
     .limit(1)
     .maybeSingle();
 
   if (!sub) return null;
+// Courtesy plans never show billing banners
+  if (sub.is_courtesy) return null;
 
   const today = new Date();
   const endDate = new Date(sub.end_date);
@@ -117,7 +119,7 @@ function SubscriptionBanner({
           <span className="font-semibold">suspendida</span>. Los clientes no
           pueden hacer reservas.{" "}
           <a
-            href="https://wa.me/18096106459"
+            href={`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "447586255903"}`}
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:text-amber-200"
@@ -138,7 +140,7 @@ function SubscriptionBanner({
           <span className="font-semibold">vencido</span>. Los clientes no
           pueden hacer reservas.{" "}
           <a
-            href="https://wa.me/18096106459"
+            href={`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "447586255903"}`}
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:text-red-200"
@@ -168,7 +170,7 @@ function SubscriptionBanner({
         </span>
         .{" "}
         <a
-          href="https://wa.me/18096106459"
+          href={`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "447586255903"}`}
           target="_blank"
           rel="noopener noreferrer"
           className="underline hover:opacity-80"

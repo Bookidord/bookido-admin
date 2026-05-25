@@ -109,13 +109,13 @@ export async function middleware(request: NextRequest) {
   if (
     !tenantSlug &&
     !isPublicNoTenant &&
-    (pathname.startsWith("/panel") || pathname.startsWith("/reserva"))
+    ((pathname.startsWith("/panel") && !pathname.startsWith("/panel-v2-preview")) || pathname.startsWith("/reserva"))
   ) {
     return NextResponse.redirect(`https://${BASE_DOMAIN}`);
   }
 
   // Protect /panel/*
-  if (pathname.startsWith("/panel") && !user) {
+  if (pathname.startsWith("/panel") && !pathname.startsWith("/panel-v2-preview") && !user) {
     // Allow superadmin impersonation via cookie set by /api/imp route
     const impSession = request.cookies.get("__bookido_imp")?.value;
     if (impSession && tenantSlug && impSession === tenantSlug) {
