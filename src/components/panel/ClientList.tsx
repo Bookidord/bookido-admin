@@ -17,7 +17,7 @@ type Client = {
 
 function clientTag(total: number): { label: string; cls: string } {
   if (total >= 10) return { label: "VIP", cls: "bg-amber-400/10 text-amber-400 ring-amber-400/20" };
-  if (total >= 4)  return { label: "Regular", cls: "bg-[#14F195]/10 text-[#14F195] ring-[#14F195]/20" };
+  if (total >= 4)  return { label: "Regular", cls: "bg-[var(--accent-hex)]/10 text-[var(--accent-hex)] ring-[var(--accent-hex)]/20" };
   return { label: "Nuevo", cls: "bg-zinc-700/40 text-zinc-400 ring-zinc-600/20" };
 }
 
@@ -50,14 +50,14 @@ export function ClientList({ clients }: { clients: Client[] }) {
           placeholder="Buscar por nombre, email o teléfono…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-xl border border-white/[0.07] bg-ink-900/40 py-2.5 pl-9 pr-4 text-sm text-zinc-200 placeholder-zinc-600 outline-none transition focus:border-[#14F195]/30 focus:ring-1 focus:ring-[#14F195]/20 sm:max-w-sm"
+          className="w-full rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 py-2.5 pl-9 pr-4 text-sm text-zinc-200 placeholder-zinc-600 outline-none transition focus:border-[var(--accent-hex)]/30 focus:ring-1 focus:ring-[var(--accent-hex)]/20 sm:max-w-sm"
         />
       </div>
 
       {/* Mobile cards */}
       <div className="sm:hidden space-y-2">
         {filtered.length === 0 ? (
-          <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 py-16 text-center">
+          <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 py-16 text-center">
             <p className="text-2xl">👤</p>
             <p className="mt-3 text-sm text-zinc-500">No se encontraron clientes.</p>
           </div>
@@ -68,7 +68,7 @@ export function ClientList({ clients }: { clients: Client[] }) {
               <Link
                 key={c.email}
                 href={`/panel/clientes/${encodeURIComponent(c.email)}`}
-                className="block rounded-xl border border-white/[0.07] bg-ink-900/40 p-4 transition hover:bg-white/[0.03]"
+                className="block rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-4 transition hover:bg-white/[0.03]"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
@@ -88,7 +88,7 @@ export function ClientList({ clients }: { clients: Client[] }) {
       </div>
 
       {/* Desktop table */}
-      <div className="hidden sm:block overflow-hidden rounded-xl border border-white/[0.07] bg-ink-900/40">
+      <div className="hidden sm:block overflow-hidden rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40">
         {filtered.length === 0 ? (
           <div className="py-16 text-center">
             <p className="text-2xl">👤</p>

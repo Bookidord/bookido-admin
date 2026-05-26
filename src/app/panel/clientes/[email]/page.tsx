@@ -73,7 +73,7 @@ export default async function ClienteDetailPage({ params }: { params: Params }) 
 
   const tag =
     total >= 10 ? { label: "VIP ⭐", cls: "bg-amber-400/10 text-amber-400 ring-amber-400/20" }
-    : total >= 4 ? { label: "Regular", cls: "bg-[#14F195]/10 text-[#14F195] ring-[#14F195]/20" }
+    : total >= 4 ? { label: "Regular", cls: "bg-[var(--accent-hex)]/10 text-[var(--accent-hex)] ring-[var(--accent-hex)]/20" }
     : { label: "Nuevo", cls: "bg-zinc-700/40 text-zinc-400 ring-zinc-600/20" };
 
   return (
@@ -87,7 +87,7 @@ export default async function ClienteDetailPage({ params }: { params: Params }) 
       </Link>
 
       {/* Client header */}
-      <div className="mb-6 rounded-xl border border-white/[0.07] bg-ink-900/40 p-5">
+      <div className="mb-6 rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/[0.07] text-xl font-semibold text-white">
@@ -145,7 +145,7 @@ export default async function ClienteDetailPage({ params }: { params: Params }) 
           const start = parseDate(b.starts_at);
           const badge = STATUS_BADGE[b.status] ?? STATUS_BADGE.confirmed;
           return (
-            <div key={b.id} className={`rounded-xl border bg-ink-900/40 p-4 ${b.status !== "confirmed" ? "border-white/[0.04] opacity-70" : "border-white/[0.07]"}`}>
+            <div key={b.id} className={`rounded-xl border bg-[var(--ink-900)]/40 p-4 ${b.status !== "confirmed" ? "border-white/[0.04] opacity-70" : "border-white/[0.07]"}`}>
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <p className="font-mono text-sm font-semibold text-white">{format(start, "HH:mm")}</p>
@@ -164,7 +164,7 @@ export default async function ClienteDetailPage({ params }: { params: Params }) 
       </div>
 
       {/* Desktop table */}
-      <div className="hidden sm:block overflow-hidden rounded-xl border border-white/[0.07] bg-ink-900/40">
+      <div className="hidden sm:block overflow-hidden rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40">
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-white/[0.07]">

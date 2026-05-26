@@ -43,7 +43,7 @@ export default async function NuevaCitaPage() {
         </p>
       </div>
 
-      <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 p-5 sm:p-6">
+      <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-5 sm:p-6">
         <NuevaReservaForm
           services={services}
           openHour={schedule.openHour}

@@ -68,7 +68,7 @@ function ServiceForm({
   return (
     <form
       onSubmit={submit}
-      className="rounded-xl border border-[#14F195]/15 bg-[#14F195]/[0.04] p-5 space-y-4"
+      className="rounded-xl border border-[var(--accent-hex)]/15 bg-[var(--accent-hex)]/[0.04] p-5 space-y-4"
     >
       <h3 className="text-sm font-semibold text-white">
         {initial ? "Editar servicio" : "Nuevo servicio"}
@@ -83,7 +83,7 @@ function ServiceForm({
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-ink-950 px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+            className="w-full rounded-lg border border-white/10 bg-[var(--ink-950)] px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
             placeholder="Manicura gel"
           />
         </div>
@@ -98,7 +98,7 @@ function ServiceForm({
             max={480}
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-ink-950 px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+            className="w-full rounded-lg border border-white/10 bg-[var(--ink-950)] px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
           />
         </div>
         <div>
@@ -113,7 +113,7 @@ function ServiceForm({
               step={0.01}
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="flex-1 w-full rounded-lg border border-white/10 bg-ink-950 px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+              className="flex-1 w-full rounded-lg border border-white/10 bg-[var(--ink-950)] px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
               placeholder="1500"
             />
           </div>
@@ -126,7 +126,7 @@ function ServiceForm({
             rows={2}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full resize-none rounded-lg border border-white/10 bg-ink-950 px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+            className="w-full resize-none rounded-lg border border-white/10 bg-[var(--ink-950)] px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
             placeholder="Descripción breve del servicio…"
           />
         </div>
@@ -140,7 +140,7 @@ function ServiceForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-full bg-[#14F195] px-5 py-2 text-sm font-semibold text-[#0A0A0F] disabled:opacity-50 transition hover:opacity-90"
+          className="rounded-full bg-[var(--accent-hex)] px-5 py-2 text-sm font-semibold text-[var(--ink-950)] disabled:opacity-50 transition hover:opacity-90"
         >
           {pending ? "Guardando…" : "Guardar"}
         </button>
@@ -208,7 +208,7 @@ export function ServiciosClient({ services }: { services: Service[] }) {
         <button
           type="button"
           onClick={() => setForm({ mode: "create" })}
-          className="flex items-center gap-2 rounded-xl border border-dashed border-white/[0.12] px-4 py-3 text-sm text-zinc-400 transition hover:border-[#14F195]/30 hover:text-[#14F195] w-full"
+          className="flex items-center gap-2 rounded-xl border border-dashed border-white/[0.12] px-4 py-3 text-sm text-zinc-400 transition hover:border-[var(--accent-hex)]/30 hover:text-[var(--accent-hex)] w-full"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -219,7 +219,7 @@ export function ServiciosClient({ services }: { services: Service[] }) {
 
       {/* Services list */}
       {sorted.length === 0 && !form && (
-        <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 py-14 text-center">
+        <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 py-14 text-center">
           <p className="text-2xl">✂️</p>
           <p className="mt-3 text-sm text-zinc-500">No hay servicios todavía.</p>
           <p className="mt-1 text-xs text-zinc-600">Añade el primero con el botón de arriba.</p>
@@ -236,7 +236,7 @@ export function ServiciosClient({ services }: { services: Service[] }) {
               onSaved={() => router.refresh()}
             />
           ) : (
-            <div className={`flex items-center gap-3 rounded-xl border bg-ink-900/40 px-4 py-4 transition ${
+            <div className={`flex items-center gap-3 rounded-xl border bg-[var(--ink-900)]/40 px-4 py-4 transition ${
               svc.active ? "border-white/[0.07]" : "border-white/[0.04] opacity-60"
             }`}>
               {/* Reorder arrows */}

@@ -80,8 +80,8 @@ export function Sidebar({ userEmail, instagram, facebook, whatsapp }: Props) {
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between border-b border-white/[0.07] px-4 py-4">
         <Link href="/panel" className="flex items-center gap-3 transition hover:opacity-80">
-          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[#14F195] shadow-[0_0_16px_rgba(20,241,149,0.3)]">
-            <span className="text-xs font-bold text-[#0A0A0F]">B</span>
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--accent-hex)] shadow-[0_0_16px_rgb(var(--accent)/0.3)]">
+            <span className="text-xs font-bold text-[var(--ink-950)]">B</span>
           </div>
           <div>
             <p className="font-future text-sm font-semibold text-white">Bookido</p>
@@ -109,11 +109,11 @@ export function Sidebar({ userEmail, instagram, facebook, whatsapp }: Props) {
                 <Link
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${active ? "bg-[#14F195]/[0.10] text-white ring-1 ring-[#14F195]/20" : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"}`}
+                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${active ? "bg-[var(--accent-hex)]/[0.10] text-white ring-1 ring-[var(--accent-hex)]/20" : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"}`}
                 >
-                  <span className={active ? "text-[#14F195]" : "text-zinc-500"}>{item.icon}</span>
+                  <span className={active ? "text-[var(--accent-hex)]" : "text-zinc-500"}>{item.icon}</span>
                   {item.label}
-                  {active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#14F195] shadow-[0_0_6px_rgba(20,241,149,0.7)]" />}
+                  {active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[var(--accent-hex)] shadow-[0_0_6px_rgba(20,241,149,0.7)]" />}
                 </Link>
               </li>
             );
@@ -177,8 +177,8 @@ export function Sidebar({ userEmail, instagram, facebook, whatsapp }: Props) {
       </button>
 
       {/* Brand dot */}
-      <Link href="/panel" className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-[#14F195] shadow-[0_0_14px_rgba(20,241,149,0.3)] transition hover:opacity-80">
-        <span className="text-xs font-bold text-[#0A0A0F]">B</span>
+      <Link href="/panel" className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--accent-hex)] shadow-[0_0_14px_rgba(20,241,149,0.3)] transition hover:opacity-80">
+        <span className="text-xs font-bold text-[var(--ink-950)]">B</span>
       </Link>
 
       {/* Nav icons */}
@@ -189,7 +189,7 @@ export function Sidebar({ userEmail, instagram, facebook, whatsapp }: Props) {
             key={item.href}
             href={item.href}
             title={item.label}
-            className={`group relative flex h-9 w-9 items-center justify-center rounded-xl transition ${active ? "bg-[#14F195]/10 text-[#14F195] ring-1 ring-[#14F195]/20" : "text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"}`}
+            className={`group relative flex h-9 w-9 items-center justify-center rounded-xl transition ${active ? "bg-[var(--accent-hex)]/10 text-[var(--accent-hex)] ring-1 ring-[var(--accent-hex)]/20" : "text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"}`}
           >
             {item.icon}
             {/* Tooltip */}
@@ -256,7 +256,7 @@ export function Sidebar({ userEmail, instagram, facebook, whatsapp }: Props) {
       {/* Mobile top bar */}
       <div className="flex items-center justify-between border-b border-white/[0.07] bg-ink-900/80 px-4 py-3 backdrop-blur-sm lg:hidden">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#14F195]">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent-hex)]">
             <span className="text-xs font-bold text-white">B</span>
           </div>
           <span className="font-future text-sm font-semibold text-white">Bookido</span>

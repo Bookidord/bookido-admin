@@ -12,7 +12,7 @@ export default function RegistroPage() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-ink-950 px-4 py-12">
       {/* Background glows */}
-      <div className="pointer-events-none fixed -left-40 top-20 h-96 w-96 rounded-full bg-[#14F195]/5 blur-[120px]" />
+      <div className="pointer-events-none fixed -left-40 top-20 h-96 w-96 rounded-full bg-[var(--accent-hex)]/5 blur-[120px]" />
       <div className="pointer-events-none fixed -right-32 bottom-10 h-80 w-80 rounded-full bg-purple-600/8 blur-[100px]" />
 
       <div className="relative w-full max-w-sm">
@@ -60,7 +60,7 @@ export default function RegistroPage() {
             "Sin comisiones, sin contratos",
           ].map((f) => (
             <li key={f} className="flex items-start gap-2 text-xs text-zinc-600">
-              <span className="mt-px text-[#14F195]/60">✓</span>
+              <span className="mt-px text-[var(--accent-hex)]/60">✓</span>
               {f}
             </li>
           ))}

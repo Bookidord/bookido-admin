@@ -18,7 +18,7 @@ const DEFAULTS: BusinessSettings = {
   open_hour: 10,
   close_hour: 20,
   description: "",
-  primary_color: "#14F195",
+  primary_color: "var(--accent-hex)",
   instagram: "",
   facebook: "",
 };

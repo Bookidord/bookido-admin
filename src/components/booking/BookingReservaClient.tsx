@@ -321,7 +321,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
           {pendingOptions.map((opt) => (
             <button key={opt.value} type="button" onClick={() => handleOptionClick(opt)}
               disabled={isPending || slotLoading}
-              className="shrink-0 rounded-xl border border-white/[0.12] bg-zinc-800/60 px-3 py-2 text-sm text-zinc-200 transition hover:border-[color:var(--primary-hex,#14F195)]/50 hover:bg-zinc-700/60 disabled:opacity-40">
+              className="shrink-0 rounded-xl border border-white/[0.12] bg-zinc-800/60 px-3 py-2 text-sm text-zinc-200 transition hover:border-[color:var(--primary-hex,var(--accent-hex))]/50 hover:bg-zinc-700/60 disabled:opacity-40">
               {opt.label}
             </button>
           ))}
@@ -336,7 +336,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
           {pendingOptions.map((opt) => (
             <button key={opt.value} type="button" onClick={() => handleOptionClick(opt)}
               disabled={isPending}
-              className="rounded-xl border border-white/[0.12] bg-zinc-800/60 py-2.5 text-sm font-medium text-zinc-200 transition hover:border-[color:var(--primary-hex,#14F195)]/50 hover:bg-zinc-700/60 disabled:opacity-40">
+              className="rounded-xl border border-white/[0.12] bg-zinc-800/60 py-2.5 text-sm font-medium text-zinc-200 transition hover:border-[color:var(--primary-hex,var(--accent-hex))]/50 hover:bg-zinc-700/60 disabled:opacity-40">
               {opt.label}
             </button>
           ))}
@@ -350,7 +350,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
           {pendingOptions.map((opt) => (
             <button key={opt.value} type="button" onClick={() => handleOptionClick(opt)}
               disabled={isPending}
-              className="rounded-xl border border-white/[0.12] bg-zinc-800/60 px-4 py-2.5 text-sm font-medium text-zinc-200 transition hover:border-[color:var(--primary-hex,#14F195)]/50 hover:bg-zinc-700/60 disabled:opacity-40">
+              className="rounded-xl border border-white/[0.12] bg-zinc-800/60 px-4 py-2.5 text-sm font-medium text-zinc-200 transition hover:border-[color:var(--primary-hex,var(--accent-hex))]/50 hover:bg-zinc-700/60 disabled:opacity-40">
               {opt.label}
             </button>
           ))}
@@ -364,7 +364,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
         {pendingOptions.map((opt) => (
           <button key={opt.value} type="button" onClick={() => handleOptionClick(opt)}
             disabled={isPending}
-            className="flex items-center justify-between rounded-xl border border-white/[0.12] bg-zinc-800/60 px-4 py-3 text-left text-sm transition hover:border-[color:var(--primary-hex,#14F195)]/50 hover:bg-zinc-700/60 disabled:opacity-40">
+            className="flex items-center justify-between rounded-xl border border-white/[0.12] bg-zinc-800/60 px-4 py-3 text-left text-sm transition hover:border-[color:var(--primary-hex,var(--accent-hex))]/50 hover:bg-zinc-700/60 disabled:opacity-40">
             <span className="font-medium text-zinc-100">{opt.label}</span>
             {opt.sub && <span className="text-xs text-zinc-500">{opt.sub}</span>}
           </button>
@@ -408,7 +408,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
           return (
             <div key={msg.id} className="flex justify-end">
               <div className="max-w-[75%] rounded-2xl rounded-br-sm px-4 py-3 text-sm font-medium"
-                style={{ background: "var(--primary-hex, #14F195)", color: "#0A0A0F" }}>
+                style={{ background: "var(--primary-hex, var(--accent-hex))", color: "var(--ink-950)" }}>
                 {msg.text}
               </div>
             </div>
@@ -439,7 +439,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
                   onClick={() => setCountryIdx(i)}
                   className={`shrink-0 flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs transition ${
                     countryIdx === i
-                      ? "border-[color:var(--primary-hex,#14F195)]/50 bg-[color:var(--primary-hex,#14F195)]/10 text-white"
+                      ? "border-[color:var(--primary-hex,var(--accent-hex))]/50 bg-[color:var(--primary-hex,var(--accent-hex))]/10 text-white"
                       : "border-white/[0.08] text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
@@ -463,12 +463,12 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
               onKeyDown={handleKeyDown}
               placeholder={inputMeta.placeholder}
               autoComplete={inputMeta.type === "email" ? "email" : inputMeta.type === "tel" ? "tel" : "name"}
-              className="flex-1 rounded-xl border border-white/[0.08] bg-zinc-900 px-4 py-3 text-sm text-white outline-none focus:border-[color:var(--primary-hex,#14F195)]/50"
+              className="flex-1 rounded-xl border border-white/[0.08] bg-zinc-900 px-4 py-3 text-sm text-white outline-none focus:border-[color:var(--primary-hex,var(--accent-hex))]/50"
             />
             <button type="button" onClick={handleSend} disabled={isPending}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition hover:opacity-90 disabled:opacity-40"
-              style={{ background: "var(--primary-hex, #14F195)" }}>
-              <svg className="h-4 w-4" fill="none" stroke="#0A0A0F" strokeWidth={2.5} viewBox="0 0 24 24">
+              style={{ background: "var(--primary-hex, var(--accent-hex))" }}>
+              <svg className="h-4 w-4" fill="none" stroke="var(--ink-950)" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
             </button>
@@ -482,7 +482,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
 function BotAvatar() {
   return (
     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-base"
-      style={{ background: "var(--primary-hex, #14F195)" }}>
+      style={{ background: "var(--primary-hex, var(--accent-hex))" }}>
       <span style={{ filter: "brightness(0)" }}>✨</span>
     </div>
   );

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createBrowserClient } from "@supabase/ssr";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -8,31 +10,31 @@ const NAV_GROUPS = [
   {
     label: "Operación",
     items: [
-      { name: "Inicio", href: "/panel", icon: "🏠" },
-      { name: "Landing", href: "/panel/landing", icon: "🌐" },
-      { name: "Reservas", href: "/panel/reservas", icon: "📅", badge: true },
-      { name: "Calendario", href: "/panel/calendario", icon: "📆" },
+      { name: "Inicio", href: "/panel", icon: "\ud83c\udfe0" },
+      { name: "Landing", href: "/panel/landing", icon: "\ud83c\udf10" },
+      { name: "Reservas", href: "/panel/reservas", icon: "\ud83d\udcc5" },
+      { name: "Calendario", href: "/panel/calendario", icon: "\ud83d\udcc6" },
     ],
   },
   {
     label: "Catálogo",
     items: [
-      { name: "Productos", href: "/panel/productos", icon: "📦" },
-      { name: "Servicios", href: "/panel/servicios", icon: "✨" },
+      { name: "Productos", href: "/panel/productos", icon: "\ud83d\udce6" },
+      { name: "Servicios", href: "/panel/servicios", icon: "\u2728" },
     ],
   },
   {
     label: "Crecer",
     items: [
-      { name: "Campañas", href: "/panel/campanas", icon: "🚀" },
-      { name: "Clientes", href: "/panel/clientes", icon: "👥" },
+      { name: "Campañas", href: "/panel/campanas", icon: "\ud83d\ude80" },
+      { name: "Clientes", href: "/panel/clientes", icon: "\ud83d\udc65" },
     ],
   },
   {
     label: "Cuenta",
     items: [
-      { name: "Configuración", href: "/panel/configuracion", icon: "⚙️" },
-      { name: "Guías", href: "/ayuda", icon: "📖" },
+      { name: "Configuración", href: "/panel/configuracion", icon: "\u2699\ufe0f" },
+      { name: "Guías", href: "/ayuda", icon: "\ud83d\udcd6" },
     ],
   },
 ];
@@ -55,6 +57,25 @@ export function SidebarV2({
   activeRoute?: string;
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const router = useRouter();
+  const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
+  function handleLogout() {
+    setSigningOut(true);
+    // Clear all cookies first
+    document.cookie.split(";").forEach((c) => {
+      const name = c.split("=")[0].trim();
+      if (name) {
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname;
+      }
+    });
+    // Fire signOut in background, don't wait
+    supabase.auth.signOut().catch(() => {});
+    // Redirect immediately
+    window.location.replace("/login");
+  }
   const pathname = usePathname();
 
   const displayName = tenantName || tenantSlug;
@@ -195,7 +216,7 @@ export function SidebarV2({
               style={{ background: "rgb(var(--accent) / 0.08)" }}
             >
               <span className="text-lg shrink-0 relative">
-                💬
+                \ud83d\udcac
                 <span className="wa-dot absolute -top-0.5 -right-0.5" />
               </span>
               {!collapsed && (
@@ -204,17 +225,17 @@ export function SidebarV2({
             </a>
           </div>
         )}
-
         {/* Logout */}
-        <Link
-          href="/login"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/30 hover:text-white/50 hover:bg-white/[0.03] transition-all duration-[180ms]"
+        <button
+          onClick={handleLogout}
+          disabled={signingOut}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/30 hover:text-white/50 hover:bg-white/[0.03] transition-all duration-[180ms] disabled:opacity-40"
         >
           <span className="text-lg shrink-0">🚪</span>
           {!collapsed && (
-            <span className="text-[13px] font-medium">Cerrar sesión</span>
+            <span className="text-[13px] font-medium">{signingOut ? "Saliendo..." : "Cerrar sesión"}</span>
           )}
-        </Link>
+        </button>
       </div>
     </aside>
   );

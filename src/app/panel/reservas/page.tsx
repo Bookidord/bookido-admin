@@ -96,7 +96,7 @@ export default async function ReservasPage({
         </div>
         <Link
           href="/panel/reservas/nueva"
-          className="flex items-center gap-2 self-start rounded-full bg-[#14F195] px-4 py-2 text-sm font-semibold text-[#0A0A0F] transition hover:opacity-90 sm:self-auto"
+          className="flex items-center gap-2 self-start rounded-full bg-[var(--accent-hex)] px-4 py-2 text-sm font-semibold text-[var(--ink-950)] transition hover:opacity-90 sm:self-auto"
         >
           <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -118,7 +118,7 @@ export default async function ReservasPage({
               href={`/panel/reservas?status=${f.value}&days=${days}`}
               className={`rounded-full px-4 py-1.5 text-xs font-medium transition ${
                 status === f.value
-                  ? "bg-[#14F195]/10 text-[#14F195] ring-1 ring-[#14F195]/25"
+                  ? "bg-[var(--accent-hex)]/10 text-[var(--accent-hex)] ring-1 ring-[rgb(var(--accent)/0.25)]"
                   : "border border-white/[0.07] text-zinc-400 hover:text-zinc-200"
               }`}
             >
@@ -138,7 +138,7 @@ export default async function ReservasPage({
               href={`/panel/reservas?status=${status}&days=${d.value}`}
               className={`rounded-full px-4 py-1.5 text-xs font-medium transition ${
                 days === d.value
-                  ? "bg-ink-800 text-white ring-1 ring-white/[0.1]"
+                  ? "bg-[var(--ink-800)] text-white ring-1 ring-white/[0.1]"
                   : "border border-white/[0.07] text-zinc-400 hover:text-zinc-200"
               }`}
             >
@@ -153,7 +153,7 @@ export default async function ReservasPage({
         const weekDayLabels = ["L", "M", "X", "J", "V", "S", "D"];
         const maxWeekDay = Math.max(...weekDayCounts, 1);
         return (
-          <div className="mb-6 rounded-xl border border-white/[0.07] bg-ink-900/40 p-5">
+          <div className="mb-6 rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-5">
             <h2 className="mb-4 font-future text-base font-semibold text-white">Resumen de la semana</h2>
             <div className="flex items-end gap-2" style={{ height: 64 }}>
               {weekDayLabels.map((label, i) => {
@@ -168,11 +168,11 @@ export default async function ReservasPage({
                     </span>
                     <div className="flex w-full flex-col justify-end flex-1">
                       <div
-                        className={`w-full rounded-md transition-all ${isToday ? "bg-[#14F195]/60" : count > 0 ? "bg-white/20" : "bg-white/[0.05]"}`}
+                        className={`w-full rounded-md transition-all ${isToday ? "bg-[var(--accent-hex)]/60" : count > 0 ? "bg-white/20" : "bg-white/[0.05]"}`}
                         style={{ height: `${barPct}%` }}
                       />
                     </div>
-                    <span className={`text-[10px] font-medium uppercase tracking-wide leading-none ${isToday ? "text-[#14F195]" : "text-zinc-600"}`}>
+                    <span className={`text-[10px] font-medium uppercase tracking-wide leading-none ${isToday ? "text-[var(--accent-hex)]" : "text-zinc-600"}`}>
                       {label}
                     </span>
                   </div>
@@ -189,7 +189,7 @@ export default async function ReservasPage({
       {/* Mobile card list (< sm) */}
       <div className="sm:hidden space-y-3">
         {bookings.length === 0 ? (
-          <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 py-16 text-center">
+          <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 py-16 text-center">
             <p className="text-2xl">📭</p>
             <p className="mt-3 text-sm text-zinc-500">No hay reservas en este período.</p>
           </div>
@@ -199,7 +199,7 @@ export default async function ReservasPage({
       </div>
 
       {/* Desktop table (≥ sm) */}
-      <div className="hidden sm:block overflow-hidden rounded-xl border border-white/[0.07] bg-ink-900/40">
+      <div className="hidden sm:block overflow-hidden rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40">
         {bookings.length === 0 ? (
           <div className="py-16 text-center">
             <p className="text-2xl">📭</p>

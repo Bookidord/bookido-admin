@@ -40,7 +40,7 @@ export default async function CampanasPage() {
         <p className="text-sm text-zinc-500">
           {clients.length} clientes en tu base de datos ·{" "}
           <span className="text-amber-400">{vip} VIP</span> ·{" "}
-          <span className="text-[#14F195]">{regular} regulares</span> ·{" "}
+          <span className="text-[var(--accent-hex)]">{regular} regulares</span> ·{" "}
           <span className="text-zinc-400">{nuevo} nuevos</span>
         </p>
       </div>

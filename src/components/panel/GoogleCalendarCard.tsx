@@ -45,7 +45,7 @@ export function GoogleCalendarCard({ connection, authUrl }: Props) {
   }
 
   return (
-    <div className="mt-6 rounded-xl border border-white/[0.07] bg-ink-900/40 p-5">
+    <div className="mt-6 rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-5">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.05]">

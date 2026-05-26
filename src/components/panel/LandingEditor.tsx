@@ -116,7 +116,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
-const inputCls = "w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-3 text-sm text-zinc-200 outline-none focus:border-[#14F195]/40 placeholder:text-zinc-700";
+const inputCls = "w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-3 text-sm text-zinc-200 outline-none focus:border-[var(--accent-hex)]/40 placeholder:text-zinc-700";
 
 // ── Main component ────────────────────────────────────────────────────────────
 export function LandingEditor({ initialData }: { initialData: LandingRow | null }) {
@@ -176,7 +176,7 @@ export function LandingEditor({ initialData }: { initialData: LandingRow | null 
             <button
               type="button"
               onClick={() => set("is_active", !form.is_active)}
-              className={`relative h-6 w-11 rounded-full transition-colors ${form.is_active ? "bg-[#14F195]" : "bg-zinc-700"}`}
+              className={`relative h-6 w-11 rounded-full transition-colors ${form.is_active ? "bg-[var(--accent-hex)]" : "bg-zinc-700"}`}
             >
               <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${form.is_active ? "translate-x-5" : "translate-x-0.5"}`} />
             </button>
@@ -314,7 +314,7 @@ export function LandingEditor({ initialData }: { initialData: LandingRow | null 
             ))}
             {diplomas.length < 3 && (
               <button type="button" onClick={() => setDiplomas((d) => [...d, ""])}
-                className="text-xs text-zinc-500 transition hover:text-[#14F195]">
+                className="text-xs text-zinc-500 transition hover:text-[var(--accent-hex)]">
                 + Agregar diploma
               </button>
             )}
@@ -349,14 +349,14 @@ export function LandingEditor({ initialData }: { initialData: LandingRow | null 
       <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/[0.07] bg-zinc-950/90 px-4 py-3 backdrop-blur-sm lg:left-14">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
           {saved && (
-            <p className="text-sm text-[#14F195]">Guardado</p>
+            <p className="text-sm text-[var(--accent-hex)]">Guardado</p>
           )}
           {!saved && <span />}
           <button
             type="button"
             onClick={handleSave}
             disabled={isPending}
-            className="rounded-xl bg-[#14F195] px-8 py-3 text-sm font-semibold text-[#0A0A0F] transition hover:bg-[#14F195]/90 disabled:opacity-50"
+            className="rounded-xl bg-[var(--accent-hex)] px-8 py-3 text-sm font-semibold text-[var(--ink-950)] transition hover:bg-[var(--accent-hex)]/90 disabled:opacity-50"
           >
             {isPending ? "Guardando…" : "Guardar cambios"}
           </button>

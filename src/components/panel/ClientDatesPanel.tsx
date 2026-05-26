@@ -111,7 +111,7 @@ export function ClientDatesPanel({
       {dates.length > 0 && (
         <div className="mb-3 space-y-2">
           {dates.map((d) => (
-            <div key={d.id} className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-ink-900/40 px-4 py-3">
+            <div key={d.id} className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 px-4 py-3">
               <div className="flex items-center gap-3">
                 <span className="text-xl">{d.date_type === "birthday" ? "🎂" : d.date_type === "anniversary" ? "💍" : "⭐"}</span>
                 <div>
@@ -144,7 +144,7 @@ export function ClientDatesPanel({
 
       {/* Add form */}
       {adding && (
-        <div className="rounded-xl border border-[#14F195]/20 bg-[#14F195]/[0.03] p-4">
+        <div className="rounded-xl border border-[var(--accent-hex)]/20 bg-[var(--accent-hex)]/[0.03] p-4">
           <p className="mb-3 text-sm font-medium text-zinc-300">Nueva fecha especial</p>
 
           <div className="space-y-3">
@@ -159,7 +159,7 @@ export function ClientDatesPanel({
                     onClick={() => setForm((f) => ({ ...f, dateType: o.value }))}
                     className={`rounded-lg border px-3 py-1.5 text-xs transition ${
                       form.dateType === o.value
-                        ? "border-[#14F195]/40 bg-[#14F195]/10 text-[#14F195]"
+                        ? "border-[var(--accent-hex)]/40 bg-[var(--accent-hex)]/10 text-[var(--accent-hex)]"
                         : "border-white/[0.07] bg-white/[0.03] text-zinc-500 hover:text-zinc-300"
                     }`}
                   >
@@ -178,7 +178,7 @@ export function ClientDatesPanel({
                   value={form.label}
                   onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
                   placeholder="Ej: Día de la madre"
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 outline-none focus:border-[#14F195]/40"
+                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 outline-none focus:border-[var(--accent-hex)]/40"
                 />
               </div>
             )}
@@ -190,7 +190,7 @@ export function ClientDatesPanel({
                 <select
                   value={form.month}
                   onChange={(e) => setForm((f) => ({ ...f, month: +e.target.value, day: 1 }))}
-                  className="w-full rounded-lg border border-white/[0.08] bg-[#0A0A0F] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[#14F195]/40"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[var(--ink-950)] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[var(--accent-hex)]/40"
                 >
                   {MONTHS.map((m, i) => (
                     <option key={m} value={i + 1}>{m}</option>
@@ -202,7 +202,7 @@ export function ClientDatesPanel({
                 <select
                   value={form.day}
                   onChange={(e) => setForm((f) => ({ ...f, day: +e.target.value }))}
-                  className="w-full rounded-lg border border-white/[0.08] bg-[#0A0A0F] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[#14F195]/40"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[var(--ink-950)] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[var(--accent-hex)]/40"
                 >
                   {Array.from({ length: daysInMonth(form.month) }, (_, i) => i + 1).map((d) => (
                     <option key={d} value={d}>{d}</option>
@@ -218,7 +218,7 @@ export function ClientDatesPanel({
                 type="button"
                 onClick={handleSave}
                 disabled={isPending}
-                className="flex-1 rounded-lg bg-[#14F195] py-2 text-sm font-semibold text-[#0A0A0F] transition hover:bg-[#14F195]/90 disabled:opacity-50"
+                className="flex-1 rounded-lg bg-[var(--accent-hex)] py-2 text-sm font-semibold text-[var(--ink-950)] transition hover:bg-[var(--accent-hex)]/90 disabled:opacity-50"
               >
                 {isPending ? "Guardando…" : "Guardar"}
               </button>

@@ -20,8 +20,8 @@ import type { LandingConfig } from "@/app/panel/configuracion/actions";
 // ─── Shared helpers ────────────────────────────────────────────────────────────
 function SaveBadge({ show }: { show: boolean }) {
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border border-[#14F195]/20 bg-[#14F195]/10 px-2.5 py-0.5 text-xs font-medium text-[#14F195] transition-all duration-200 ${show ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1 pointer-events-none"}`}>
-      <span className="h-1.5 w-1.5 rounded-full bg-[#14F195]" />
+    <span className={`inline-flex items-center gap-1 rounded-full border border-[var(--accent-hex)]/20 bg-[var(--accent-hex)]/10 px-2.5 py-0.5 text-xs font-medium text-[var(--accent-hex)] transition-all duration-200 ${show ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1 pointer-events-none"}`}>
+      <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-hex)]" />
       Guardado
     </span>
   );
@@ -39,15 +39,15 @@ function FieldInput({ label, value, onChange, type = "text", placeholder, hint, 
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`w-full rounded-xl border border-white/[0.08] bg-ink-950/60 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-700 outline-none transition focus:border-[#14F195]/30 focus:ring-1 focus:ring-[#14F195]/20 ${mono ? "font-mono" : ""}`}
+        className={`w-full rounded-xl border border-white/[0.08] bg-[var(--ink-950)]/60 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-700 outline-none transition focus:border-[var(--accent-hex)]/30 focus:ring-1 focus:ring-[var(--accent-hex)]/20 ${mono ? "font-mono" : ""}`}
       />
       {hint && <p className="mt-1 text-xs text-zinc-600">{hint}</p>}
     </div>
   );
 }
 
-const INPUT_CLS = "w-full rounded-xl border border-white/[0.08] bg-ink-950/60 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-700 outline-none transition focus:border-[#14F195]/30 focus:ring-1 focus:ring-[#14F195]/20";
-const BTN_PRIMARY = "rounded-xl bg-[#14F195] px-5 py-2.5 text-sm font-semibold text-[#0A0A0F] transition hover:opacity-90 disabled:opacity-40";
+const INPUT_CLS = "w-full rounded-xl border border-white/[0.08] bg-[var(--ink-950)]/60 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-700 outline-none transition focus:border-[var(--accent-hex)]/30 focus:ring-1 focus:ring-[var(--accent-hex)]/20";
+const BTN_PRIMARY = "rounded-xl bg-[var(--accent-hex)] px-5 py-2.5 text-sm font-semibold text-[var(--ink-950)] transition hover:opacity-90 disabled:opacity-40";
 
 const DAY_NAMES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
@@ -112,7 +112,7 @@ function TabNegocio({ settings, onSaved }: {
           </div>
           {/* Preset chips */}
           <div className="flex flex-wrap gap-1.5 mb-2.5">
-            {["#14F195","#9945FF","#E24B4A","#EF9F27","#378ADD","#1D9E75","#D4537E","#5F5E5A"].map(hex => (
+            {["var(--accent-hex)","#9945FF","#E24B4A","#EF9F27","#378ADD","#1D9E75","#D4537E","#5F5E5A"].map(hex => (
               <button
                 key={hex}
                 type="button"
@@ -127,7 +127,7 @@ function TabNegocio({ settings, onSaved }: {
           <button
             type="button"
             className="h-9 rounded-full px-4 text-sm font-medium transition hover:brightness-110"
-            style={{ backgroundColor: s.primary_color, color: "#0A0A0F" }}
+            style={{ backgroundColor: s.primary_color, color: "var(--ink-950)" }}
           >
             Vista previa
           </button>
@@ -241,12 +241,12 @@ function TabHorarios({ initialHours, specialDays }: {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 overflow-hidden">
+      <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 overflow-hidden">
         {hours.map(day => (
           <div key={day.day_of_week} className={`flex flex-col gap-2 px-5 py-4 border-b border-white/[0.04] last:border-0 ${!day.is_open ? "opacity-50" : ""}`}>
             <div className="flex items-center justify-between">
               <button type="button" onClick={() => toggleDay(day.day_of_week)} className="flex items-center gap-3 text-left">
-                <span className={`relative inline-flex h-5 w-9 flex-shrink-0 rounded-full transition-colors ${day.is_open ? "bg-[#14F195]/70" : "bg-zinc-700"}`}>
+                <span className={`relative inline-flex h-5 w-9 flex-shrink-0 rounded-full transition-colors ${day.is_open ? "bg-[var(--accent-hex)]/70" : "bg-zinc-700"}`}>
                   <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform mt-0.5 ml-0.5 ${day.is_open ? "translate-x-4" : "translate-x-0"}`} />
                 </span>
                 <span className="text-sm font-medium text-zinc-200">{DAY_NAMES[day.day_of_week]}</span>
@@ -256,20 +256,20 @@ function TabHorarios({ initialHours, specialDays }: {
                   <button
                     type="button"
                     onClick={() => toggleBreak(day.day_of_week)}
-                    className={`text-xs transition ${day.slots.length === 2 ? "text-[#14F195]" : "text-zinc-600 hover:text-zinc-400"}`}
+                    className={`text-xs transition ${day.slots.length === 2 ? "text-[var(--accent-hex)]" : "text-zinc-600 hover:text-zinc-400"}`}
                     title={day.slots.length === 2 ? "Quitar pausa" : "Añadir pausa intermedia"}
                   >
                     {day.slots.length === 2 ? "⟳ pausa activa" : "pausa"}
                   </button>
-                  <button type="button" onClick={() => addSlot(day.day_of_week)} className="text-xs text-zinc-600 hover:text-[#14F195] transition">+ franja</button>
+                  <button type="button" onClick={() => addSlot(day.day_of_week)} className="text-xs text-zinc-600 hover:text-[var(--accent-hex)] transition">+ franja</button>
                 </div>
               )}
             </div>
             {day.is_open && day.slots.map((slot, idx) => (
               <div key={idx} className="flex items-center gap-2 pl-12">
-                <input type="time" value={slot.open}  onChange={e => updateSlot(day.day_of_week, idx, "open",  e.target.value)} className="rounded-lg border border-white/[0.07] bg-ink-950 px-3 py-1.5 text-sm text-zinc-200 outline-none [color-scheme:dark]" />
+                <input type="time" value={slot.open}  onChange={e => updateSlot(day.day_of_week, idx, "open",  e.target.value)} className="rounded-lg border border-white/[0.07] bg-[var(--ink-950)] px-3 py-1.5 text-sm text-zinc-200 outline-none [color-scheme:dark]" />
                 <span className="text-zinc-600 text-xs">–</span>
-                <input type="time" value={slot.close} onChange={e => updateSlot(day.day_of_week, idx, "close", e.target.value)} className="rounded-lg border border-white/[0.07] bg-ink-950 px-3 py-1.5 text-sm text-zinc-200 outline-none [color-scheme:dark]" />
+                <input type="time" value={slot.close} onChange={e => updateSlot(day.day_of_week, idx, "close", e.target.value)} className="rounded-lg border border-white/[0.07] bg-[var(--ink-950)] px-3 py-1.5 text-sm text-zinc-200 outline-none [color-scheme:dark]" />
                 {day.slots.length > 1 && (
                   <button type="button" onClick={() => removeSlot(day.day_of_week, idx)} className="text-zinc-600 hover:text-red-400 transition text-xs">✕</button>
                 )}
@@ -286,19 +286,19 @@ function TabHorarios({ initialHours, specialDays }: {
       </div>
 
       {/* Special days */}
-      <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 p-5">
+      <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-5">
         <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-600 mb-4">Días especiales / feriados</p>
         <div className="flex flex-wrap gap-2 mb-4">
           <input type="date" value={sdDate} onChange={e => setSdDate(e.target.value)}
-            className="rounded-xl border border-white/[0.07] bg-ink-950/60 px-3 py-2 text-sm text-zinc-200 outline-none [color-scheme:dark]" />
+            className="rounded-xl border border-white/[0.07] bg-[var(--ink-950)]/60 px-3 py-2 text-sm text-zinc-200 outline-none [color-scheme:dark]" />
           <select value={sdReason} onChange={e => setSdReason(e.target.value)}
-            className="rounded-xl border border-white/[0.07] bg-ink-950/60 px-3 py-2 text-sm text-zinc-200 outline-none">
+            className="rounded-xl border border-white/[0.07] bg-[var(--ink-950)]/60 px-3 py-2 text-sm text-zinc-200 outline-none">
             <option value="feriado">Feriado</option>
             <option value="vacaciones">Vacaciones</option>
             <option value="custom">Otro</option>
           </select>
           <input type="text" value={sdDetail} onChange={e => setSdDetail(e.target.value)} placeholder="Detalle (opcional)"
-            className="rounded-xl border border-white/[0.07] bg-ink-950/60 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-700 outline-none" />
+            className="rounded-xl border border-white/[0.07] bg-[var(--ink-950)]/60 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-700 outline-none" />
           <button type="button" onClick={addSpecialDay} disabled={!sdDate || sdPending} className={BTN_PRIMARY + " !py-2"}>Agregar</button>
         </div>
         {sdList.length === 0 ? (
@@ -306,7 +306,7 @@ function TabHorarios({ initialHours, specialDays }: {
         ) : (
           <ul className="space-y-2">
             {sdList.map(sd => (
-              <li key={sd.date} className="flex items-center justify-between rounded-lg border border-white/[0.05] bg-ink-950/40 px-3 py-2">
+              <li key={sd.date} className="flex items-center justify-between rounded-lg border border-white/[0.05] bg-[var(--ink-950)]/40 px-3 py-2">
                 <span className="font-mono text-sm text-zinc-300">{sd.date}</span>
                 <span className="text-xs text-zinc-500 mx-3">{sd.reason}{sd.reason_detail ? ` · ${sd.reason_detail}` : ""}</span>
                 <button type="button" onClick={() => removeSpecialDay(sd.date)} disabled={sdPending} className="text-zinc-600 hover:text-red-400 transition text-xs">✕</button>
@@ -363,7 +363,7 @@ function TabPoliticas({ initial }: { initial: BookingPolicies }) {
       <div className="flex items-center gap-4">
         <label className="flex items-center gap-2 cursor-pointer">
           <button type="button" onClick={() => set("require_deposit", !p.require_deposit)}
-            className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${p.require_deposit ? "bg-[#14F195]/70" : "bg-zinc-700"}`}>
+            className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${p.require_deposit ? "bg-[var(--accent-hex)]/70" : "bg-zinc-700"}`}>
             <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform mt-0.5 ml-0.5 ${p.require_deposit ? "translate-x-4" : "translate-x-0"}`} />
           </button>
           <span className="text-sm text-zinc-300">Requerir depósito</span>
@@ -372,7 +372,7 @@ function TabPoliticas({ initial }: { initial: BookingPolicies }) {
           <div className="flex items-center gap-2">
             <span className="text-sm text-zinc-500">RD$</span>
             <input type="number" min={0} value={p.deposit_amount} onChange={e => set("deposit_amount", +e.target.value)}
-              className="w-28 rounded-xl border border-white/[0.08] bg-ink-950/60 px-3 py-2 font-mono text-sm text-zinc-100 outline-none" />
+              className="w-28 rounded-xl border border-white/[0.08] bg-[var(--ink-950)]/60 px-3 py-2 font-mono text-sm text-zinc-100 outline-none" />
           </div>
         )}
       </div>
@@ -425,20 +425,20 @@ function TabMensajes({ initialTemplates }: { initialTemplates: MessageTemplate[]
       <div className="flex flex-wrap gap-2">
         {templates.map(t => (
           <button key={t.key} type="button" onClick={() => setActive(t.key)}
-            className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${active === t.key ? "border-[#14F195]/30 bg-[#14F195]/10 text-[#14F195]" : "border-white/[0.08] text-zinc-500 hover:text-zinc-300"}`}>
+            className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${active === t.key ? "border-[var(--accent-hex)]/30 bg-[var(--accent-hex)]/10 text-[var(--accent-hex)]" : "border-white/[0.08] text-zinc-500 hover:text-zinc-300"}`}>
             {TEMPLATE_LABELS[t.key]}
-            {t.enabled ? <span className="h-1.5 w-1.5 rounded-full bg-[#14F195]" /> : <span className="h-1.5 w-1.5 rounded-full bg-zinc-600" />}
+            {t.enabled ? <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-hex)]" /> : <span className="h-1.5 w-1.5 rounded-full bg-zinc-600" />}
           </button>
         ))}
       </div>
 
       {tpl && (
-        <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 p-5 space-y-4">
+        <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-5 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-zinc-200">{TEMPLATE_LABELS[tpl.key]}</p>
             <label className="flex items-center gap-2 cursor-pointer">
               <button type="button" onClick={() => update("enabled", !tpl.enabled)}
-                className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${tpl.enabled ? "bg-[#14F195]/70" : "bg-zinc-700"}`}>
+                className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${tpl.enabled ? "bg-[var(--accent-hex)]/70" : "bg-zinc-700"}`}>
                 <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform mt-0.5 ml-0.5 ${tpl.enabled ? "translate-x-4" : "translate-x-0"}`} />
               </button>
               <span className="text-xs text-zinc-500">{tpl.enabled ? "Activo" : "Inactivo"}</span>
@@ -449,7 +449,7 @@ function TabMensajes({ initialTemplates }: { initialTemplates: MessageTemplate[]
             <div>
               <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-600 mb-1.5">Canal</label>
               <select value={tpl.channel} onChange={e => update("channel", e.target.value)}
-                className="w-full rounded-xl border border-white/[0.08] bg-ink-950/60 px-3 py-2.5 text-sm text-zinc-200 outline-none">
+                className="w-full rounded-xl border border-white/[0.08] bg-[var(--ink-950)]/60 px-3 py-2.5 text-sm text-zinc-200 outline-none">
                 <option value="whatsapp">WhatsApp</option>
                 <option value="email">Email</option>
                 <option value="both">WhatsApp + Email</option>
@@ -459,19 +459,19 @@ function TabMensajes({ initialTemplates }: { initialTemplates: MessageTemplate[]
               <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-600 mb-1.5">Asunto (email)</label>
               <input type="text" value={tpl.subject ?? ""} onChange={e => update("subject", e.target.value)}
                 placeholder="Asunto del correo"
-                className="w-full rounded-xl border border-white/[0.08] bg-ink-950/60 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-700 outline-none" />
+                className="w-full rounded-xl border border-white/[0.08] bg-[var(--ink-950)]/60 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-700 outline-none" />
             </div>
           </div>
 
           <div>
             <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-600 mb-1.5">Cuerpo del mensaje</label>
             <textarea rows={5} value={tpl.body} onChange={e => update("body", e.target.value)}
-              className="w-full resize-y rounded-xl border border-white/[0.08] bg-ink-950/60 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-700 outline-none transition focus:border-[#14F195]/30 font-mono" />
+              className="w-full resize-y rounded-xl border border-white/[0.08] bg-[var(--ink-950)]/60 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-700 outline-none transition focus:border-[var(--accent-hex)]/30 font-mono" />
             <p className="mt-1 text-[11px] text-zinc-600">Variables: {TEMPLATE_VARS}</p>
           </div>
 
           {/* Live preview */}
-          <div className="rounded-xl border border-white/[0.05] bg-ink-950/60 p-4">
+          <div className="rounded-xl border border-white/[0.05] bg-[var(--ink-950)]/60 p-4">
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600 mb-2">Vista previa</p>
             <pre className="text-xs text-zinc-300 whitespace-pre-wrap font-sans leading-relaxed">{preview}</pre>
           </div>
@@ -551,8 +551,8 @@ function TabSeguridad() {
   const boxCls = (d: string, mismatch?: boolean) =>
     `h-14 w-12 rounded-xl border text-center text-2xl font-bold outline-none transition-all duration-150 ${
       mismatch ? "border-red-500/40 bg-red-500/[0.06] text-white"
-      : d ? "border-[#14F195]/40 bg-[#14F195]/[0.07] text-[#14F195]"
-      : "border-white/[0.09] bg-ink-950 text-white focus:border-white/20"
+      : d ? "border-[var(--accent-hex)]/40 bg-[var(--accent-hex)]/[0.07] text-[var(--accent-hex)]"
+      : "border-white/[0.09] bg-[var(--ink-950)] text-white focus:border-white/20"
     }`;
 
   return (
@@ -591,9 +591,9 @@ function TabSeguridad() {
 
       {/* Feedback */}
       {step === "success" && (
-        <div className="flex items-center gap-2 rounded-xl border border-[#14F195]/20 bg-[#14F195]/[0.07] px-4 py-3">
-          <span className="text-[#14F195]">✓</span>
-          <p className="text-sm text-[#14F195]">PIN actualizado. Úsalo la próxima vez que entres.</p>
+        <div className="flex items-center gap-2 rounded-xl border border-[var(--accent-hex)]/20 bg-[var(--accent-hex)]/[0.07] px-4 py-3">
+          <span className="text-[var(--accent-hex)]">✓</span>
+          <p className="text-sm text-[var(--accent-hex)]">PIN actualizado. Úsalo la próxima vez que entres.</p>
         </div>
       )}
       {step === "error" && (
@@ -603,7 +603,7 @@ function TabSeguridad() {
       <button
         onClick={handleSave}
         disabled={!isReady || mismatch || loading}
-        className="flex items-center gap-2 rounded-xl bg-[#14F195] px-5 py-2.5 text-sm font-semibold text-[#0A0A0F] transition hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+        className="flex items-center gap-2 rounded-xl bg-[var(--accent-hex)] px-5 py-2.5 text-sm font-semibold text-[var(--ink-950)] transition hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {loading ? "Guardando…" : "Guardar nuevo PIN"}
       </button>
@@ -652,12 +652,12 @@ export function ConfiguracionTabs({ settings, businessHours, policies, templates
   const savedCallback = useCallback(() => {}, []);
 
   return (
-    <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 overflow-hidden">
+    <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 overflow-hidden">
       {/* Tab bar */}
       <div className="flex overflow-x-auto border-b border-white/[0.07] scrollbar-none">
         {TABS.map(t => (
           <button key={t.id} type="button" onClick={() => setTab(t.id)}
-            className={`flex-shrink-0 px-5 py-3.5 text-xs font-medium uppercase tracking-wider transition border-b-2 -mb-px ${tab === t.id ? "border-[#14F195] text-[#14F195]" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
+            className={`flex-shrink-0 px-5 py-3.5 text-xs font-medium uppercase tracking-wider transition border-b-2 -mb-px ${tab === t.id ? "border-[var(--accent-hex)] text-[var(--accent-hex)]" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
             {t.label}
           </button>
         ))}
@@ -670,7 +670,7 @@ export function ConfiguracionTabs({ settings, businessHours, policies, templates
         {tab === "servicios" && (
           <div className="text-sm text-zinc-400">
             <p className="mb-3">Gestiona tus servicios en la sección dedicada:</p>
-            <a href="/panel/servicios" className="inline-flex items-center gap-2 rounded-xl bg-[#14F195] px-5 py-2.5 text-sm font-semibold text-[#0A0A0F] transition hover:opacity-90">
+            <a href="/panel/servicios" className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent-hex)] px-5 py-2.5 text-sm font-semibold text-[var(--ink-950)] transition hover:opacity-90">
               Ir a servicios →
             </a>
           </div>
@@ -679,7 +679,7 @@ export function ConfiguracionTabs({ settings, businessHours, policies, templates
         {tab === "mensajes" && <TabMensajes initialTemplates={templates} />}
         {tab === "landing" && (
           <LandingTab
-            config={landingConfig ?? { template: "nail_studio", tagline: null, description: null, address: null, schedule: null, whatsapp: null, hero_color: "#14F195", custom_cta_text: "Reservar cita", show_booking_button: true, instagram_url: null, tiktok_url: null, facebook_url: null, photo_url_1: null, photo_url_2: null, photo_url_3: null, photo_url_4: null, photo_url_5: null, photo_url_6: null, owner_name: null, owner_bio: null, owner_photo_url: null, owner_video_url: null, diploma_urls: [], stats_years: null, stats_clients: null }}
+            config={landingConfig ?? { template: "nail_studio", tagline: null, description: null, address: null, schedule: null, whatsapp: null, hero_color: "var(--accent-hex)", custom_cta_text: "Reservar cita", show_booking_button: true, instagram_url: null, tiktok_url: null, facebook_url: null, photo_url_1: null, photo_url_2: null, photo_url_3: null, photo_url_4: null, photo_url_5: null, photo_url_6: null, owner_name: null, owner_bio: null, owner_photo_url: null, owner_video_url: null, diploma_urls: [], stats_years: null, stats_clients: null }}
             tenant={tenant}
           />
         )}
@@ -691,7 +691,7 @@ export function ConfiguracionTabs({ settings, businessHours, policies, templates
               <CopyLinkButton bookingUrl={bookingUrl} />
               <p className="mt-2 text-xs text-zinc-600">Comparte por WhatsApp, Instagram o donde tus clientes te contacten.</p>
             </div>
-            <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 p-5">
+            <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-5">
               <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-600 mb-2">Tu subdominio</p>
               <p className="font-mono text-sm text-zinc-300">{tenant}.bookido.online</p>
               <p className="mt-1 text-xs text-zinc-600">Dominio exclusivo en Bookido. No se puede cambiar.</p>

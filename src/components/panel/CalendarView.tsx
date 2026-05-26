@@ -82,7 +82,7 @@ export function CalendarView({
     <div className="flex flex-col gap-6 lg:flex-row">
       {/* Calendar grid */}
       <div className="flex-1">
-        <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 p-5">
+        <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-5">
           {/* Month navigation */}
           <div className="mb-4 flex items-center justify-between">
             <button
@@ -137,7 +137,7 @@ export function CalendarView({
                   onClick={() => setSelectedDay(day)}
                   className={`relative flex min-h-[52px] flex-col items-center rounded-xl p-1.5 transition ${
                     isSelected
-                      ? "bg-[#14F195]/10 ring-1 ring-[#14F195]/30"
+                      ? "bg-[var(--accent-hex)]/10 ring-1 ring-[var(--accent-hex)]/30"
                       : isToday
                       ? "bg-white/[0.06] ring-1 ring-white/10"
                       : "hover:bg-white/[0.03]"
@@ -146,7 +146,7 @@ export function CalendarView({
                   <span
                     className={`text-xs font-medium leading-none ${
                       isSelected
-                        ? "text-[#14F195]"
+                        ? "text-[var(--accent-hex)]"
                         : isToday
                         ? "text-white"
                         : "text-zinc-400"
@@ -169,7 +169,7 @@ export function CalendarView({
                     </div>
                   )}
                   {confirmed > 0 && (
-                    <span className="mt-auto text-[9px] font-semibold leading-none text-[#14F195]/70">
+                    <span className="mt-auto text-[9px] font-semibold leading-none text-[var(--accent-hex)]/70">
                       {confirmed}
                     </span>
                   )}
@@ -192,7 +192,7 @@ export function CalendarView({
 
       {/* Day detail panel */}
       <div className="lg:w-80">
-        <div className="rounded-xl border border-white/[0.07] bg-ink-900/40">
+        <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40">
           {/* Header */}
           <div className="border-b border-white/[0.06] px-4 py-3">
             <p className="text-sm font-semibold text-white">

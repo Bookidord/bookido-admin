@@ -92,7 +92,7 @@ export function NuevaReservaForm({ services, openHour, closeHour, slotMinutes }:
           value={name}
           onChange={(e) => setName(e.target.value)}
           autoComplete="off"
-          className="w-full rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+          className="w-full rounded-xl border border-white/10 bg-[var(--ink-950)] px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
           placeholder="María García"
         />
       </div>
@@ -107,7 +107,7 @@ export function NuevaReservaForm({ services, openHour, closeHour, slotMinutes }:
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           autoComplete="off"
-          className="w-full rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+          className="w-full rounded-xl border border-white/10 bg-[var(--ink-950)] px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
           placeholder="+1 809 000 0000"
         />
       </div>
@@ -120,7 +120,7 @@ export function NuevaReservaForm({ services, openHour, closeHour, slotMinutes }:
         <select
           value={serviceId}
           onChange={(e) => { setServiceId(e.target.value); setSelectedSlot(null); }}
-          className="w-full rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+          className="w-full rounded-xl border border-white/10 bg-[var(--ink-950)] px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
         >
           {services.map((s) => (
             <option key={s.id} value={s.id}>
@@ -142,7 +142,7 @@ export function NuevaReservaForm({ services, openHour, closeHour, slotMinutes }:
           min={todayStr}
           max={maxStr}
           onChange={(e) => { setDateStr(e.target.value); setSelectedSlot(null); }}
-          className="w-full rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition [color-scheme:dark]"
+          className="w-full rounded-xl border border-white/10 bg-[var(--ink-950)] px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition [color-scheme:dark]"
         />
       </div>
 
@@ -175,8 +175,8 @@ export function NuevaReservaForm({ services, openHour, closeHour, slotMinutes }:
                     isPast
                       ? "cursor-not-allowed border-white/[0.05] text-zinc-700"
                       : active
-                      ? "border-[#14F195]/40 bg-[#14F195]/10 text-[#14F195]"
-                      : "border-white/10 bg-ink-950/50 text-zinc-300 hover:border-white/20 hover:bg-ink-900"
+                      ? "border-[var(--accent-hex)]/40 bg-[var(--accent-hex)]/10 text-[var(--accent-hex)]"
+                      : "border-white/10 bg-[var(--ink-950)]/50 text-zinc-300 hover:border-white/20 hover:bg-ink-900"
                   }`}
                 >
                   {format(slot, "HH:mm", { locale: es })}
@@ -205,7 +205,7 @@ export function NuevaReservaForm({ services, openHour, closeHour, slotMinutes }:
           rows={2}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="w-full resize-none rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+          className="w-full resize-none rounded-xl border border-white/10 bg-[var(--ink-950)] px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
           placeholder="Preferencias, alergias, color elegido…"
         />
       </div>
@@ -220,7 +220,7 @@ export function NuevaReservaForm({ services, openHour, closeHour, slotMinutes }:
         <button
           type="submit"
           disabled={pending || !selectedSlot}
-          className="flex-1 rounded-full bg-[#14F195] py-3.5 text-sm font-medium text-[#0A0A0F] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex-1 rounded-full bg-[var(--accent-hex)] py-3.5 text-sm font-medium text-[var(--ink-950)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {pending ? "Guardando…" : "Confirmar reserva"}
         </button>

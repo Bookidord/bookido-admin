@@ -99,7 +99,7 @@ export default async function AdminDashboard() {
   ];
 
   const accentMap: Record<string, string> = {
-    emerald: "text-[#14F195]",
+    emerald: "text-[var(--accent-hex)]",
     amber:   "text-amber-300",
     indigo:  "text-indigo-300",
     red:     "text-red-400",

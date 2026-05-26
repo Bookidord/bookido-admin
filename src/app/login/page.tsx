@@ -38,7 +38,7 @@ export default async function LoginPage() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-ink-950 px-4">
       {/* Glows */}
-      <div className="pointer-events-none fixed -left-40 top-20 h-96 w-96 rounded-full bg-[#14F195]/5 blur-[120px]" />
+      <div className="pointer-events-none fixed -left-40 top-20 h-96 w-96 rounded-full bg-[var(--accent-hex)]/5 blur-[120px]" />
       <div className="pointer-events-none fixed -right-32 bottom-10 h-80 w-80 rounded-full bg-red-600/10 blur-[100px]" />
       {isSuperAdmin && (
         <div className="pointer-events-none fixed left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-amber-400/5 blur-[80px]" />

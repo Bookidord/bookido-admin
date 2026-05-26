@@ -9,7 +9,7 @@ export function Spinner({ size = "md", className = "" }: SpinnerProps) {
   return (
     <span
       className={[
-        "rounded-full border-[#14F195]/30 border-t-[#14F195] animate-spin",
+        "rounded-full border-[var(--accent-hex)]/30 border-t-[var(--accent-hex)] animate-spin",
         sizes[size],
         className,
       ].join(" ")}

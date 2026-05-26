@@ -52,7 +52,7 @@ export function BookingCard({ b }: { b: Booking }) {
   }
 
   return (
-    <div className={`rounded-xl border bg-ink-900/40 p-4 transition ${b.status !== "confirmed" ? "border-white/[0.04] opacity-60" : "border-white/[0.07]"}`}>
+    <div className={`rounded-xl border bg-[var(--ink-900)]/40 p-4 transition ${b.status !== "confirmed" ? "border-white/[0.04] opacity-60" : "border-white/[0.07]"}`}>
       {/* Top row: name + status */}
       <div className="flex items-start justify-between gap-2">
         <p className="font-medium text-zinc-100">{b.customer_name}</p>

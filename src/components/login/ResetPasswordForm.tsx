@@ -99,7 +99,7 @@ export function ResetPasswordForm() {
           autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-2 w-full rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-600 ring-[#14F195]/25 focus:ring-2 transition"
+          className="mt-2 w-full rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-600 ring-[var(--accent-hex)]/25 focus:ring-2 transition"
           placeholder="Mínimo 8 caracteres"
         />
       </div>
@@ -114,7 +114,7 @@ export function ResetPasswordForm() {
           autoComplete="new-password"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          className="mt-2 w-full rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-600 ring-[#14F195]/25 focus:ring-2 transition"
+          className="mt-2 w-full rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-600 ring-[var(--accent-hex)]/25 focus:ring-2 transition"
           placeholder="Repite la contraseña"
         />
       </div>
@@ -128,7 +128,7 @@ export function ResetPasswordForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-[#14F195] py-3.5 text-sm font-semibold text-ink-950 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-full bg-[var(--accent-hex)] py-3.5 text-sm font-semibold text-ink-950 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Guardando…" : "Actualizar contraseña"}
       </button>

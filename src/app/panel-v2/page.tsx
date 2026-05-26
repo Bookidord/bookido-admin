@@ -3,7 +3,6 @@ import { SidebarV2 } from "@/components/panel-v2/SidebarV2";
 import { TopStatsBar } from "@/components/panel-v2/TopStatsBar";
 import { HeroCompact } from "@/components/panel-v2/HeroCompact";
 import { MetricRowCompact } from "@/components/panel-v2/MetricRowCompact";
-import { StatusSync } from "@/components/panel-v2/StatusSync";
 import { BookidoAICard } from "@/components/panel-v2/BookidoAICard";
 import type { MetricCard } from "@/components/panel-v2/MetricRowCompact";
 import { getTenantSlug } from "@/lib/tenant";
@@ -101,7 +100,6 @@ export default async function PanelV2Page() {
           </div>
         </main>
 
-        <StatusSync />
       </div>
     </>
   );

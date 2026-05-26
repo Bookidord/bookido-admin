@@ -3,7 +3,6 @@ import { SidebarV2 } from "@/components/panel-v2/SidebarV2";
 import { TopStatsBar } from "@/components/panel-v2/TopStatsBar";
 import { HeroCompact } from "@/components/panel-v2/HeroCompact";
 import { MetricRowCompact } from "@/components/panel-v2/MetricRowCompact";
-import { StatusSync } from "@/components/panel-v2/StatusSync";
 import { BookidoAICard } from "@/components/panel-v2/BookidoAICard";
 import type { MetricCard } from "@/components/panel-v2/MetricRowCompact";
 import { notFound } from "next/navigation";
@@ -210,7 +209,7 @@ function hexToRgb(hex: string): string {
 export default async function PanelV2PreviewPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string; tenant?: string; active?: string }>;
+  searchParams: Promise<{ token?: string; tenant?: string; active?: string; demo?: string }>;
 }) {
   const params = await searchParams;
 
@@ -224,6 +223,7 @@ export default async function PanelV2PreviewPage({
   const tenantKey = params.tenant || "bookido";
   const tenant = MOCK_TENANTS[tenantKey] || MOCK_TENANTS.bookido;
   const activeRoute = params.active || "inicio";
+  const demoMode = params.demo === "true";
 
   return (
     <>
@@ -244,12 +244,14 @@ export default async function PanelV2PreviewPage({
           className="flex-1 flex flex-col h-screen overflow-hidden"
           style={{ marginLeft: "var(--sidebar-w)" }}
         >
-          {/* QA Banner */}
-          <div className="bg-amber-500/20 border-b border-amber-400/30 px-6 py-1.5 text-center shrink-0">
-            <span className="text-amber-300 text-[10px] font-bold uppercase tracking-wider">
-              ⚠ MODO QA — datos mock — no es panel real
-            </span>
-          </div>
+          {/* QA Banner — hidden in demo mode for screen-share */}
+          {!demoMode && (
+            <div className="bg-amber-500/20 border-b border-amber-400/30 px-6 py-1.5 text-center shrink-0">
+              <span className="text-amber-300 text-[10px] font-bold uppercase tracking-wider">
+                ⚠ MODO QA — datos mock — no es panel real
+              </span>
+            </div>
+          )}
 
           {/* Top Stats Bar — 56px */}
           <TopStatsBar />
@@ -288,7 +290,6 @@ export default async function PanelV2PreviewPage({
         </main>
 
         {/* Status Sync indicator */}
-        <StatusSync />
       </div>
     </>
   );

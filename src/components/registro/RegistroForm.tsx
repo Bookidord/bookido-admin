@@ -12,7 +12,7 @@ const TEMPLATES = [
   { id: "restaurant",  label: "🍽️ Restaurante" },
 ];
 
-const INPUT = "w-full rounded-xl border border-white/[0.08] bg-ink-950/60 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-700 outline-none transition focus:border-[#14F195]/40 focus:ring-1 focus:ring-[#14F195]/20";
+const INPUT = "w-full rounded-xl border border-white/[0.08] bg-ink-950/60 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-700 outline-none transition focus:border-[var(--accent-hex)]/40 focus:ring-1 focus:ring-[var(--accent-hex)]/20";
 
 function slugify(v: string) {
   return v.toLowerCase()
@@ -82,11 +82,11 @@ export function RegistroForm() {
             <button key={t.id} type="button" onClick={() => setTemplate(t.id)}
               className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm transition text-left ${
                 template === t.id
-                  ? "border-[#14F195]/30 bg-[#14F195]/[0.06] text-white"
+                  ? "border-[var(--accent-hex)]/30 bg-[var(--accent-hex)]/[0.06] text-white"
                   : "border-white/[0.05] text-zinc-500 hover:border-white/10 hover:text-zinc-300"
               }`}>
               {t.label}
-              {template === t.id && <span className="ml-auto text-[#14F195] text-xs">✓</span>}
+              {template === t.id && <span className="ml-auto text-[var(--accent-hex)] text-xs">✓</span>}
             </button>
           ))}
         </div>
@@ -102,7 +102,7 @@ export function RegistroForm() {
       {/* Slug */}
       <div>
         <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-600 mb-1.5">Tu subdominio</label>
-        <div className="flex items-center rounded-xl border border-white/[0.08] bg-ink-950/60 overflow-hidden focus-within:border-[#14F195]/40 transition">
+        <div className="flex items-center rounded-xl border border-white/[0.08] bg-ink-950/60 overflow-hidden focus-within:border-[var(--accent-hex)]/40 transition">
           <span className="px-3 text-sm text-zinc-600 border-r border-white/[0.06] py-3 flex-shrink-0">bookido.online/</span>
           <input required value={slug}
             onChange={e => { setSlugEdited(true); setSlug(slugify(e.target.value)); }}
@@ -151,7 +151,7 @@ export function RegistroForm() {
 
       <button type="submit"
         disabled={pending || slugStatus === "taken" || slugStatus === "checking"}
-        className="w-full rounded-xl bg-[#14F195] py-3.5 text-sm font-bold text-[#0A0A0F] transition hover:opacity-90 disabled:opacity-40">
+        className="w-full rounded-xl bg-[var(--accent-hex)] py-3.5 text-sm font-bold text-[var(--ink-950)] transition hover:opacity-90 disabled:opacity-40">
         {pending ? "Creando tu panel…" : "Crear mi panel gratis →"}
       </button>
 

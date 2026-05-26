@@ -76,7 +76,7 @@ export function CampanaForm({ clients, tenantSlug }: { clients: Client[]; tenant
       {/* Form */}
       <div className="lg:col-span-2 space-y-5">
         {/* Channel toggle */}
-        <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 p-5">
+        <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-5">
           <p className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">Canal de envío</p>
           <div className="flex gap-2">
             {(["email", "whatsapp"] as Channel[]).map((ch) => (
@@ -108,7 +108,7 @@ export function CampanaForm({ clients, tenantSlug }: { clients: Client[]; tenant
         </div>
 
         {/* Message */}
-        <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 p-5 space-y-4">
+        <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-5 space-y-4">
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Mensaje</p>
 
           {channel === "email" && (
@@ -119,7 +119,7 @@ export function CampanaForm({ clients, tenantSlug }: { clients: Client[]; tenant
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Ej: ¡Promoción especial este mes!"
-                className="w-full rounded-xl border border-white/[0.07] bg-ink-950/60 px-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-600 outline-none focus:border-[#14F195]/30 focus:ring-1 focus:ring-[#14F195]/20"
+                className="w-full rounded-xl border border-white/[0.07] bg-[var(--ink-950)]/60 px-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-600 outline-none focus:border-[var(--accent-hex)]/30 focus:ring-1 focus:ring-[var(--accent-hex)]/20"
               />
             </div>
           )}
@@ -127,14 +127,14 @@ export function CampanaForm({ clients, tenantSlug }: { clients: Client[]; tenant
           <div>
             <label className="mb-1.5 block text-xs text-zinc-400">
               Mensaje
-              <span className="ml-2 text-zinc-600">— usa <code className="text-[#14F195]/70">{"{{nombre}}"}</code> para personalizar</span>
+              <span className="ml-2 text-zinc-600">— usa <code className="text-[var(--accent-hex)]/70">{"{{nombre}}"}</code> para personalizar</span>
             </label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={"Hola {{nombre}}, tenemos una promoción especial para ti esta semana. ¡Reserva tu turno antes de que se agoten los espacios!"}
               rows={5}
-              className="w-full rounded-xl border border-white/[0.07] bg-ink-950/60 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 outline-none resize-none focus:border-[#14F195]/30 focus:ring-1 focus:ring-[#14F195]/20"
+              className="w-full rounded-xl border border-white/[0.07] bg-[var(--ink-950)]/60 px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 outline-none resize-none focus:border-[var(--accent-hex)]/30 focus:ring-1 focus:ring-[var(--accent-hex)]/20"
             />
             {message && (
               <p className="mt-1.5 text-xs text-zinc-600">
@@ -197,7 +197,7 @@ export function CampanaForm({ clients, tenantSlug }: { clients: Client[]; tenant
               <div>
                 <p className="mb-1.5 text-xs text-zinc-500">1. Copia el mensaje</p>
                 <div className="flex items-start gap-2">
-                  <div className="flex-1 rounded-lg border border-white/[0.06] bg-ink-950/60 px-3 py-2.5 text-xs text-zinc-300 whitespace-pre-wrap max-h-28 overflow-y-auto">
+                  <div className="flex-1 rounded-lg border border-white/[0.06] bg-[var(--ink-950)]/60 px-3 py-2.5 text-xs text-zinc-300 whitespace-pre-wrap max-h-28 overflow-y-auto">
                     {waMessage || <span className="text-zinc-600 italic">Escribe un mensaje primero</span>}
                   </div>
                   <button
@@ -214,7 +214,7 @@ export function CampanaForm({ clients, tenantSlug }: { clients: Client[]; tenant
               <div>
                 <p className="mb-1.5 text-xs text-zinc-500">2. Copia los números para tu lista de difusión</p>
                 <div className="flex items-start gap-2">
-                  <div className="flex-1 rounded-lg border border-white/[0.06] bg-ink-950/60 px-3 py-2.5 text-xs text-zinc-300 font-mono max-h-28 overflow-y-auto whitespace-pre">
+                  <div className="flex-1 rounded-lg border border-white/[0.06] bg-[var(--ink-950)]/60 px-3 py-2.5 text-xs text-zinc-300 font-mono max-h-28 overflow-y-auto whitespace-pre">
                     {phoneList || <span className="text-zinc-600 italic">Sin teléfonos</span>}
                   </div>
                   <button
@@ -258,7 +258,7 @@ export function CampanaForm({ clients, tenantSlug }: { clients: Client[]; tenant
       {/* Sidebar: filter + recipient list */}
       <div className="space-y-4">
         {/* Filter */}
-        <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 p-4">
+        <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-4">
           <p className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">Destinatarios</p>
           <div className="space-y-1.5">
             {FILTER_OPTS.map((f) => {
@@ -270,7 +270,7 @@ export function CampanaForm({ clients, tenantSlug }: { clients: Client[]; tenant
                   onClick={() => setFilter(f.value)}
                   className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm transition ${
                     filter === f.value
-                      ? "bg-[#14F195]/10 text-white ring-1 ring-[#14F195]/20"
+                      ? "bg-[var(--accent-hex)]/10 text-white ring-1 ring-[var(--accent-hex)]/20"
                       : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
                   }`}
                 >
@@ -278,7 +278,7 @@ export function CampanaForm({ clients, tenantSlug }: { clients: Client[]; tenant
                     <span className="font-medium">{f.label}</span>
                     <span className="ml-2 text-xs text-zinc-600">{f.desc}</span>
                   </div>
-                  <span className={`text-xs font-mono font-semibold ${filter === f.value ? "text-[#14F195]" : "text-zinc-600"}`}>
+                  <span className={`text-xs font-mono font-semibold ${filter === f.value ? "text-[var(--accent-hex)]" : "text-zinc-600"}`}>
                     {count}
                   </span>
                 </button>
@@ -288,7 +288,7 @@ export function CampanaForm({ clients, tenantSlug }: { clients: Client[]; tenant
         </div>
 
         {/* Recipient preview */}
-        <div className="rounded-xl border border-white/[0.07] bg-ink-900/40">
+        <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40">
           <div className="border-b border-white/[0.06] px-4 py-3">
             <p className="text-xs font-medium text-zinc-400">
               {recipients.length} destinatario{recipients.length !== 1 ? "s" : ""}

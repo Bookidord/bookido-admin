@@ -1,33 +1,22 @@
+import "@/styles/tokens.css";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createSsrClient } from "@/lib/supabase/ssr";
 import { createServiceSupabaseClient } from "@/lib/supabase/admin";
 import { getTenantSlug } from "@/lib/tenant";
 import { getSettings } from "@/lib/settings";
-import { Sidebar } from "@/components/panel/Sidebar";
-import { PanelTopBar } from "@/components/panel/PanelTopBar";
+import { SidebarV2 } from "@/components/panel-v2/SidebarV2";
 import { BookingLiveAlert } from "@/components/panel/BookingLiveAlert";
 
-async function fetchNewsItems(): Promise<string[]> {
-  const feeds = [
-    "https://listindiario.com/rss",
-    "https://diariolibre.com/rss",
-    "https://elnacional.com.do/feed/",
-  ];
-  for (const url of feeds) {
-    try {
-      const res = await fetch(url, { next: { revalidate: 600 }, signal: AbortSignal.timeout(4000) });
-      if (!res.ok) continue;
-      const xml = await res.text();
-      const matches = [...xml.matchAll(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/gm)];
-      const items = matches
-        .map((m) => m[1].replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/<[^>]+>/g, "").trim())
-        .filter((t) => t.length > 15 && !t.toLowerCase().includes("listín") && !t.toLowerCase().includes("diario libre") && !t.toLowerCase().includes("el nacional"))
-        .slice(0, 12);
-      if (items.length >= 3) return items;
-    } catch { /* try next */ }
-  }
-  return [];
+async function getTenantData(slug: string) {
+  const admin = createServiceSupabaseClient();
+  if (!admin) return null;
+  const { data } = await admin
+    .from("tenants")
+    .select("slug, name, settings")
+    .eq("slug", slug)
+    .maybeSingle();
+  return data;
 }
 
 async function getSubscriptionBanner(tenantSlug: string) {
@@ -43,7 +32,6 @@ async function getSubscriptionBanner(tenantSlug: string) {
     .maybeSingle();
 
   if (!sub) return null;
-// Courtesy plans never show billing banners
   if (sub.is_courtesy) return null;
 
   const today = new Date();
@@ -52,16 +40,17 @@ async function getSubscriptionBanner(tenantSlug: string) {
     (endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
   );
 
-  if (sub.status === "suspended") {
-    return { type: "suspended" as const, daysLeft };
-  }
-  if (daysLeft < 0) {
-    return { type: "expired" as const, daysLeft };
-  }
-  if (daysLeft <= 15) {
-    return { type: "expiring" as const, daysLeft };
-  }
+  if (sub.status === "suspended") return { type: "suspended" as const, daysLeft };
+  if (daysLeft < 0) return { type: "expired" as const, daysLeft };
+  if (daysLeft <= 15) return { type: "expiring" as const, daysLeft };
   return null;
+}
+
+function hexToRgb(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `${r} ${g} ${b}`;
 }
 
 export default async function PanelLayout({
@@ -70,38 +59,47 @@ export default async function PanelLayout({
   children: React.ReactNode;
 }) {
   const tenantSlug = await getTenantSlug();
-  const [newsItems, settings] = await Promise.all([fetchNewsItems(), getSettings()]);
+  const settings = await getSettings();
 
-  // Allow superadmin impersonation (cookie set by /api/imp)
+  // Allow superadmin impersonation
   const cookieStore = await cookies();
   const impSession = cookieStore.get("__bookido_imp")?.value;
   const isImpersonating = impSession === tenantSlug;
 
-  let userEmail: string | undefined;
   if (!isImpersonating) {
     const supabase = await createSsrClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect("/login");
-    userEmail = user.email;
   }
+
+  // Tenant data for V2 theming
+  const tenantData = await getTenantData(tenantSlug);
+  const tenantName = tenantData?.name || tenantSlug;
+  const whatsapp = tenantData?.settings?.whatsapp || settings.whatsapp || "";
+  const accentHex = tenantData?.settings?.accent || "#00F8A0";
+
   const banner = await getSubscriptionBanner(tenantSlug);
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-ink-950 lg:flex-row">
-      <Sidebar userEmail={userEmail ?? "superadmin"} instagram={settings.instagram} facebook={settings.facebook} whatsapp={settings.whatsapp} />
-      <div className="flex flex-1 flex-col overflow-hidden relative">
-        {/* Ambient background orbs */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-32 -left-32 h-80 w-80 rounded-full bg-emerald-500/5 blur-3xl animate-[pulse_8s_ease-in-out_infinite]" />
-          <div className="absolute top-1/3 -right-24 h-72 w-72 rounded-full bg-violet-500/5 blur-3xl animate-[pulse_11s_ease-in-out_infinite_2s]" />
-          <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-cyan-500/4 blur-3xl animate-[pulse_14s_ease-in-out_infinite_4s]" />
+    <>
+      <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+      <style>{`body { --accent: ${hexToRgb(accentHex)}; --accent-hex: ${accentHex}; margin: 0; }`}</style>
+      <div className="flex h-dvh overflow-hidden bg-[var(--ink-950)]">
+        <SidebarV2
+          tenantSlug={tenantSlug}
+          tenantName={tenantName}
+          whatsapp={whatsapp}
+        />
+        <div
+          className="flex flex-1 flex-col overflow-hidden relative"
+          style={{ marginLeft: "var(--sidebar-w)" }}
+        >
+          {banner && <SubscriptionBanner banner={banner} />}
+          <main className="flex-1 overflow-y-auto relative">{children}</main>
+          <BookingLiveAlert tenantSlug={tenantSlug} />
         </div>
-        {banner && <SubscriptionBanner banner={banner} />}
-        <PanelTopBar newsItems={newsItems} tenantSlug={tenantSlug} />
-        <main className="flex-1 overflow-y-auto relative">{children}</main>
-        <BookingLiveAlert tenantSlug={tenantSlug} />
       </div>
-    </div>
+    </>
   );
 }
 
@@ -110,20 +108,15 @@ function SubscriptionBanner({
 }: {
   banner: { type: "suspended" | "expired" | "expiring"; daysLeft: number };
 }) {
+  const waHref = `https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "447586255903"}`;
+
   if (banner.type === "suspended") {
     return (
-      <div className="flex items-center gap-3 bg-amber-500/10 border-b border-amber-400/20 px-5 py-2.5 text-sm">
-        <span className="text-amber-400">⚠</span>
+      <div className="flex items-center gap-3 bg-amber-500/10 border-b border-amber-400/20 px-5 py-2.5 text-sm shrink-0">
+        <span className="text-amber-400">\u26a0</span>
         <p className="text-amber-300">
-          Tu suscripción está{" "}
-          <span className="font-semibold">suspendida</span>. Los clientes no
-          pueden hacer reservas.{" "}
-          <a
-            href={`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "447586255903"}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-amber-200"
-          >
+          Tu suscripci\u00f3n est\u00e1 <span className="font-semibold">suspendida</span>.{" "}
+          <a href={waHref} target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-200">
             Contacta a Bookido para reactivar.
           </a>
         </p>
@@ -133,18 +126,11 @@ function SubscriptionBanner({
 
   if (banner.type === "expired") {
     return (
-      <div className="flex items-center gap-3 bg-red-500/10 border-b border-red-400/20 px-5 py-2.5 text-sm">
-        <span className="text-red-400">⊘</span>
+      <div className="flex items-center gap-3 bg-red-500/10 border-b border-red-400/20 px-5 py-2.5 text-sm shrink-0">
+        <span className="text-red-400">\u2298</span>
         <p className="text-red-300">
-          Tu suscripción ha{" "}
-          <span className="font-semibold">vencido</span>. Los clientes no
-          pueden hacer reservas.{" "}
-          <a
-            href={`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "447586255903"}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-red-200"
-          >
+          Tu suscripci\u00f3n ha <span className="font-semibold">vencido</span>.{" "}
+          <a href={waHref} target="_blank" rel="noopener noreferrer" className="underline hover:text-red-200">
             Renueva tu plan por WhatsApp.
           </a>
         </p>
@@ -152,29 +138,13 @@ function SubscriptionBanner({
     );
   }
 
-  // expiring soon
   const isUrgent = banner.daysLeft <= 5;
   return (
-    <div
-      className={`flex items-center gap-3 border-b px-5 py-2.5 text-sm ${
-        isUrgent
-          ? "bg-red-500/10 border-red-400/20"
-          : "bg-amber-500/10 border-amber-400/20"
-      }`}
-    >
-      <span className={isUrgent ? "text-red-400" : "text-amber-400"}>⏰</span>
+    <div className={`flex items-center gap-3 border-b px-5 py-2.5 text-sm shrink-0 ${isUrgent ? "bg-red-500/10 border-red-400/20" : "bg-amber-500/10 border-amber-400/20"}`}>
+      <span className={isUrgent ? "text-red-400" : "text-amber-400"}>\u23f0</span>
       <p className={isUrgent ? "text-red-300" : "text-amber-300"}>
-        Tu suscripción vence en{" "}
-        <span className="font-semibold">
-          {banner.daysLeft} día{banner.daysLeft !== 1 ? "s" : ""}
-        </span>
-        .{" "}
-        <a
-          href={`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "447586255903"}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:opacity-80"
-        >
+        Tu suscripci\u00f3n vence en <span className="font-semibold">{banner.daysLeft} d\u00eda{banner.daysLeft !== 1 ? "s" : ""}</span>.{" "}
+        <a href={waHref} target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">
           Renueva antes de que venza.
         </a>
       </p>

@@ -736,17 +736,19 @@ export function LandingPage({
                 {landing.address && (
                   <AnimateIn delay={100}>
                     <div className="rounded-xl border p-4" style={{ borderColor: "rgb(var(--hero) / 0.25)", backgroundColor: "rgb(var(--hero) / 0.07)" }}>
-                      <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-zinc-500">📍 Dirección</p>
+                      <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-zinc-500">{landing.address?.toLowerCase().includes("domicilio") ? "📍 Zona de servicio" : "📍 Dirección"}</p>
                       <p className="text-sm text-zinc-200">{landing.address}</p>
-                      <a
-                        href={`https://maps.google.com/?q=${encodeURIComponent(landing.address ?? "")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-2 inline-flex items-center gap-1 text-xs font-medium transition hover:brightness-125"
-                        style={{ color: "var(--hero-hex)" }}
-                      >
-                        Ver en Maps →
-                      </a>
+                      {!landing.address?.toLowerCase().includes("domicilio") && (
+                        <a
+                          href={`https://maps.google.com/?q=${encodeURIComponent(landing.address ?? "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 inline-flex items-center gap-1 text-xs font-medium transition hover:brightness-125"
+                          style={{ color: "var(--hero-hex)" }}
+                        >
+                          Ver en Maps →
+                        </a>
+                      )}
                     </div>
                   </AnimateIn>
                 )}

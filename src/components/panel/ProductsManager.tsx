@@ -83,7 +83,7 @@ export function ProductsManager({ initialProducts }: { initialProducts: Product[
         </div>
         {!showForm && (
           <button onClick={openNew}
-            className="flex items-center gap-2 rounded-xl bg-[#14F195] px-4 py-2.5 text-sm font-semibold text-[#0A0A0F] transition hover:bg-[#14F195]/90">
+            className="flex items-center gap-2 rounded-xl bg-[var(--accent-hex)] px-4 py-2.5 text-sm font-semibold text-[var(--ink-950)] transition hover:bg-[var(--accent-hex)]/90">
             <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
@@ -94,35 +94,35 @@ export function ProductsManager({ initialProducts }: { initialProducts: Product[
 
       {/* Form */}
       {showForm && (
-        <div className="mb-6 rounded-xl border border-[#14F195]/20 bg-[#14F195]/[0.03] p-5">
+        <div className="mb-6 rounded-xl border border-[var(--accent-hex)]/20 bg-[var(--accent-hex)]/[0.03] p-5">
           <p className="mb-4 text-sm font-semibold text-white">{isNew ? "Nuevo producto" : "Editar producto"}</p>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs text-zinc-500">Nombre *</label>
               <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[#14F195]/40" />
+                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[var(--accent-hex)]/40" />
             </div>
             <div>
               <label className="mb-1 block text-xs text-zinc-500">Precio (RD$) *</label>
               <input type="number" min={0} value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: +e.target.value }))}
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[#14F195]/40" />
+                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[var(--accent-hex)]/40" />
             </div>
             <div className="sm:col-span-2">
               <label className="mb-1 block text-xs text-zinc-500">Descripción</label>
               <textarea value={form.description ?? ""} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value || null }))}
-                rows={2} className="w-full resize-none rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[#14F195]/40" />
+                rows={2} className="w-full resize-none rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[var(--accent-hex)]/40" />
             </div>
             <div className="sm:col-span-2">
               <label className="mb-1 block text-xs text-zinc-500">URL de foto</label>
               <input value={form.photo_url ?? ""} onChange={(e) => setForm((f) => ({ ...f, photo_url: e.target.value || null }))}
                 placeholder="https://..."
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[#14F195]/40" />
+                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-zinc-200 outline-none focus:border-[var(--accent-hex)]/40" />
             </div>
           </div>
           {error && <p className="mt-3 text-xs text-red-400">{error}</p>}
           <div className="mt-4 flex gap-2">
             <button onClick={handleSave} disabled={isPending}
-              className="rounded-lg bg-[#14F195] px-5 py-2 text-sm font-semibold text-[#0A0A0F] transition hover:bg-[#14F195]/90 disabled:opacity-50">
+              className="rounded-lg bg-[var(--accent-hex)] px-5 py-2 text-sm font-semibold text-[var(--ink-950)] transition hover:bg-[var(--accent-hex)]/90 disabled:opacity-50">
               {isPending ? "Guardando…" : "Guardar"}
             </button>
             <button onClick={closeForm} className="rounded-lg border border-white/[0.07] px-5 py-2 text-sm text-zinc-400 transition hover:bg-white/[0.04]">
@@ -142,7 +142,7 @@ export function ProductsManager({ initialProducts }: { initialProducts: Product[
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((p) => (
-          <div key={p.id} className={`relative rounded-xl border bg-ink-900/40 overflow-hidden transition ${p.active ? "border-white/[0.07]" : "border-white/[0.03] opacity-50"}`}>
+          <div key={p.id} className={`relative rounded-xl border bg-[var(--ink-900)]/40 overflow-hidden transition ${p.active ? "border-white/[0.07]" : "border-white/[0.03] opacity-50"}`}>
             {p.photo_url && (
               <img src={p.photo_url} alt={p.name} className="h-40 w-full object-cover" />
             )}
@@ -152,7 +152,7 @@ export function ProductsManager({ initialProducts }: { initialProducts: Product[
             <div className="p-4">
               <div className="flex items-start justify-between gap-2">
                 <p className="font-semibold text-white text-sm">{p.name}</p>
-                <p className="shrink-0 text-sm font-bold" style={{ color: "var(--hero-hex, #14F195)" }}>
+                <p className="shrink-0 text-sm font-bold" style={{ color: "var(--hero-hex, var(--accent-hex))" }}>
                   RD${p.price.toLocaleString("es-DO")}
                 </p>
               </div>
@@ -163,7 +163,7 @@ export function ProductsManager({ initialProducts }: { initialProducts: Product[
                   Editar
                 </button>
                 <button onClick={() => handleToggle(p.id, !p.active)} disabled={isPending}
-                  className={`flex-1 rounded-lg border py-1.5 text-xs transition ${p.active ? "border-zinc-600/30 text-zinc-500 hover:bg-white/[0.03]" : "border-[#14F195]/30 text-[#14F195] hover:bg-[#14F195]/10"}`}>
+                  className={`flex-1 rounded-lg border py-1.5 text-xs transition ${p.active ? "border-zinc-600/30 text-zinc-500 hover:bg-white/[0.03]" : "border-[var(--accent-hex)]/30 text-[var(--accent-hex)] hover:bg-[var(--accent-hex)]/10"}`}>
                   {p.active ? "Ocultar" : "Activar"}
                 </button>
                 <button onClick={() => handleDelete(p.id)} disabled={isPending}

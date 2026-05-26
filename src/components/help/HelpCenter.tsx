@@ -51,7 +51,7 @@ export function HelpCenter({ guides, initialSlug }: Props) {
         `}
       >
         <div className="px-5 pb-3 pt-6">
-          <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-[#14F195]/50">
+          <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-[var(--accent-hex)]/50">
             Centro de ayuda
           </p>
           <h2 className="mt-1 font-future text-lg font-semibold text-white">
@@ -73,7 +73,7 @@ export function HelpCenter({ guides, initialSlug }: Props) {
                       transition-all duration-200
                       ${
                         active
-                          ? "bg-[#14F195]/[0.10] text-white ring-1 ring-[#14F195]/20"
+                          ? "bg-[var(--accent-hex)]/[0.10] text-white ring-1 ring-[var(--accent-hex)]/20"
                           : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
                       }
                     `}
@@ -91,13 +91,13 @@ export function HelpCenter({ guides, initialSlug }: Props) {
                         {guide.title}
                       </p>
                       <p
-                        className={`mt-0.5 text-xs leading-snug ${active ? "text-[#14F195]/50" : "text-zinc-600"}`}
+                        className={`mt-0.5 text-xs leading-snug ${active ? "text-[var(--accent-hex)]/50" : "text-zinc-600"}`}
                       >
                         {guide.description}
                       </p>
                     </div>
                     {active && (
-                      <span className="ml-auto mt-1 flex-shrink-0 h-1.5 w-1.5 rounded-full bg-[#14F195] shadow-[0_0_6px_rgba(20,241,149,0.7)]" />
+                      <span className="ml-auto mt-1 flex-shrink-0 h-1.5 w-1.5 rounded-full bg-[var(--accent-hex)] shadow-[0_0_6px_rgba(20,241,149,0.7)]" />
                     )}
                   </button>
                 </li>
@@ -112,7 +112,7 @@ export function HelpCenter({ guides, initialSlug }: Props) {
             ¿No encuentras lo que buscas?{" "}
             <a
               href="mailto:soporte@bookido.app"
-              className="text-[#14F195]/70 transition hover:text-[#14F195]"
+              className="text-[var(--accent-hex)]/70 transition hover:text-[var(--accent-hex)]"
             >
               Escríbenos
             </a>
@@ -184,10 +184,10 @@ export function HelpCenter({ guides, initialSlug }: Props) {
                       <button
                         type="button"
                         onClick={() => selectGuide(prev.slug)}
-                        className="group flex items-center gap-2 rounded-xl border border-white/10 bg-ink-900/40 px-4 py-3 text-left transition hover:border-[#14F195]/25 hover:bg-[#14F195]/[0.05]"
+                        className="group flex items-center gap-2 rounded-xl border border-white/10 bg-ink-900/40 px-4 py-3 text-left transition hover:border-[var(--accent-hex)]/25 hover:bg-[var(--accent-hex)]/[0.05]"
                       >
                         <svg
-                          className="h-4 w-4 flex-shrink-0 text-zinc-500 transition group-hover:text-[#14F195]"
+                          className="h-4 w-4 flex-shrink-0 text-zinc-500 transition group-hover:text-[var(--accent-hex)]"
                           fill="none"
                           stroke="currentColor"
                           strokeWidth={2}
@@ -215,7 +215,7 @@ export function HelpCenter({ guides, initialSlug }: Props) {
                       <button
                         type="button"
                         onClick={() => selectGuide(next.slug)}
-                        className="group flex items-center gap-2 rounded-xl border border-white/10 bg-ink-900/40 px-4 py-3 text-right transition hover:border-[#14F195]/25 hover:bg-[#14F195]/[0.05]"
+                        className="group flex items-center gap-2 rounded-xl border border-white/10 bg-ink-900/40 px-4 py-3 text-right transition hover:border-[var(--accent-hex)]/25 hover:bg-[var(--accent-hex)]/[0.05]"
                       >
                         <div>
                           <p className="text-[10px] uppercase tracking-wider text-zinc-600">
@@ -226,7 +226,7 @@ export function HelpCenter({ guides, initialSlug }: Props) {
                           </p>
                         </div>
                         <svg
-                          className="h-4 w-4 flex-shrink-0 text-zinc-500 transition group-hover:text-[#14F195]"
+                          className="h-4 w-4 flex-shrink-0 text-zinc-500 transition group-hover:text-[var(--accent-hex)]"
                           fill="none"
                           stroke="currentColor"
                           strokeWidth={2}

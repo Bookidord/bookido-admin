@@ -23,7 +23,7 @@ export default async function AyudaPage({ searchParams }: Props) {
     <div className="flex h-dvh flex-col overflow-hidden bg-ink-950">
       {/* Top line glow */}
       <div
-        className="pointer-events-none fixed inset-x-0 top-0 z-50 h-px bg-gradient-to-r from-transparent via-[#14F195]/30 to-transparent"
+        className="pointer-events-none fixed inset-x-0 top-0 z-50 h-px bg-gradient-to-r from-transparent via-[var(--accent-hex)]/30 to-transparent"
         aria-hidden
       />
 
@@ -56,7 +56,7 @@ export default async function AyudaPage({ searchParams }: Props) {
             </Link>
             <Link
               href="/ayuda"
-              className="font-medium text-[#14F195]/90 transition hover:text-[#14F195]"
+              className="font-medium text-[var(--accent-hex)]/90 transition hover:text-[var(--accent-hex)]"
             >
               Guías
             </Link>

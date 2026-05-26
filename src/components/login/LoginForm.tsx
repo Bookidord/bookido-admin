@@ -96,7 +96,7 @@ export function LoginForm({ email, isSuperAdmin }: Props) {
     if (filled(i))
       return isSuperAdmin
         ? "border-amber-400/50 bg-amber-400/[0.09] text-amber-300 shadow-[0_0_14px_rgba(251,191,36,0.2)]"
-        : "border-[#14F195]/50 bg-[#14F195]/[0.09] text-[#14F195] shadow-[0_0_14px_rgba(20,241,149,0.2)]";
+        : "border-[var(--accent-hex)]/50 bg-[var(--accent-hex)]/[0.09] text-[var(--accent-hex)] shadow-[0_0_14px_rgb(var(--accent)/0.2)]";
     return "border-white/[0.09] bg-ink-950 text-white focus:border-white/20 focus:bg-white/[0.03]";
   };
 
@@ -107,7 +107,7 @@ export function LoginForm({ email, isSuperAdmin }: Props) {
         <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] ${
           isSuperAdmin
             ? "border-amber-400/25 bg-amber-400/[0.08] text-amber-300"
-            : "border-[#14F195]/25 bg-[#14F195]/[0.08] text-[#14F195]"
+            : "border-[var(--accent-hex)]/25 bg-[var(--accent-hex)]/[0.08] text-[var(--accent-hex)]"
         }`}>
           {isSuperAdmin ? "👑 Superadmin" : "🏪 Tu negocio"}
         </div>
@@ -147,7 +147,7 @@ export function LoginForm({ email, isSuperAdmin }: Props) {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className={`h-1.5 w-1.5 rounded-full ${isSuperAdmin ? "bg-amber-400" : "bg-[#14F195]"}`}
+              className={`h-1.5 w-1.5 rounded-full ${isSuperAdmin ? "bg-amber-400" : "bg-[var(--accent-hex)]"}`}
               style={{ animation: `bounce 0.8s ${i * 0.15}s ease-in-out infinite` }}
             />
           ))}

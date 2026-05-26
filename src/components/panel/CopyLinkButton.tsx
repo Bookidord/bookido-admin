@@ -26,7 +26,7 @@ export function CopyLinkButton({ bookingUrl }: { bookingUrl: string }) {
     <button
       type="button"
       onClick={copy}
-      className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-ink-900/40 px-4 py-3.5 text-sm text-zinc-300 transition hover:border-[#14F195]/20 hover:bg-[#14F195]/[0.04] hover:text-white w-full text-left"
+      className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 px-4 py-3.5 text-sm text-zinc-300 transition hover:border-[var(--accent-hex)]/20 hover:bg-[var(--accent-hex)]/[0.04] hover:text-white w-full text-left"
     >
       <svg
         className="h-4 w-4 flex-shrink-0 text-zinc-500"

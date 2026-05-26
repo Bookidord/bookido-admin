@@ -3,8 +3,8 @@
 import { useState, useTransition, useRef } from "react";
 import { saveLandingAction, type LandingConfig } from "@/app/panel/configuracion/actions";
 
-const INPUT_CLS = "w-full rounded-xl border border-white/[0.08] bg-ink-950/60 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-700 outline-none transition focus:border-[#14F195]/30 focus:ring-1 focus:ring-[#14F195]/20";
-const BTN_PRIMARY = "rounded-xl bg-[#14F195] px-5 py-2.5 text-sm font-semibold text-[#0A0A0F] transition hover:opacity-90 disabled:opacity-40";
+const INPUT_CLS = "w-full rounded-xl border border-white/[0.08] bg-[var(--ink-950)]/60 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-700 outline-none transition focus:border-[var(--accent-hex)]/30 focus:ring-1 focus:ring-[var(--accent-hex)]/20";
+const BTN_PRIMARY = "rounded-xl bg-[var(--accent-hex)] px-5 py-2.5 text-sm font-semibold text-[var(--ink-950)] transition hover:opacity-90 disabled:opacity-40";
 
 function Label({ children }: { children: React.ReactNode }) {
   return <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-600 mb-1.5">{children}</label>;
@@ -67,7 +67,7 @@ function ImageSlot({
         )}
         {uploading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#14F195] border-t-transparent" />
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent-hex)] border-t-transparent" />
           </div>
         )}
         {url && !uploading && (
@@ -139,7 +139,7 @@ export function LandingTab({ config, tenant }: { config: LandingConfig; tenant: 
               <input type="color" value={c.hero_color} onChange={e => set("hero_color", e.target.value)}
                 className="h-11 w-14 cursor-pointer rounded-xl border border-white/[0.08] bg-transparent p-1" />
               <input type="text" value={c.hero_color} onChange={e => set("hero_color", e.target.value)}
-                placeholder="#14F195" className={INPUT_CLS + " font-mono"} maxLength={7} />
+                placeholder="var(--accent-hex)" className={INPUT_CLS + " font-mono"} maxLength={7} />
             </div>
           </div>
           {/* Tagline */}
@@ -158,7 +158,7 @@ export function LandingTab({ config, tenant }: { config: LandingConfig; tenant: 
           <div className="flex items-center gap-3 pt-6">
             <button type="button"
               onClick={() => set("show_booking_button", !c.show_booking_button)}
-              className={`relative h-6 w-11 flex-shrink-0 rounded-full transition-colors duration-200 ${c.show_booking_button ? "bg-[#14F195]" : "bg-zinc-700"}`}>
+              className={`relative h-6 w-11 flex-shrink-0 rounded-full transition-colors duration-200 ${c.show_booking_button ? "bg-[var(--accent-hex)]" : "bg-zinc-700"}`}>
               <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${c.show_booking_button ? "translate-x-5" : "translate-x-0.5"}`} />
             </button>
             <Label>Mostrar botón de reserva</Label>
@@ -339,7 +339,7 @@ export function LandingTab({ config, tenant }: { config: LandingConfig; tenant: 
         </a>
         <div className="flex items-center gap-3">
           {saved && (
-            <span className="text-xs font-medium text-[#14F195]">✓ Guardado</span>
+            <span className="text-xs font-medium text-[var(--accent-hex)]">✓ Guardado</span>
           )}
           {error && <span className="text-xs text-red-400">{error}</span>}
           <button type="submit" disabled={pending} className={BTN_PRIMARY}>

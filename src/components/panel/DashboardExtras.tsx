@@ -121,7 +121,7 @@ export function DashboardExtras({
       </div>
 
       {/* ── Logros / Badges ────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-white/[0.07] bg-ink-900/40 p-5">
+      <div className="rounded-xl border border-white/[0.07] bg-[var(--ink-900)]/40 p-5">
         <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
           🏅 Logros
         </p>
@@ -133,7 +133,7 @@ export function DashboardExtras({
             lastThree.map((b) => (
               <div
                 key={b.id}
-                className="flex items-center gap-2 rounded-full border border-[#14F195]/20 bg-[#14F195]/[0.06] px-3 py-1.5"
+                className="flex items-center gap-2 rounded-full border border-[var(--accent-hex)]/20 bg-[var(--accent-hex)]/[0.06] px-3 py-1.5"
               >
                 <span>{b.emoji}</span>
                 <span className="text-xs font-medium text-zinc-200">{b.label}</span>
@@ -159,7 +159,7 @@ export function DashboardExtras({
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#14F195] to-cyan-400 transition-all duration-700"
+                className="h-full rounded-full bg-gradient-to-r from-[var(--accent-hex)] to-cyan-400 transition-all duration-700"
                 style={{ width: `${progressPct}%` }}
               />
             </div>

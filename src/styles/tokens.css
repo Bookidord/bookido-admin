@@ -48,18 +48,6 @@
 }
 
 /* ── Per-tenant theming ── */
-body[data-tenant="yorbana"],
-body[data-tenant="yorbana-nail"],
-body[data-tenant="yorbananails"] {
-  --accent: 190 24 93;
-  --accent-hex: #BE185D;
-}
-
-body[data-tenant="balance-spa"],
-body[data-tenant="balance"] {
-  --accent: 20 184 166;
-  --accent-hex: #14B8A6;
-}
 
 /* ── WhatsApp pulse animation ── */
 @keyframes wa-pulse {

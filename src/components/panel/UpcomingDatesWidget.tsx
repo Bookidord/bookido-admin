@@ -32,7 +32,7 @@ export function UpcomingDatesWidget({ dates }: { dates: DateEntry[] }) {
   const soon  = dates.filter((d) => d.daysUntil > 0);
 
   return (
-    <div className="rounded-xl border border-[#14F195]/20 bg-[#14F195]/[0.04] overflow-hidden">
+    <div className="rounded-xl border border-[var(--accent-hex)]/20 bg-[var(--accent-hex)]/[0.04] overflow-hidden">
       {/* Header */}
       <button
         type="button"
@@ -40,12 +40,12 @@ export function UpcomingDatesWidget({ dates }: { dates: DateEntry[] }) {
         className="flex w-full items-center justify-between px-5 py-4 transition hover:bg-white/[0.02]"
       >
         <div className="flex items-center gap-2.5">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#14F195]/10 text-base">🎂</span>
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--accent-hex)]/10 text-base">🎂</span>
           <div className="text-left">
             <p className="text-sm font-semibold text-white">
               Fechas especiales
               {today.length > 0 && (
-                <span className="ml-2 rounded-full bg-[#14F195] px-2 py-0.5 text-[10px] font-bold text-[#0A0A0F]">
+                <span className="ml-2 rounded-full bg-[var(--accent-hex)] px-2 py-0.5 text-[10px] font-bold text-[var(--ink-950)]">
                   HOY {today.length}
                 </span>
               )}
@@ -67,7 +67,7 @@ export function UpcomingDatesWidget({ dates }: { dates: DateEntry[] }) {
         <div className="divide-y divide-white/[0.04] border-t border-white/[0.06]">
           {today.length > 0 && (
             <div className="px-5 py-2">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-[#14F195]/70 py-1">Hoy</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--accent-hex)]/70 py-1">Hoy</p>
             </div>
           )}
           {[...today, ...soon].map((d) => {
@@ -75,7 +75,7 @@ export function UpcomingDatesWidget({ dates }: { dates: DateEntry[] }) {
               ? `Hola ${d.customer_name.split(" ")[0]}, hoy es tu cumpleaños y desde ${""} queremos desearte un feliz día 🎂🎉 ¡Ven a celebrar con nosotros, tienes un regalo especial esperándote!`
               : `Hola ${d.customer_name.split(" ")[0]}, en tu día especial queremos enviarte un saludo 🌟`;
             return (
-              <div key={d.id} className={`flex items-center gap-3 px-5 py-3 ${d.daysUntil === 0 ? "bg-[#14F195]/[0.04]" : ""}`}>
+              <div key={d.id} className={`flex items-center gap-3 px-5 py-3 ${d.daysUntil === 0 ? "bg-[var(--accent-hex)]/[0.04]" : ""}`}>
                 <div className="shrink-0 text-center w-10">
                   <p className="text-base font-semibold text-white leading-none">{d.day}</p>
                   <p className="text-[10px] text-zinc-500">{MONTHS[d.month - 1]}</p>
@@ -86,7 +86,7 @@ export function UpcomingDatesWidget({ dates }: { dates: DateEntry[] }) {
                 </div>
                 <div className="shrink-0 flex items-center gap-2">
                   {d.daysUntil === 0 ? (
-                    <span className="rounded-full bg-[#14F195]/10 px-2 py-0.5 text-[10px] font-semibold text-[#14F195]">Hoy 🎉</span>
+                    <span className="rounded-full bg-[var(--accent-hex)]/10 px-2 py-0.5 text-[10px] font-semibold text-[var(--accent-hex)]">Hoy 🎉</span>
                   ) : (
                     <span className="text-xs text-zinc-600">{d.daysUntil}d</span>
                   )}

@@ -47,7 +47,7 @@ export function ConfiguracionClient({ initial }: { initial: BusinessSettings }) 
           type="text"
           value={s.business_name}
           onChange={(e) => update("business_name", e.target.value)}
-          className="w-full rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+          className="w-full rounded-xl border border-white/10 bg-[var(--ink-950)] px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
           placeholder="Mi Nail Studio"
         />
         <p className="mt-1 text-xs text-zinc-600">
@@ -64,7 +64,7 @@ export function ConfiguracionClient({ initial }: { initial: BusinessSettings }) 
           rows={2}
           value={s.description}
           onChange={(e) => update("description", e.target.value)}
-          className="w-full resize-none rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+          className="w-full resize-none rounded-xl border border-white/10 bg-[var(--ink-950)] px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
           placeholder="Nail estudio especializado en manicura y pedicura..."
         />
       </div>
@@ -82,7 +82,7 @@ export function ConfiguracionClient({ initial }: { initial: BusinessSettings }) 
             type="tel"
             value={s.whatsapp.replace(/^\+?1?/, "")}
             onChange={(e) => update("whatsapp", "1" + e.target.value.replace(/\D/g, ""))}
-            className="flex-1 rounded-xl border border-white/10 bg-ink-950 px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+            className="flex-1 rounded-xl border border-white/10 bg-[var(--ink-950)] px-4 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
             placeholder="8096106459"
           />
         </div>
@@ -102,7 +102,7 @@ export function ConfiguracionClient({ initial }: { initial: BusinessSettings }) 
             <select
               value={s.open_hour}
               onChange={(e) => update("open_hour", Number(e.target.value))}
-              className="w-full rounded-xl border border-white/10 bg-ink-950 px-3 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+              className="w-full rounded-xl border border-white/10 bg-[var(--ink-950)] px-3 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
             >
               {HOURS.filter((h) => h < s.close_hour).map((h) => (
                 <option key={h} value={h}>{hourLabel(h)}</option>
@@ -115,7 +115,7 @@ export function ConfiguracionClient({ initial }: { initial: BusinessSettings }) 
             <select
               value={s.close_hour}
               onChange={(e) => update("close_hour", Number(e.target.value))}
-              className="w-full rounded-xl border border-white/10 bg-ink-950 px-3 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[#14F195]/20 focus:border-[#14F195]/30 transition"
+              className="w-full rounded-xl border border-white/10 bg-[var(--ink-950)] px-3 py-3 text-sm text-white outline-none focus:ring-1 focus:ring-[var(--accent-hex)]/20 focus:border-[var(--accent-hex)]/30 transition"
             >
               {HOURS.filter((h) => h > s.open_hour).map((h) => (
                 <option key={h} value={h}>{hourLabel(h)}</option>
@@ -135,7 +135,7 @@ export function ConfiguracionClient({ initial }: { initial: BusinessSettings }) 
         </label>
         {/* Presets */}
         <div className="flex flex-wrap gap-2 mb-3">
-          {["#14F195","#9945FF","#0EA5E9","#F97316","#EC4899","#be185d","#06B6D4","#F59E0B"].map(hex => (
+          {["var(--accent-hex)","#9945FF","#0EA5E9","#F97316","#EC4899","#be185d","#06B6D4","#F59E0B"].map(hex => (
             <button
               key={hex}
               type="button"
@@ -157,7 +157,7 @@ export function ConfiguracionClient({ initial }: { initial: BusinessSettings }) 
             type="text"
             readOnly
             value={s.primary_color}
-            className="w-32 rounded-xl border border-white/10 bg-ink-950/60 px-3 py-3 font-mono text-sm text-zinc-400 outline-none cursor-default"
+            className="w-32 rounded-xl border border-white/10 bg-[var(--ink-950)]/60 px-3 py-3 font-mono text-sm text-zinc-400 outline-none cursor-default"
           />
           <div
             className="h-11 w-11 flex-shrink-0 rounded-xl shadow-inner ring-1 ring-white/10"
@@ -179,7 +179,7 @@ export function ConfiguracionClient({ initial }: { initial: BusinessSettings }) 
         <button
           type="submit"
           disabled={pending}
-          className="rounded-full bg-[#14F195] px-6 py-3 text-sm font-semibold text-[#0A0A0F] transition hover:opacity-90 disabled:opacity-50"
+          className="rounded-full bg-[var(--accent-hex)] px-6 py-3 text-sm font-semibold text-[var(--ink-950)] transition hover:opacity-90 disabled:opacity-50"
         >
           {pending ? "Guardando…" : "Guardar cambios"}
         </button>
