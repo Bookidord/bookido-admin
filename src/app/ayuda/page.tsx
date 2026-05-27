@@ -1,14 +1,30 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { createServiceSupabaseClient } from "@/lib/supabase/admin";
+import { getTenantSlug } from "@/lib/tenant";
 import { Suspense } from "react";
 import { guides, defaultSlug } from "@/lib/help/guides";
 import { HelpCenter } from "@/components/help/HelpCenter";
 
-export const metadata: Metadata = {
-  title: "Centro de Ayuda | Bookido",
-  description:
-    "Guías paso a paso para configurar y sacar el máximo provecho de Bookido: servicios, reservas, WhatsApp, cancelaciones y más.",
-};
+async function resolveTenantName(): Promise<string> {
+  try {
+    const slug = await getTenantSlug();
+    const admin = createServiceSupabaseClient();
+    if (admin) {
+      const { data } = await admin.from("tenants").select("name").eq("slug", slug).maybeSingle();
+      if (data?.name) return data.name;
+    }
+  } catch {}
+  return "Bookido";
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const name = await resolveTenantName();
+  return {
+    title: `Centro de Ayuda | ${name}`,
+    description: `Guías paso a paso para configurar y sacar el máximo provecho de ${name}: servicios, reservas, WhatsApp, cancelaciones y más.`,
+  };
+}
 
 type Props = {
   searchParams: Promise<{ g?: string }>;
@@ -16,6 +32,7 @@ type Props = {
 
 export default async function AyudaPage({ searchParams }: Props) {
   const { g } = await searchParams;
+  const tenantName = await resolveTenantName();
   const initialSlug =
     guides.find((guide) => guide.slug === g)?.slug ?? defaultSlug;
 
@@ -37,7 +54,7 @@ export default async function AyudaPage({ searchParams }: Props) {
               className="flex flex-col leading-none transition hover:opacity-80"
             >
               <span className="font-future text-base font-semibold tracking-tight text-white">
-                Bookido
+                {tenantName}
               </span>
             </Link>
             <span className="text-zinc-700" aria-hidden>

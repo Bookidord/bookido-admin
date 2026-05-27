@@ -3,6 +3,7 @@
 import { createServiceSupabaseClient } from "@/lib/supabase/admin";
 import { createSsrClient } from "@/lib/supabase/ssr";
 import { sendWelcomeEmail } from "@/lib/email";
+import { generateLandingContent } from "@/lib/ai-landing-generator";
 
 const TEMPLATE_COLORS: Record<string, string> = {
   nail_studio: "#be185d",
@@ -12,7 +13,51 @@ const TEMPLATE_COLORS: Record<string, string> = {
   restaurant:  "#b45309",
 };
 
+const TEMPLATE_DEFAULTS: Record<string, { tagline: string; description: string; custom_cta_text: string }> = {
+  nail_studio: {
+    tagline: "Tu espacio para uñas perfectas",
+    description: "Transformamos tus uñas con los mejores productos y técnicas del momento.",
+    custom_cta_text: "Reservar mi cita",
+  },
+  barbershop: {
+    tagline: "Tu look, nuestro arte",
+    description: "Cortes modernos y clásicos con la mejor atención para el caballero de hoy.",
+    custom_cta_text: "Agendar corte",
+  },
+  spa: {
+    tagline: "Tu momento de paz y bienestar",
+    description: "Relájate y renueva cuerpo y mente con nuestros tratamientos profesionales.",
+    custom_cta_text: "Reservar sesión",
+  },
+  salon: {
+    tagline: "Donde tu belleza brilla",
+    description: "Estilo, color y cuidado profesional para que luzcas espectacular.",
+    custom_cta_text: "Agendar cita",
+  },
+  restaurant: {
+    tagline: "Sabores que enamoran",
+    description: "Una experiencia gastronómica única con los mejores ingredientes.",
+    custom_cta_text: "Reservar mesa",
+  },
+};
+
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/;
+
+async function verifyTurnstile(token: string): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true;
+  try {
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ secret, response: token }),
+    });
+    const data = await res.json();
+    return data.success === true;
+  } catch {
+    return false;
+  }
+}
 
 export async function registrarNegocioAction(input: {
   business_name: string;
@@ -21,7 +66,17 @@ export async function registrarNegocioAction(input: {
   email: string;
   password: string;
   whatsapp?: string;
+  instagram?: string;
+  turnstileToken?: string;
 }): Promise<{ ok: true; redirectUrl: string } | { ok: false; error: string }> {
+  // Turnstile verification
+  if (input.turnstileToken) {
+    const valid = await verifyTurnstile(input.turnstileToken);
+    if (!valid) return { ok: false, error: "Verificación de seguridad fallida. Intenta de nuevo." };
+  } else if (process.env.TURNSTILE_SECRET_KEY) {
+    return { ok: false, error: "Completa la verificación de seguridad." };
+  }
+
   const admin = createServiceSupabaseClient();
   if (!admin) return { ok: false, error: "Servicio no disponible." };
 
@@ -49,6 +104,7 @@ export async function registrarNegocioAction(input: {
   const userId = authData.user.id;
 
   const heroColor = TEMPLATE_COLORS[input.template] ?? "#14F195";
+  const defaults = TEMPLATE_DEFAULTS[input.template] ?? TEMPLATE_DEFAULTS.salon;
 
   // ── Create tenant + supporting rows ───────────────────────────────────────
   const endDate = new Date();
@@ -57,6 +113,10 @@ export async function registrarNegocioAction(input: {
   const { data: plan } = await admin.from("bookido_plans")
     .select("id").eq("name", "Básico").maybeSingle();
   const planId = plan?.id;
+
+  const tenantSettings: Record<string, string> = {};
+  if (input.whatsapp) tenantSettings.whatsapp = input.whatsapp;
+  if (input.instagram) tenantSettings.instagram = input.instagram;
 
   const hours = Array.from({ length: 7 }, (_, d) => ({
     tenant_slug: slug,
@@ -71,7 +131,7 @@ export async function registrarNegocioAction(input: {
       slug,
       name,
       owner_email: input.email.trim().toLowerCase(),
-      settings: input.whatsapp ? { whatsapp: input.whatsapp } : {},
+      settings: Object.keys(tenantSettings).length > 0 ? tenantSettings : {},
       timezone: "America/Santo_Domingo",
     }),
     admin.from("bookido_landings").insert({
@@ -81,7 +141,9 @@ export async function registrarNegocioAction(input: {
       template: input.template,
       hero_color: heroColor,
       show_booking_button: true,
-      custom_cta_text: "Reservar cita",
+      tagline: defaults.tagline,
+      description: defaults.description,
+      custom_cta_text: defaults.custom_cta_text,
     }),
     admin.from("bookido_business_hours").insert(hours),
     planId
@@ -114,6 +176,40 @@ export async function registrarNegocioAction(input: {
   // ── Welcome email (non-blocking) ─────────────────────────────────────────
   sendWelcomeEmail({ to: input.email.trim().toLowerCase(), businessName: name, slug })
     .catch(err => console.error("[registro] Welcome email failed:", err));
+
+  // ── AI landing generation (non-blocking) ─────────────────────────────────
+  generateLandingContent({
+    businessName: name,
+    template: input.template,
+    instagram: input.instagram,
+    whatsapp: input.whatsapp,
+    slug,
+  }).then(async (content) => {
+    const adminClient = createServiceSupabaseClient();
+    if (!adminClient) return;
+
+    await adminClient.from("bookido_landings").update({
+      tagline: content.tagline,
+      description: content.description,
+      schedule: content.schedule,
+      owner_specialty: content.ownerSpecialty,
+    }).eq("tenant_slug", slug);
+
+    if (content.services?.length) {
+      await adminClient.from("bookido_services").insert(
+        content.services.map((s, i) => ({
+          tenant_slug: slug,
+          name: s.name,
+          duration_minutes: s.duration,
+          price: s.price,
+          description: s.description,
+          sort_order: i + 1,
+          active: true,
+        }))
+      );
+    }
+    console.log("[registro] AI landing generated for", slug);
+  }).catch(err => console.error("[registro] AI landing generation failed:", err));
 
   const isProd = process.env.NODE_ENV === "production";
   const redirectUrl = isProd

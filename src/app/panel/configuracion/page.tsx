@@ -77,7 +77,7 @@ export default async function ConfiguracionPage() {
             address:             ld.address             ?? null,
             schedule:            ld.schedule            ?? null,
             whatsapp:            ld.whatsapp            ?? null,
-            hero_color:          ld.hero_color          ?? "var(--accent-hex)",
+            hero_color:          ld.hero_color          ?? "#14F195",
             custom_cta_text:     ld.custom_cta_text     ?? "Reservar cita",
             show_booking_button: ld.show_booking_button ?? true,
             instagram_url:       ld.instagram_url       ?? null,

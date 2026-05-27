@@ -5,9 +5,22 @@ import { LoginForm } from "@/components/login/LoginForm";
 import { createServiceSupabaseClient } from "@/lib/supabase/admin";
 import { getTenantSlug } from "@/lib/tenant";
 
-export const metadata: Metadata = {
-  title: "Entrar | Bookido Panel",
-};
+async function resolveTenantName(): Promise<string> {
+  try {
+    const slug = await getTenantSlug();
+    const admin = createServiceSupabaseClient();
+    if (admin) {
+      const { data } = await admin.from("tenants").select("business_name").eq("slug", slug).maybeSingle();
+      if (data?.business_name) return data.business_name;
+    }
+  } catch {}
+  return "Bookido";
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const name = await resolveTenantName();
+  return { title: `Entrar | ${name} Panel` };
+}
 
 async function resolveLoginEmail(): Promise<{ email: string; isSuperAdmin: boolean }> {
   try {
@@ -34,6 +47,7 @@ async function resolveLoginEmail(): Promise<{ email: string; isSuperAdmin: boole
 
 export default async function LoginPage() {
   const { email, isSuperAdmin } = await resolveLoginEmail();
+  const tenantName = await resolveTenantName();
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-ink-950 px-4">
@@ -49,7 +63,7 @@ export default async function LoginPage() {
         <div className="mb-10 text-center">
           <Link href="/" className="inline-block">
             <span className="font-future text-2xl font-semibold tracking-tight text-white">
-              Bookido
+              {tenantName}
             </span>
           </Link>
           <p className="mt-2 text-sm text-zinc-500">Panel de administración</p>

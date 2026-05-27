@@ -112,7 +112,7 @@ function TabNegocio({ settings, onSaved }: {
           </div>
           {/* Preset chips */}
           <div className="flex flex-wrap gap-1.5 mb-2.5">
-            {["var(--accent-hex)","#9945FF","#E24B4A","#EF9F27","#378ADD","#1D9E75","#D4537E","#5F5E5A"].map(hex => (
+            {["#14F195","#9945FF","#E24B4A","#EF9F27","#378ADD","#1D9E75","#D4537E","#5F5E5A"].map(hex => (
               <button
                 key={hex}
                 type="button"
@@ -679,7 +679,7 @@ export function ConfiguracionTabs({ settings, businessHours, policies, templates
         {tab === "mensajes" && <TabMensajes initialTemplates={templates} />}
         {tab === "landing" && (
           <LandingTab
-            config={landingConfig ?? { template: "nail_studio", tagline: null, description: null, address: null, schedule: null, whatsapp: null, hero_color: "var(--accent-hex)", custom_cta_text: "Reservar cita", show_booking_button: true, instagram_url: null, tiktok_url: null, facebook_url: null, photo_url_1: null, photo_url_2: null, photo_url_3: null, photo_url_4: null, photo_url_5: null, photo_url_6: null, owner_name: null, owner_bio: null, owner_photo_url: null, owner_video_url: null, diploma_urls: [], stats_years: null, stats_clients: null }}
+            config={landingConfig ?? { template: "nail_studio", tagline: null, description: null, address: null, schedule: null, whatsapp: null, hero_color: "#14F195", custom_cta_text: "Reservar cita", show_booking_button: true, instagram_url: null, tiktok_url: null, facebook_url: null, photo_url_1: null, photo_url_2: null, photo_url_3: null, photo_url_4: null, photo_url_5: null, photo_url_6: null, owner_name: null, owner_bio: null, owner_photo_url: null, owner_video_url: null, diploma_urls: [], stats_years: null, stats_clients: null }}
             tenant={tenant}
           />
         )}

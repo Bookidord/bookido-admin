@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import Link from "next/link";
@@ -8,7 +8,7 @@ import { usePathname } from "next/navigation";
 
 const NAV_GROUPS = [
   {
-    label: "Operación",
+    label: "Operaci\u00f3n",
     items: [
       { name: "Inicio", href: "/panel", icon: "\ud83c\udfe0" },
       { name: "Landing", href: "/panel/landing", icon: "\ud83c\udf10" },
@@ -17,7 +17,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "Catálogo",
+    label: "Cat\u00e1logo",
     items: [
       { name: "Productos", href: "/panel/productos", icon: "\ud83d\udce6" },
       { name: "Servicios", href: "/panel/servicios", icon: "\u2728" },
@@ -26,15 +26,15 @@ const NAV_GROUPS = [
   {
     label: "Crecer",
     items: [
-      { name: "Campañas", href: "/panel/campanas", icon: "\ud83d\ude80" },
+      { name: "Campa\u00f1as", href: "/panel/campanas", icon: "\ud83d\ude80" },
       { name: "Clientes", href: "/panel/clientes", icon: "\ud83d\udc65" },
     ],
   },
   {
     label: "Cuenta",
     items: [
-      { name: "Configuración", href: "/panel/configuracion", icon: "\u2699\ufe0f" },
-      { name: "Guías", href: "/ayuda", icon: "\ud83d\udcd6" },
+      { name: "Configuraci\u00f3n", href: "/panel/configuracion", icon: "\u2699\ufe0f" },
+      { name: "Gu\u00edas", href: "/ayuda", icon: "\ud83d\udcd6" },
     ],
   },
 ];
@@ -58,6 +58,7 @@ export function SidebarV2({
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [waStatus, setWaStatus] = useState<"connected"|"disconnected"|"checking">("checking");
   const router = useRouter();
   const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
@@ -77,6 +78,21 @@ export function SidebarV2({
     window.location.replace("/login");
   }
   const pathname = usePathname();
+
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const res = await fetch(`/api/wa-status/${tenantSlug}`);
+        const data = await res.json();
+        setWaStatus(data.connected ? "connected" : "disconnected");
+      } catch {
+        setWaStatus("disconnected");
+      }
+    };
+    check();
+    const id = setInterval(check, 30000);
+    return () => clearInterval(id);
+  }, [tenantSlug]);
 
   const displayName = tenantName || tenantSlug;
   const subdomain = `${tenantSlug}.bookido.online`;
@@ -180,17 +196,6 @@ export function SidebarV2({
                     </span>
                   )}
 
-                  {item.badge && !collapsed && (
-                    <span
-                      className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                      style={{
-                        background: "rgb(var(--accent) / 0.15)",
-                        color: "var(--accent-hex)",
-                      }}
-                    >
-                      3
-                    </span>
-                  )}
                 </Link>
               );
             })}
@@ -200,12 +205,12 @@ export function SidebarV2({
 
       {/* Bottom section */}
       <div className="px-2 py-3 border-t border-white/[0.04] shrink-0">
-        {/* SOPORTE INSTANTÁNEO group */}
+        {/* SOPORTE INSTANT\u00c1NEO group */}
         {whatsapp && (
           <div className="mb-2">
             {!collapsed && (
               <p className="px-2 mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-white/25">
-                Soporte instantáneo
+                Soporte instant\u00e1neo
               </p>
             )}
             <a
@@ -216,13 +221,33 @@ export function SidebarV2({
               style={{ background: "rgb(var(--accent) / 0.08)" }}
             >
               <span className="text-lg shrink-0 relative">
-                \ud83d\udcac
+                {"\ud83d\udcac"}
                 <span className="wa-dot absolute -top-0.5 -right-0.5" />
               </span>
               {!collapsed && (
                 <span className="text-[13px] font-medium">WhatsApp</span>
               )}
             </a>
+            {!collapsed && (
+              <div className="px-3 mt-1">
+                <div className="flex items-center gap-1.5">
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    waStatus === "connected" ? "bg-emerald-400" :
+                    waStatus === "checking" ? "bg-amber-400 animate-pulse" :
+                    "bg-red-400"
+                  }`} />
+                  <span className={`text-[9px] ${
+                    waStatus === "connected" ? "text-emerald-400/60" :
+                    waStatus === "checking" ? "text-amber-400/60" :
+                    "text-red-400/60"
+                  }`}>
+                    {waStatus === "connected" ? "WhatsApp activo" :
+                     waStatus === "checking" ? "Verificando..." :
+                     "WhatsApp desconectado"}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         )}
         {/* Logout */}
@@ -231,9 +256,9 @@ export function SidebarV2({
           disabled={signingOut}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/30 hover:text-white/50 hover:bg-white/[0.03] transition-all duration-[180ms] disabled:opacity-40"
         >
-          <span className="text-lg shrink-0">🚪</span>
+          <span className="text-lg shrink-0">{"\ud83d\udeaa"}</span>
           {!collapsed && (
-            <span className="text-[13px] font-medium">{signingOut ? "Saliendo..." : "Cerrar sesión"}</span>
+            <span className="text-[13px] font-medium">{signingOut ? "Saliendo..." : "Cerrar sesi\u00f3n"}</span>
           )}
         </button>
       </div>

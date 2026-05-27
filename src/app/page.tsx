@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createServiceSupabaseClient } from "@/lib/supabase/admin";
-import { LandingPage, type ProductItem } from "@/components/landing/LandingPage";
+import { LandingPage, type ProductItem, type BusinessHourRow } from "@/components/landing/LandingPage";
 import { buildThemeStyle } from "@/lib/theme";
 
 export const dynamic = "force-dynamic";
@@ -103,6 +103,7 @@ export default async function Home() {
         bookingUrl="/reserva"
         services={services ?? []}
         products={(products ?? []) as ProductItem[]}
+        hoursRows={(hoursRows ?? []) as BusinessHourRow[]}
         isOpenNow={isOpenNow}
         fomoLastMinutes={fomoLastMinutes}
         fomoWeekCount={weekCount ?? 0}

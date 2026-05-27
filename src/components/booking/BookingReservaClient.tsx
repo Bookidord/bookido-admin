@@ -263,7 +263,7 @@ export function BookingReservaClient({ services, configured, tenantSlug, schedul
         const dateCap = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
         replaceTyping({
           id: uid(), from: "bot",
-          text: `¡Reserva confirmada! 🎉\n\nTe esperamos el ${dateCap}.\n\n¡Hasta pronto, ${name.split(" ")[0]}! 💅`,
+          text: `¡Reserva confirmada! 🎉\n\nTe esperamos el ${dateCap}.\n\n¡Hasta pronto, ${name.split(" ")[0]}! ✨`,
         });
         setPendingOptions([{ label: "Nueva reserva", value: "new" }]);
         setStep("done");

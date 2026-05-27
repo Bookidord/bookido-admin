@@ -13,6 +13,7 @@ type Booking = {
 
 export function TopStatsBar() {
   const [display, setDisplay] = useState("");
+  const [greeting, setGreeting] = useState("Buenos d\u00edas");
   const [showSeconds, setShowSeconds] = useState(false);
   const [pulse, setPulse] = useState(false);
   const [bellOpen, setBellOpen] = useState(false);
@@ -46,6 +47,11 @@ export function TopStatsBar() {
     }
     lastMinuteRef.current = currentMinute;
     setDisplay(formatTime(withSeconds));
+    // Update greeting based on Santo Domingo hour
+    const sdHour = parseInt(new Date().toLocaleTimeString("en-US", { hour: "numeric", hour12: false, timeZone: "America/Santo_Domingo" }), 10);
+    if (sdHour >= 5 && sdHour < 12) setGreeting("Buenos d\u00edas");
+    else if (sdHour >= 12 && sdHour < 18) setGreeting("Buenas tardes");
+    else setGreeting("Buenas noches");
   }, [formatTime]);
 
   // Fetch today's bookings
@@ -157,7 +163,7 @@ export function TopStatsBar() {
         {/* Center: ticker */}
         <div className="flex-1 mx-8 overflow-hidden relative h-5">
           <div className="absolute whitespace-nowrap text-white/25 text-xs leading-5" style={{ animation: "bk-marquee 25s linear infinite" }}>
-            {"\ud83c\udde9\ud83c\uddf4"} Buenos d{"\u00ed"}as desde Bookido — Tu negocio, automatizado — Reservas en piloto autom{"\u00e1"}tico — M{"\u00e1"}s tiempo para ti, m{"\u00e1"}s clientes para tu negocio
+            {"\ud83c\udde9\ud83c\uddf4"} {greeting} desde Bookido — Tu negocio, automatizado — Reservas en piloto autom{"\u00e1"}tico — M{"\u00e1"}s tiempo para ti, m{"\u00e1"}s clientes para tu negocio
           </div>
         </div>
 

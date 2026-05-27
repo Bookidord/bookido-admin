@@ -14,7 +14,22 @@ export default async function ReservaPage() {
   const admin = createServiceSupabaseClient();
   const configured = admin !== null;
   const tenantSlug = await getTenantSlug();
-  const schedule = getScheduleConfig();
+  // Per-tenant schedule from DB, fallback to global config
+  let schedule = getScheduleConfig();
+  if (admin) {
+    const { data: hours } = await admin
+      .from("bookido_business_hours")
+      .select("slots, is_open")
+      .eq("tenant_slug", tenantSlug)
+      .eq("is_open", true)
+      .limit(1);
+    if (hours && hours.length > 0 && hours[0].slots?.length > 0) {
+      const slot = hours[0].slots[0];
+      const openH = parseInt(slot.open?.split(":")[0] || "10", 10);
+      const closeH = parseInt(slot.close?.split(":")[0] || "20", 10);
+      schedule = { openHour: openH, closeHour: closeH, slotMinutes: schedule.slotMinutes };
+    }
+  }
   const settings = await getSettings();
 
   let services: ServiceRow[] = [];

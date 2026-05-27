@@ -3,9 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 
 function getGreeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return "Buenos días,";
-  if (h < 19) return "Buenas tardes,";
+  const h = parseInt(new Date().toLocaleTimeString("en-US", { hour: "numeric", hour12: false, timeZone: "America/Santo_Domingo" }), 10);
+  if (h >= 5 && h < 12) return "Buenos días,";
+  if (h >= 12 && h < 19) return "Buenas tardes,";
   return "Buenas noches,";
 }
 

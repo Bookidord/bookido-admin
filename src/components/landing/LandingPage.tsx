@@ -51,6 +51,61 @@ export type ServiceItem = {
   description: string | null;
 };
 
+export type BusinessHourRow = {
+  day_of_week: number;
+  open_time: string;
+  close_time: string;
+  is_closed: boolean;
+};
+
+// ── Schedule formatter ───────────────────────────────────────────────────────
+function formatSchedule(s: string): string {
+  return s.replace(/(\d)(am|pm)/gi, (_, d, p) => d + " " + p.toUpperCase());
+}
+
+// ── Business hours grouper ───────────────────────────────────────────────────
+const DAY_NAMES = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+function formatBusinessHours(rows: BusinessHourRow[]): string[] {
+  if (!rows.length) return [];
+  const sorted = [...rows].sort((a, b) => a.day_of_week - b.day_of_week);
+  // Reorder: Mon(1)..Sat(6), Sun(0)
+  const ordered = [...sorted.filter(r => r.day_of_week >= 1), ...sorted.filter(r => r.day_of_week === 0)];
+
+  function fmtTime(t: string): string {
+    const [hStr, mStr] = t.split(":");
+    let h = parseInt(hStr, 10);
+    const m = mStr || "00";
+    const suffix = h >= 12 ? "PM" : "AM";
+    if (h === 0) h = 12;
+    else if (h > 12) h -= 12;
+    return m === "00" ? `${h} ${suffix}` : `${h}:${m} ${suffix}`;
+  }
+
+  const entries = ordered.map(r => ({
+    day: r.day_of_week,
+    label: r.is_closed ? "Cerrado" : `${fmtTime(r.open_time)} \u2013 ${fmtTime(r.close_time)}`,
+  }));
+
+  // Group consecutive days with same label
+  const groups: { days: number[]; label: string }[] = [];
+  for (const e of entries) {
+    const last = groups[groups.length - 1];
+    if (last && last.label === e.label) {
+      last.days.push(e.day);
+    } else {
+      groups.push({ days: [e.day], label: e.label });
+    }
+  }
+
+  return groups.map(g => {
+    const first = DAY_NAMES[g.days[0]];
+    const last = DAY_NAMES[g.days[g.days.length - 1]];
+    const range = g.days.length === 1 ? first : `${first}\u2013${last}`;
+    return `${range}: ${g.label}`;
+  });
+}
+
 // ── Vertical meta ─────────────────────────────────────────────────────────────
 const TEMPLATE_META: Record<string, {
   emoji: string;
@@ -91,20 +146,20 @@ const TEMPLATE_META: Record<string, {
     faq: [
       { q: "¿Con cuánto tiempo debo reservar?", a: "Recomendamos reservar con al menos 24 horas de anticipación para asegurarte el horario que prefieres." },
       { q: "¿Los tratamientos faciales tienen contraindicaciones?", a: "Algunos tratamientos requieren que nos avises si tienes piel sensible, acné activo o usas retinol. Indícalo al reservar." },
-      { q: "¿La depilación duele mucho?", a: "Usamos técnicas y productos que minimizan el dolor. Los resultados son duraderos y la piel queda suave desde la primera sesión." },
+      { q: "¿Qué debo saber antes de mi primera visita?", a: "Recomendamos llegar 10 minutos antes para completar un breve formulario de salud. Así personalizamos el tratamiento a tus necesidades." },
       { q: "¿Cómo cancelo o reprogramo?", a: "Escríbenos por WhatsApp con al menos 12 horas de anticipación y con gusto encontramos otro horario para ti." },
     ],
   },
   salon: {
-    emoji: "💇",
-    badge: "Salón de Belleza",
-    ownerTitle: "Estilista",
+    emoji: "💄",
+    badge: "Maquillaje Profesional",
+    ownerTitle: "Maquilladora profesional",
     ctaLine: "Tu mejor versión te está esperando.",
     faq: [
-      { q: "¿Hacen consulta de color gratis?", a: "Sí, ofrecemos una consulta inicial gratuita para entender exactamente el resultado que deseas antes de aplicar cualquier color." },
-      { q: "¿Usan productos sin amoniaco?", a: "Contamos con líneas de coloración sin amoniaco y alternativas naturales. Cuéntanos tus preferencias al reservar." },
-      { q: "¿Qué pasa si no me gusta el resultado?", a: "Tu satisfacción es nuestra prioridad. Contáctanos dentro de los 7 días y hacemos los ajustes necesarios sin costo." },
-      { q: "¿Aceptan grupos para eventos?", a: "¡Sí! Hacemos paquetes para bodas, quinceañeras y eventos especiales. Escríbenos para cotizar." },
+      { q: "¿Con cuánto tiempo debo reservar?", a: "Recomendamos reservar con al menos 48 horas de anticipación, especialmente para bodas y eventos." },
+      { q: "¿Vas a domicilio?", a: "¡Sí! Ofrezco servicio a domicilio en Las Galeras, Samaná y alrededores. Yo voy donde tú estés." },
+      { q: "¿Qué productos usas?", a: "Trabajo con productos profesionales importados de alta gama, resistentes al calor y la humedad tropical." },
+      { q: "¿Incluyen prueba de maquillaje?", a: "Sí, los servicios de novia y quinceañera incluyen una prueba previa para asegurar el look perfecto." },
     ],
   },
   clinica: {
@@ -216,10 +271,12 @@ function ServiceCard({ svc, bookingUrl }: { svc: ServiceItem; bookingUrl: string
         )}
         <div className="mt-auto pt-4 flex items-end justify-between gap-2">
           <div className="flex flex-col gap-0.5">
-            {svc.price !== null && (
+            {svc.price !== null && svc.price > 0 ? (
               <span className="text-xl font-bold" style={{ color: "var(--hero-hex)" }}>
                 RD${svc.price.toLocaleString("es-DO")}
               </span>
+            ) : (
+              <span className="text-sm text-zinc-500">Consulta el precio</span>
             )}
             <span className="text-xs text-zinc-500">⏱ {durLabel}</span>
           </div>
@@ -338,7 +395,7 @@ function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
 // ── Testimonials ─────────────────────────────────────────────────────────────
 const TESTIMONIALS: Record<string, { name: string; avatar: string; text: string; stars: number }[]> = {
   nail_studio: [
-    { name: "María González",   avatar: "MG", text: "Las mejores uñas que me han hecho en mi vida. Valentina es un genio del nail art, cada diseño que le pido lo supera. Ya voy 8 meses siendo cliente fija 💅", stars: 5 },
+    { name: "María González",   avatar: "MG", text: "Las mejores uñas que me han hecho en mi vida. El trabajo es espectacular, cada diseño que pido lo superan. Ya voy 8 meses siendo cliente fija 💅", stars: 5 },
     { name: "Karla Reyes",      avatar: "KR", text: "El servicio es impecable, el lugar súper limpio y los productos de primera. Me hice las acrílicas para mi boda y quedaron perfectas. ¡Todas mis amigas preguntaron dónde!", stars: 5 },
     { name: "Stephanie Marte",  avatar: "SM", text: "Vine por primera vez y ya no voy a ningún otro sitio. La atención personalizada marca la diferencia. Mis uñas nunca se habían visto tan bien.", stars: 5 },
     { name: "Paola Jiménez",    avatar: "PJ", text: "El pedicure spa es una experiencia de relajación total. Salí con los pies renovados y un diseño hermoso. Los precios son muy justos para la calidad que ofrecen.", stars: 5 },
@@ -354,20 +411,19 @@ const TESTIMONIALS: Record<string, { name: string; avatar: string; text: string;
     { name: "Pedro Almonte",    avatar: "PA", text: "Me hice la barba completa y quedó perfecta. El aftershave que usan huele increíble. Top tier barbershop.", stars: 5 },
   ],
   spa: [
-    { name: "Isabella Torres",  avatar: "IT", text: "El facial que me hicieron fue transformador. Mi piel nunca se había visto tan bien. El equipo es muy profesional y usa productos de primera calidad.", stars: 5 },
+    { name: "Isabella Torres",  avatar: "IT", text: "La limpieza facial profunda que me hicieron fue transformadora. Mi piel nunca se había visto tan bien. El equipo es muy profesional y usa productos de primera calidad.", stars: 5 },
     { name: "Daniela Herrera",  avatar: "DH", text: "Vine estresada del trabajo y salí flotando. El masaje relajante de 60 minutos es exactamente lo que necesitaba. Ya agendé el próximo.", stars: 5 },
-    { name: "Sofía Vargas",     avatar: "SV", text: "La depilación fue rapidísima y sin casi dolor. Se nota que tienen experiencia y usan técnicas modernas. No voy a ningún otro spa.", stars: 5 },
-    { name: "Valentina Cruz",   avatar: "VC", text: "El hidrafacial cambió mi piel por completo. Después de 3 sesiones tengo la piel que siempre quise. Vale cada centavo.", stars: 5 },
+    { name: "Sofía Vargas",     avatar: "SV", text: "La exfoliación corporal fue una experiencia increíble. Mi piel quedó suavísima desde la primera sesión. Se nota que usan productos de calidad.", stars: 5 },
+    { name: "Valentina Cruz",   avatar: "VC", text: "El masaje con piedras calientes es lo mejor que he probado. Salí como nueva después de una semana intensa de trabajo. Vale cada centavo.", stars: 5 },
     { name: "Natalia Soto",     avatar: "NS", text: "Atención al cliente excepcional. Desde que reservas hasta que sales, todo es profesional y cálido. Mis amigas y yo venimos juntas cada mes.", stars: 5 },
-    { name: "Andrea Morales",   avatar: "AM", text: "El tratamiento corporal es una experiencia de lujo. El ambiente es relajante, la música perfecta y el resultado dura semanas. Totalmente recomendado.", stars: 5 },
+    { name: "Andrea Morales",   avatar: "AM", text: "El masaje descontracturante me quitó el dolor de espalda que llevaba semanas. El ambiente es relajante, la música perfecta. Totalmente recomendado.", stars: 5 },
   ],
   salon: [
-    { name: "Gabriela Ruiz",    avatar: "GR", text: "Me tiñeron el cabello por primera vez aquí y el resultado fue exactamente lo que quería. La consulta previa marca la diferencia.", stars: 5 },
-    { name: "Alejandra Núñez",  avatar: "AN", text: "El corte y brushing que me hacen aquí dura días. Se nota la calidad de los productos y la técnica. Mi cabello nunca se había visto tan sano.", stars: 5 },
-    { name: "Fernanda López",   avatar: "FL", text: "Vine para mi quinceañera y todo el equipo estuvo increíble. Pelo, maquillaje y manicure para mí y mis amigas. ¡Un servicio completo y perfecto!", stars: 5 },
-    { name: "Mariela Santos",   avatar: "MS", text: "Llevo años de clienta y la calidad siempre es consistente. El trato personalizado hace que uno se sienta especial cada visita.", stars: 5 },
-    { name: "Carolina Reyes",   avatar: "CR", text: "Los mejores colores sin amoniaco que he probado. Mi cabello quedó brillante y el color duró meses. Vale la pena cada peso.", stars: 5 },
-    { name: "Patricia Vega",    avatar: "PV", text: "Fui con el cabello dañado y salí con una melena hermosa. El tratamiento de keratina que hacen es de los mejores de la ciudad.", stars: 5 },
+    { name: "Ana Mercedes",     avatar: "AM", text: "Baby me maquilló para mi boda y quedé espectacular. El maquillaje duró toda la noche. 100% recomendada.", stars: 5 },
+    { name: "Stephanie Marté",  avatar: "SM", text: "Para mis 15 me hizo un look de princesa. Todas mis amigas querían saber quién me maquilló.", stars: 5 },
+    { name: "Lisandra Peña",    avatar: "LP", text: "Reservé en línea y me confirmó al instante. El maquillaje para mi sesión de fotos quedó brutal.", stars: 5 },
+    { name: "Carmen Díaz",      avatar: "CD", text: "Me dio una clase de automaquillaje y ahora me arreglo sola para salir. Excelente maestra.", stars: 5 },
+    { name: "Yulissa Reyes",    avatar: "YR", text: "El mejor maquillaje que me han hecho. Natural pero elegante. Baby sabe lo que cada rostro necesita.", stars: 5 },
   ],
   clinica: [
     { name: "Dr. Juan Pérez",   avatar: "JP", text: "Excelente atención médica. El especialista se tomó el tiempo necesario para explicarme todo. Muy profesional y humano a la vez.", stars: 5 },
@@ -381,7 +437,6 @@ const TESTIMONIALS: Record<string, { name: string; avatar: string; text: string;
 
 function TestimonialsSection({ template }: { template: string }) {
   const items = TESTIMONIALS[template] ?? TESTIMONIALS.nail_studio;
-  const doubled = [...items, ...items];
 
   return (
     <section className="border-t border-white/[0.06] bg-zinc-900 py-20 overflow-hidden">
@@ -397,7 +452,7 @@ function TestimonialsSection({ template }: { template: string }) {
       <div className="relative overflow-hidden"
         style={{ maskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)", WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)" }}>
         <div className="flex gap-4 w-max" style={{ animation: "testimonialsScroll 40s linear infinite" }}>
-          {doubled.map((t, i) => (
+          {items.map((t, i) => (
             <div key={i} className="w-72 flex-shrink-0 rounded-2xl border border-white/[0.07] bg-zinc-950/80 p-5 hover:[animation-play-state:paused]">
               <div className="mb-3 flex gap-0.5">
                 {Array.from({ length: t.stars }).map((_, s) => (
@@ -515,6 +570,7 @@ export function LandingPage({
   bookingUrl,
   services = [],
   products = [],
+  hoursRows = [],
   isOpenNow = null,
   fomoLastMinutes = null,
   fomoWeekCount = 0,
@@ -523,6 +579,7 @@ export function LandingPage({
   bookingUrl: string;
   services?: ServiceItem[];
   products?: ProductItem[];
+  hoursRows?: BusinessHourRow[];
   isOpenNow?: boolean | null;
   fomoLastMinutes?: number | null;
   fomoWeekCount?: number;
@@ -749,14 +806,32 @@ export function LandingPage({
                           Ver en Maps →
                         </a>
                       )}
+                      {landing.address && !landing.address.toLowerCase().includes("domicilio") && (
+                        <iframe
+                          src={`https://maps.google.com/maps?q=${encodeURIComponent(landing.address)}&output=embed`}
+                          width="100%"
+                          height="200"
+                          style={{ border: 0, borderRadius: "12px", marginTop: "12px" }}
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        />
+                      )}
                     </div>
                   </AnimateIn>
                 )}
-                {landing.schedule && (
+                {(hoursRows.length > 0 || landing.schedule) && (
                   <AnimateIn delay={150}>
                     <div className="rounded-xl border p-4" style={{ borderColor: "rgb(var(--hero) / 0.25)", backgroundColor: "rgb(var(--hero) / 0.07)" }}>
                       <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-zinc-500">🕐 Horario</p>
-                      <p className="text-sm text-zinc-200">{landing.schedule}</p>
+                      {hoursRows.length > 0 ? (
+                        <div className="space-y-0.5">
+                          {formatBusinessHours(hoursRows).map((line, i) => (
+                            <p key={i} className="text-sm text-zinc-200">{line}</p>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-zinc-200">{formatSchedule(landing.schedule!)}</p>
+                      )}
                     </div>
                   </AnimateIn>
                 )}

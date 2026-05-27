@@ -34,9 +34,38 @@ export function RegistroForm() {
   const [email, setEmail]           = useState("");
   const [password, setPassword]     = useState("");
   const [whatsapp, setWhatsapp]     = useState("");
+  const [instagram, setInstagram]   = useState("");
   const [showPass, setShowPass]     = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [slugStatus, setSlugStatus] = useState<"idle"|"checking"|"ok"|"taken">("idle");
   const slugTimer = useRef<ReturnType<typeof setTimeout>>(null);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+
+  // Load + render Turnstile
+  useEffect(() => {
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    if (!siteKey || !turnstileRef.current) return;
+
+    const renderWidget = () => {
+      if (turnstileRef.current && (window as any).turnstile) {
+        (window as any).turnstile.render(turnstileRef.current, {
+          sitekey: siteKey,
+          theme: "dark",
+          callback: (token: string) => setTurnstileToken(token),
+        });
+      }
+    };
+
+    if ((window as any).turnstile) {
+      renderWidget();
+    } else {
+      const script = document.createElement("script");
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      script.async = true;
+      script.onload = renderWidget;
+      document.head.appendChild(script);
+    }
+  }, []);
 
   useEffect(() => {
     if (!slugEdited && name) setSlug(slugify(name));
@@ -57,7 +86,16 @@ export function RegistroForm() {
     e.preventDefault();
     setError(null);
     start(async () => {
-      const res = await registrarNegocioAction({ business_name: name, slug, template, email, password, whatsapp: whatsapp || undefined });
+      const res = await registrarNegocioAction({
+        business_name: name,
+        slug,
+        template,
+        email,
+        password,
+        whatsapp: whatsapp || undefined,
+        instagram: instagram || undefined,
+        turnstileToken,
+      });
       if (!res.ok) { setError(res.error); return; }
       window.location.href = res.redirectUrl;
     });
@@ -145,12 +183,24 @@ export function RegistroForm() {
           placeholder="+18095550000" className={INPUT} />
       </div>
 
+      {/* Instagram */}
+      <div>
+        <label className="block text-[11px] font-medium uppercase tracking-wider text-zinc-600 mb-1.5">
+          Instagram <span className="normal-case font-normal text-zinc-700">(opcional)</span>
+        </label>
+        <input type="text" value={instagram} onChange={e => setInstagram(e.target.value)}
+          placeholder="@tu_negocio" className={INPUT} />
+      </div>
+
+      {/* Turnstile CAPTCHA */}
+      <div id="turnstile-container" ref={turnstileRef} />
+
       {error && (
         <div className="rounded-xl border border-red-400/20 bg-red-500/[0.08] px-4 py-3 text-sm text-red-300">{error}</div>
       )}
 
       <button type="submit"
-        disabled={pending || slugStatus === "taken" || slugStatus === "checking"}
+        disabled={pending || slugStatus === "taken" || slugStatus === "checking" || !turnstileToken}
         className="w-full rounded-xl bg-[var(--accent-hex)] py-3.5 text-sm font-bold text-[var(--ink-950)] transition hover:opacity-90 disabled:opacity-40">
         {pending ? "Creando tu panel…" : "Crear mi panel gratis →"}
       </button>

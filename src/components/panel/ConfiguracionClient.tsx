@@ -135,7 +135,7 @@ export function ConfiguracionClient({ initial }: { initial: BusinessSettings }) 
         </label>
         {/* Presets */}
         <div className="flex flex-wrap gap-2 mb-3">
-          {["var(--accent-hex)","#9945FF","#0EA5E9","#F97316","#EC4899","#be185d","#06B6D4","#F59E0B"].map(hex => (
+          {["#14F195","#9945FF","#0EA5E9","#F97316","#EC4899","#be185d","#06B6D4","#F59E0B"].map(hex => (
             <button
               key={hex}
               type="button"

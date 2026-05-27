@@ -119,7 +119,7 @@ export default async function PanelHomePage() {
   const metrics: MetricCard[] = [
     { label: "Reservas hoy", value: String(reservasHoy), trend: "", trendUp: true, icon: "\ud83d\udcc5", sparkline: [0, 0, 0, 0, reservasHoy] },
     { label: "Esta semana", value: String(reservasSemana), trend: "", trendUp: true, icon: "\ud83d\udcca", sparkline: [0, 0, 0, 0, reservasSemana] },
-    { label: "Ingresos hoy", value: ingresosHoy > 0 ? `RD$${ingresosHoy.toLocaleString()}` : "—", trend: "", trendUp: true, icon: "\ud83d\udcb0", sparkline: [0, 0, 0, 0, 0] },
+    { label: "Ingresos hoy", value: ingresosHoy > 0 ? `RD$${ingresosHoy.toLocaleString()}` : "RD$0", trend: "", trendUp: true, icon: "\ud83d\udcb0", sparkline: [0, 0, 0, 0, 0] },
     { label: "Por confirmar", value: String(porConfirmar), trend: "", trendUp: false, icon: "\u23f3", sparkline: [0, 0, 0, 0, porConfirmar] },
     { label: "Clientes nuevos", value: String(clientesNuevos), trend: "", trendUp: true, icon: "\ud83d\udc64", sparkline: [0, 0, 0, 0, clientesNuevos] },
   ];
@@ -184,7 +184,7 @@ export default async function PanelHomePage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-white truncate">{b.customer_name}</p>
-                    <p className="text-xs text-white/40">{b.service_name} \u00b7 {format(new Date(b.starts_at), "h:mm a", { locale: es })}</p>
+                    <p className="text-xs text-white/40">{b.service_name} · {format(new Date(b.starts_at), "h:mm a", { locale: es })}</p>
                   </div>
                   <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${statusColors[b.status] || "bg-zinc-500/10 text-zinc-400"}`}>
                     {statusLabels[b.status] || b.status}

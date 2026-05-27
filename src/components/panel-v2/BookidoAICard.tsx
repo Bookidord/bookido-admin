@@ -27,6 +27,7 @@ interface BriefingData {
   generated_at: string;
   status: string;
   cost_usd: number;
+  model?: string;
 }
 
 const SEVERITY_STYLES: Record<string, { bg: string; text: string; label: string }> = {
