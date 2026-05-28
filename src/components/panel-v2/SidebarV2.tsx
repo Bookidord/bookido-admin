@@ -17,7 +17,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "Cat\u00e1logo",
+    label: "Catálogo",
     items: [
       { name: "Productos", href: "/panel/productos", icon: "\ud83d\udce6" },
       { name: "Servicios", href: "/panel/servicios", icon: "\u2728" },
@@ -205,12 +205,12 @@ export function SidebarV2({
 
       {/* Bottom section */}
       <div className="px-2 py-3 border-t border-white/[0.04] shrink-0">
-        {/* SOPORTE INSTANT\u00c1NEO group */}
+        {/* SOPORTE INSTANTÁNEO group */}
         {whatsapp && (
           <div className="mb-2">
             {!collapsed && (
               <p className="px-2 mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-white/25">
-                Soporte instant\u00e1neo
+                Soporte instantáneo
               </p>
             )}
             <a
