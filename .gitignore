@@ -47,3 +47,7 @@ screenshot*.js
 # testing
 /coverage
 .env.production
+
+# build caches (no subir: archivos >100MB)
+cache/
+.next/
