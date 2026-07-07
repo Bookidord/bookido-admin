@@ -111,11 +111,32 @@ async function sendWhatsApp(text) {
 }
 
 async function fetchLicencias() {
-  let q = 'ros_licencias?select=id,license_key,restaurante_nombre,estado,printer_status,print_queue_pending,last_sale_at,telemetry_at,last_checkin,telemetry_alert_level';
+  let q = 'ros_licencias?select=id,license_key,restaurante_nombre,estado,printer_status,print_queue_pending,last_sale_at,telemetry_at,last_checkin,telemetry_alert_level,app_version,last_seen_version,tienda_activa,tienda_url,tienda_status';
   if (ONLY_KEY) q += `&license_key=eq.${encodeURIComponent(ONLY_KEY)}`;
   const r = await sb(q);
   if (!r.ok) throw new Error('Supabase read fail ' + r.status);
   return Array.isArray(r.json) ? r.json : [];
+}
+
+// Registra un evento en el timeline (best-effort — nunca rompe el barrido).
+async function logEvent(row, tipo, from_val, to_val, reason) {
+  try {
+    await sb('ros_telemetry_events', 'POST', [{
+      license_key: row.license_key, restaurante_nombre: row.restaurante_nombre || row.license_key,
+      tipo, from_val: from_val || '', to_val: to_val || '', reason: reason || '',
+    }], 'return=minimal');
+  } catch (_) {}
+}
+
+// Check HTTP de la tienda: online si responde 2xx/3xx; caída si 4xx/5xx/timeout/DNS.
+async function checkTienda(url) {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(url, { method: 'GET', redirect: 'follow', signal: ctrl.signal, headers: { 'User-Agent': 'ROS-Telemetry/1.0' } });
+    clearTimeout(t);
+    return r.status >= 200 && r.status < 400;
+  } catch (_) { return false; }
 }
 
 // ── MODO scan: transiciones de nivel ────────────────────────────────────────
@@ -125,17 +146,36 @@ async function runScan() {
   for (const row of rows) {
     const sem = semaforo(row);
     const prev = row.telemetry_alert_level || 'verde';
-    if (sem.level === prev) continue;
     const name = row.restaurante_nombre || row.license_key;
-    const recuperado = sem.level === 'verde';
-    const titulo = recuperado ? `${EMOJI.verde} ROS Pro — ${name}: RECUPERADO` : `${EMOJI[sem.level]} ROS Pro — ${name}: ${sem.level.toUpperCase()}`;
-    const motivo = sem.reasons.length ? sem.reasons.join('; ') : 'todo OK';
-    const msg = `${titulo}\nNivel: ${prev} → ${sem.level}\nMotivo: ${motivo}\n${iso()}`;
-    let delivered = 'no-enviado';
-    try { const wa = await sendWhatsApp(msg); delivered = wa.ok ? `whatsapp(${ALERT_PHONE})` : `wa-fail ${wa.status}`; }
-    catch (e) { delivered = 'wa-error: ' + e.message; }
-    await sb(`ros_licencias?id=eq.${row.id}`, 'PATCH', { telemetry_alert_level: sem.level, telemetry_alert_at: iso() });
-    fired.push(`${name}: ${prev}->${sem.level} [${delivered}]`);
+
+    // 1) Transición de nivel → alerta WhatsApp + evento en el timeline
+    if (sem.level !== prev) {
+      const recuperado = sem.level === 'verde';
+      const titulo = recuperado ? `${EMOJI.verde} ROS Pro — ${name}: RECUPERADO` : `${EMOJI[sem.level]} ROS Pro — ${name}: ${sem.level.toUpperCase()}`;
+      const motivo = sem.reasons.length ? sem.reasons.join('; ') : 'todo OK';
+      const msg = `${titulo}\nNivel: ${prev} → ${sem.level}\nMotivo: ${motivo}\n${iso()}`;
+      let delivered = 'no-enviado';
+      try { const wa = await sendWhatsApp(msg); delivered = wa.ok ? `whatsapp(${ALERT_PHONE})` : `wa-fail ${wa.status}`; }
+      catch (e) { delivered = 'wa-error: ' + e.message; }
+      await sb(`ros_licencias?id=eq.${row.id}`, 'PATCH', { telemetry_alert_level: sem.level, telemetry_alert_at: iso() });
+      await logEvent(row, 'transicion', prev, sem.level, sem.reasons.join('; '));
+      fired.push(`${name}: ${prev}->${sem.level} [${delivered}]`);
+    }
+
+    // 2) Cambio de versión → evento
+    if (row.app_version && row.app_version !== (row.last_seen_version || '')) {
+      await logEvent(row, 'version', row.last_seen_version || '', row.app_version, '');
+      await sb(`ros_licencias?id=eq.${row.id}`, 'PATCH', { last_seen_version: row.app_version });
+    }
+
+    // 3) Check de la tienda (solo si activa + con URL)
+    if (row.tienda_activa && row.tienda_url) {
+      const online = await checkTienda(row.tienda_url);
+      const st = online ? 'online' : 'caida';
+      const patch = { tienda_checked_at: iso() };
+      if (st !== (row.tienda_status || '')) patch.tienda_status = st;
+      await sb(`ros_licencias?id=eq.${row.id}`, 'PATCH', patch);
+    }
   }
   // Latido del propio barrido (lo vigila --heartbeat)
   await metaSet('last_scan_at', iso());

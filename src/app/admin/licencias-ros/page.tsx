@@ -11,6 +11,8 @@ interface Licencia {
   proximo_cobro?: string | null; notas_internas?: string | null;
   // Control del panel (verificación + tienda). Opcionales.
   verificado?: string | null; tienda_url?: string | null; tienda_activa?: boolean | null;
+  tienda_status?: string | null; tienda_checked_at?: string | null; tienda_pedidos_hoy?: number | null;
+  last_errors?: string | null; last_seen_version?: string | null;
   // Telemetría (server/telemetry.js → ros_licencias). Opcionales: pueden no existir aún.
   app_version?: string; last_checkin?: string | null; telemetry_at?: string | null;
   app_status?: string | null; printer_status?: string | null; printer_detail?: string | null;
@@ -41,6 +43,30 @@ function semaforo(lic: Licencia): { level: 'verde' | 'ambar' | 'rojo'; dot: stri
   return { level: 'verde', dot: 'bg-emerald-400', label: 'OK', reasons: [] };
 }
 
+// Uptime de los últimos 7 días (por día) reconstruido desde los eventos de
+// transición del timeline. "up" = cualquier nivel que NO sea rojo.
+function uptime7d(events: any[], nowLevel: string) {
+  const DAY = 86400000, now = Date.now(), start = now - 7 * DAY;
+  const trans = events.filter(e => e.tipo === 'transicion')
+    .map(e => ({ t: new Date(e.at).getTime(), lvl: e.to_val }))
+    .sort((a, b) => a.t - b.t);
+  let lvlAtStart = 'verde';
+  for (const tr of trans) { if (tr.t <= start) lvlAtStart = tr.lvl; else break; }
+  const pts = [{ t: start, lvl: lvlAtStart }, ...trans.filter(tr => tr.t > start && tr.t <= now), { t: now, lvl: nowLevel }];
+  const days: { date: Date; pct: number | null }[] = [];
+  for (let d = 0; d < 7; d++) {
+    const dStart = start + d * DAY, dEnd = dStart + DAY;
+    let up = 0, total = 0;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const s = Math.max(pts[i].t, dStart), e = Math.min(pts[i + 1].t, dEnd);
+      if (e <= s) continue;
+      total += e - s; if (pts[i].lvl !== 'rojo') up += e - s;
+    }
+    days.push({ date: new Date(dStart), pct: total ? up / total : null });
+  }
+  return days;
+}
+
 const PLANES: Record<string, { label: string; meses: number; precio: number }> = {
   mensual: { label: 'Mensual', meses: 1, precio: 1499 },
   trimestral: { label: 'Trimestral', meses: 3, precio: 3999 },
@@ -58,6 +84,17 @@ export default function LicenciasROS() {
   const [editId, setEditId] = useState<string | null>(null);
   const [ef, setEf] = useState<any>({});
   const [saving, setSaving] = useState(false);
+  const [q, setQ] = useState('');
+  const [filtro, setFiltro] = useState<'todos' | 'rojos' | 'porvencer' | 'impagos'>('todos');
+  const [verLic, setVerLic] = useState<Licencia | null>(null);
+  const [eventos, setEventos] = useState<any[]>([]);
+  const [evLoading, setEvLoading] = useState(false);
+
+  const abrirDetalle = async (lic: Licencia) => {
+    setVerLic(lic); setEventos([]); setEvLoading(true);
+    const { data } = await supabase.from('ros_telemetry_events').select('*').eq('license_key', lic.license_key).order('at', { ascending: false }).limit(200);
+    setEventos(data || []); setEvLoading(false);
+  };
 
   const load = async () => {
     const { data } = await supabase.from('ros_licencias').select('*').order('created_at', { ascending: false });
@@ -126,6 +163,22 @@ export default function LicenciasROS() {
 
   const ec: Record<string, string> = { activa: 'bg-green-500/20 text-green-400', suspendida: 'bg-red-500/20 text-red-400', expirada: 'bg-yellow-500/20 text-yellow-400', trial: 'bg-blue-500/20 text-blue-400' };
 
+  // Lista visible: filtro + búsqueda + orden (rojos primero por default).
+  const RANK: Record<string, number> = { rojo: 0, ambar: 1, verde: 2 };
+  const vista = [...licencias]
+    .filter(l => !q.trim() || (l.restaurante_nombre || '').toLowerCase().includes(q.trim().toLowerCase()))
+    .filter(l => {
+      if (filtro === 'rojos') return semaforo(l).level === 'rojo';
+      if (filtro === 'porvencer') return diasRestantes(l.fecha_fin) <= 15;
+      if (filtro === 'impagos') return !l.pagado;
+      return true;
+    })
+    .sort((a, b) => {
+      const ra = RANK[semaforo(a).level] ?? 3, rb = RANK[semaforo(b).level] ?? 3;
+      if (ra !== rb) return ra - rb;
+      return diasRestantes(a.fecha_fin) - diasRestantes(b.fecha_fin);
+    });
+
   if (loading) return <div className="p-8 text-center text-zinc-500">Cargando...</div>;
 
   return (
@@ -133,6 +186,14 @@ export default function LicenciasROS() {
       <div className="flex justify-between items-center mb-6">
         <div><h1 className="text-2xl font-bold text-white">Licencias ROS Pro</h1><p className="text-sm text-zinc-500">{licencias.length} restaurante{licencias.length !== 1 ? 's' : ''}</p></div>
         <button onClick={() => setShowForm(!showForm)} className="px-4 py-2 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-400">+ Nueva Licencia</button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 mb-5">
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Buscar por nombre…" className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white w-56" />
+        {([['todos', 'Todos'], ['rojos', 'Solo rojos'], ['porvencer', 'Por vencer'], ['impagos', 'Impagos']] as const).map(([k, label]) => (
+          <button key={k} onClick={() => setFiltro(k)} className={`px-3 py-2 rounded-lg text-xs font-bold ${filtro === k ? 'bg-yellow-500 text-black' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}>{label}</button>
+        ))}
+        <span className="text-xs text-zinc-500 ml-auto">{vista.length} de {licencias.length}</span>
       </div>
 
       {showForm && <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-6 mb-6">
@@ -154,14 +215,20 @@ export default function LicenciasROS() {
       </div>}
 
       <div className="space-y-3">
-        {licencias.map(lic => { const d = diasRestantes(lic.fecha_fin); const sem = semaforo(lic); return (
+        {vista.length === 0 && <p className="text-sm text-zinc-500 py-6 text-center">Sin resultados.</p>}
+        {vista.map(lic => { const d = diasRestantes(lic.fecha_fin); const sem = semaforo(lic); return (
           <div key={lic.id} className="bg-zinc-900 border border-zinc-700 rounded-xl p-5">
             <div className="flex justify-between items-start">
               <div className="flex items-start gap-2.5">
-                <span title={`${sem.label}${sem.reasons.length ? ' — ' + sem.reasons.join(' · ') : ''}`} className={`mt-1.5 w-3 h-3 shrink-0 rounded-full ${sem.dot} ${sem.level !== 'verde' ? 'animate-pulse' : ''}`} />
-                <div><h3 className="text-lg font-bold text-white">{lic.restaurante_nombre}</h3><p className="text-xs text-zinc-600 font-mono mt-1">Key: {lic.license_key}</p></div>
+                <span title={sem.label} className={`mt-1.5 w-3 h-3 shrink-0 rounded-full ${sem.dot} ${sem.level !== 'verde' ? 'animate-pulse' : ''}`} />
+                <div>
+                  <h3 className="text-lg font-bold text-white">{lic.restaurante_nombre}</h3>
+                  {sem.level !== 'verde' && <p className={`text-xs font-medium ${sem.level === 'rojo' ? 'text-red-400' : 'text-amber-400'}`}>{sem.reasons.join(' · ')}</p>}
+                  <p className="text-xs text-zinc-600 font-mono mt-0.5">Key: {lic.license_key}</p>
+                </div>
               </div>
               <div className="flex items-center gap-2">
+                {lic.tienda_activa && <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${lic.tienda_status === 'caida' ? 'bg-red-500/20 text-red-400' : lic.tienda_status === 'online' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-600/40 text-zinc-300'}`}>🛒 {lic.tienda_status === 'caida' ? 'CAÍDA' : lic.tienda_status === 'online' ? 'ONLINE' : '—'}</span>}
                 <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${VERIF[lic.verificado || 'pendiente']?.cls || VERIF.pendiente.cls}`}>{VERIF[lic.verificado || 'pendiente']?.label || 'PENDIENTE'}</span>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${ec[lic.estado] || 'bg-zinc-800 text-zinc-400'}`}>{lic.estado.toUpperCase()}</span>
               </div>
@@ -180,6 +247,7 @@ export default function LicenciasROS() {
             </div>}
             {lic.hostname && <div className="mt-3 text-xs text-zinc-600">PC: {lic.hostname} · IP: {lic.ip_local} · AnyDesk: {lic.anydesk_id || '—'} · Ping: {lic.telemetry_at ? new Date(lic.telemetry_at).toLocaleString() : (lic.updated_at ? new Date(lic.updated_at).toLocaleString() : '—')}</div>}
             <div className="flex flex-wrap gap-2 mt-4">
+              <button onClick={() => abrirDetalle(lic)} className="px-3 py-1.5 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-lg hover:bg-blue-500/30">Ver</button>
               <button onClick={() => (editId === lic.id ? setEditId(null) : abrirEditar(lic))} className="px-3 py-1.5 bg-zinc-700 text-zinc-100 text-xs font-bold rounded-lg hover:bg-zinc-600">{editId === lic.id ? 'Cerrar' : 'Editar'}</button>
               {lic.estado === 'activa' && <button onClick={() => cambiarEstado(lic.id, 'suspendida')} className="px-3 py-1.5 bg-red-500/20 text-red-400 text-xs font-bold rounded-lg hover:bg-red-500/30">Suspender</button>}
               {lic.estado === 'suspendida' && <button onClick={() => cambiarEstado(lic.id, 'activa')} className="px-3 py-1.5 bg-green-500/20 text-green-400 text-xs font-bold rounded-lg hover:bg-green-500/30">Reactivar</button>}
@@ -213,6 +281,75 @@ export default function LicenciasROS() {
           </div>
         ); })}
       </div>
+
+      {verLic && (() => {
+        const nivel = semaforo(verLic).level;
+        const dias = uptime7d(eventos, nivel);
+        const versiones = eventos.filter(e => e.tipo === 'version');
+        const barCls = (p: number | null) => p === null ? 'bg-zinc-700' : p >= 0.99 ? 'bg-emerald-500' : p >= 0.8 ? 'bg-amber-500' : 'bg-red-500';
+        return (
+          <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center overflow-y-auto p-4" onClick={() => setVerLic(null)}>
+            <div className="bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-3xl my-8 p-6" onClick={e => e.stopPropagation()}>
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h2 className="text-xl font-bold text-white">{verLic.restaurante_nombre}</h2>
+                  <p className="text-xs text-zinc-500">v{verLic.app_version || '—'} · {verLic.hostname || '—'} · último ping {verLic.telemetry_at ? new Date(verLic.telemetry_at).toLocaleString() : '—'}</p>
+                </div>
+                <button onClick={() => setVerLic(null)} className="px-3 py-1.5 bg-zinc-700 text-zinc-300 rounded-lg text-sm">Cerrar</button>
+              </div>
+
+              {/* Uptime 7 días */}
+              <h3 className="text-sm font-bold text-zinc-300 mb-2">Uptime · últimos 7 días</h3>
+              <div className="flex items-end gap-2 h-24 mb-1">
+                {dias.map((dd, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center justify-end h-full" title={`${dd.date.toLocaleDateString()} — ${dd.pct === null ? 'sin datos' : Math.round(dd.pct * 100) + '% up'}`}>
+                    <div className={`w-full rounded-t ${barCls(dd.pct)}`} style={{ height: `${dd.pct === null ? 4 : Math.max(4, dd.pct * 100)}%` }} />
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2 mb-5">{dias.map((dd, i) => <div key={i} className="flex-1 text-center text-[10px] text-zinc-500">{dd.date.getDate()}/{dd.date.getMonth() + 1}</div>)}</div>
+
+              {/* Errores del último ping */}
+              <h3 className="text-sm font-bold text-zinc-300 mb-2">Errores del último ping</h3>
+              <pre className="bg-black/40 border border-zinc-800 rounded-lg p-3 text-xs text-red-300 whitespace-pre-wrap max-h-40 overflow-y-auto mb-5">{verLic.last_errors?.trim() || 'Sin errores reportados.'}</pre>
+
+              <div className="grid md:grid-cols-2 gap-5">
+                {/* Timeline transiciones */}
+                <div>
+                  <h3 className="text-sm font-bold text-zinc-300 mb-2">Timeline de estado</h3>
+                  {evLoading ? <p className="text-xs text-zinc-500">Cargando…</p> : (
+                    <div className="space-y-1.5 max-h-64 overflow-y-auto">
+                      {eventos.filter(e => e.tipo === 'transicion').length === 0 && <p className="text-xs text-zinc-600">Sin transiciones registradas.</p>}
+                      {eventos.filter(e => e.tipo === 'transicion').map(e => (
+                        <div key={e.id} className="text-xs">
+                          <span className="text-zinc-500">{new Date(e.at).toLocaleString()}</span>{' '}
+                          <span className={e.to_val === 'rojo' ? 'text-red-400' : e.to_val === 'verde' ? 'text-emerald-400' : 'text-amber-400'}>{e.from_val} → {e.to_val}</span>
+                          {e.reason && <span className="text-zinc-600"> · {e.reason}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {/* Historial de versiones */}
+                <div>
+                  <h3 className="text-sm font-bold text-zinc-300 mb-2">Historial de versiones</h3>
+                  {evLoading ? <p className="text-xs text-zinc-500">Cargando…</p> : (
+                    <div className="space-y-1.5 max-h-64 overflow-y-auto">
+                      {versiones.length === 0 && <p className="text-xs text-zinc-600">Sin cambios de versión.</p>}
+                      {versiones.map(e => (
+                        <div key={e.id} className="text-xs">
+                          <span className="text-zinc-500">{new Date(e.at).toLocaleString()}</span>{' '}
+                          <span className="text-white font-mono">v{e.from_val || '—'} → v{e.to_val}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
