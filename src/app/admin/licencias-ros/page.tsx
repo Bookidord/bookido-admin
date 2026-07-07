@@ -8,11 +8,20 @@ interface Licencia {
   contacto_nombre: string; contacto_telefono: string; dia_cobro: number;
   auto_renovar: boolean; hostname: string; ip_local: string; anydesk_id: string;
   historial_pagos: any[]; updated_at: string; created_at: string;
+  proximo_cobro?: string | null; notas_internas?: string | null;
+  // Control del panel (verificación + tienda). Opcionales.
+  verificado?: string | null; tienda_url?: string | null; tienda_activa?: boolean | null;
   // Telemetría (server/telemetry.js → ros_licencias). Opcionales: pueden no existir aún.
   app_version?: string; last_checkin?: string | null; telemetry_at?: string | null;
   app_status?: string | null; printer_status?: string | null; printer_detail?: string | null;
   print_queue_pending?: number | null; last_sale_at?: string | null; disk_free_mb?: number | null;
 }
+
+const VERIF: Record<string, { label: string; cls: string }> = {
+  verificado: { label: 'VERIFICADO', cls: 'bg-emerald-500/20 text-emerald-400' },
+  en_prueba: { label: 'EN PRUEBA', cls: 'bg-blue-500/20 text-blue-400' },
+  pendiente: { label: 'PENDIENTE', cls: 'bg-zinc-600/40 text-zinc-300' },
+};
 
 // Semáforo de salud (misma lógica que el VPS lib.php → tel_semaforo).
 // Frescura = telemetry_at (ping cada 15 min) con respaldo en last_checkin.
@@ -46,6 +55,9 @@ export default function LicenciasROS() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ nombre: '', contacto: '', telefono: '', plan: 'mensual', monto: 1499, dia: 1 });
+  const [editId, setEditId] = useState<string | null>(null);
+  const [ef, setEf] = useState<any>({});
+  const [saving, setSaving] = useState(false);
 
   const load = async () => {
     const { data } = await supabase.from('ros_licencias').select('*').order('created_at', { ascending: false });
@@ -87,6 +99,31 @@ export default function LicenciasROS() {
     }).eq('id', lic.id); load();
   };
 
+  const abrirEditar = (lic: Licencia) => {
+    setEditId(lic.id);
+    setEf({
+      restaurante_nombre: lic.restaurante_nombre || '', plan: lic.plan || 'mensual',
+      fecha_inicio: lic.fecha_inicio || '', fecha_fin: lic.fecha_fin || '', proximo_cobro: lic.proximo_cobro || '',
+      monto_rd: lic.monto_rd ?? 0, dia_cobro: lic.dia_cobro ?? 1, pagado: !!lic.pagado,
+      contacto_nombre: lic.contacto_nombre || '', contacto_telefono: lic.contacto_telefono || '',
+      verificado: lic.verificado || 'pendiente', tienda_activa: !!lic.tienda_activa,
+      tienda_url: lic.tienda_url || '', notas_internas: lic.notas_internas || '',
+    });
+  };
+
+  const guardarEdicion = async (id: string) => {
+    setSaving(true);
+    await supabase.from('ros_licencias').update({
+      restaurante_nombre: ef.restaurante_nombre, plan: ef.plan,
+      fecha_inicio: ef.fecha_inicio || null, fecha_fin: ef.fecha_fin || null, proximo_cobro: ef.proximo_cobro || null,
+      monto_rd: +ef.monto_rd || 0, dia_cobro: +ef.dia_cobro || 1, pagado: !!ef.pagado,
+      contacto_nombre: ef.contacto_nombre, contacto_telefono: ef.contacto_telefono,
+      verificado: ef.verificado, tienda_activa: !!ef.tienda_activa, tienda_url: ef.tienda_url,
+      notas_internas: ef.notas_internas, updated_at: new Date().toISOString(),
+    }).eq('id', id);
+    setSaving(false); setEditId(null); load();
+  };
+
   const ec: Record<string, string> = { activa: 'bg-green-500/20 text-green-400', suspendida: 'bg-red-500/20 text-red-400', expirada: 'bg-yellow-500/20 text-yellow-400', trial: 'bg-blue-500/20 text-blue-400' };
 
   if (loading) return <div className="p-8 text-center text-zinc-500">Cargando...</div>;
@@ -124,7 +161,10 @@ export default function LicenciasROS() {
                 <span title={`${sem.label}${sem.reasons.length ? ' — ' + sem.reasons.join(' · ') : ''}`} className={`mt-1.5 w-3 h-3 shrink-0 rounded-full ${sem.dot} ${sem.level !== 'verde' ? 'animate-pulse' : ''}`} />
                 <div><h3 className="text-lg font-bold text-white">{lic.restaurante_nombre}</h3><p className="text-xs text-zinc-600 font-mono mt-1">Key: {lic.license_key}</p></div>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${ec[lic.estado] || 'bg-zinc-800 text-zinc-400'}`}>{lic.estado.toUpperCase()}</span>
+              <div className="flex items-center gap-2">
+                <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${VERIF[lic.verificado || 'pendiente']?.cls || VERIF.pendiente.cls}`}>{VERIF[lic.verificado || 'pendiente']?.label || 'PENDIENTE'}</span>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${ec[lic.estado] || 'bg-zinc-800 text-zinc-400'}`}>{lic.estado.toUpperCase()}</span>
+              </div>
             </div>
             <div className="grid grid-cols-4 gap-4 mt-4 text-sm">
               <div><span className="text-zinc-500">Plan:</span> <span className="text-white font-bold">{PLANES[lic.plan]?.label || lic.plan}</span></div>
@@ -139,12 +179,37 @@ export default function LicenciasROS() {
               <div><span className="text-zinc-500">Disco:</span> <span className="text-white">{lic.disk_free_mb != null ? `${Math.round(lic.disk_free_mb / 1024)} GB` : '—'}</span></div>
             </div>}
             {lic.hostname && <div className="mt-3 text-xs text-zinc-600">PC: {lic.hostname} · IP: {lic.ip_local} · AnyDesk: {lic.anydesk_id || '—'} · Ping: {lic.telemetry_at ? new Date(lic.telemetry_at).toLocaleString() : (lic.updated_at ? new Date(lic.updated_at).toLocaleString() : '—')}</div>}
-            <div className="flex gap-2 mt-4">
+            <div className="flex flex-wrap gap-2 mt-4">
+              <button onClick={() => (editId === lic.id ? setEditId(null) : abrirEditar(lic))} className="px-3 py-1.5 bg-zinc-700 text-zinc-100 text-xs font-bold rounded-lg hover:bg-zinc-600">{editId === lic.id ? 'Cerrar' : 'Editar'}</button>
               {lic.estado === 'activa' && <button onClick={() => cambiarEstado(lic.id, 'suspendida')} className="px-3 py-1.5 bg-red-500/20 text-red-400 text-xs font-bold rounded-lg hover:bg-red-500/30">Suspender</button>}
               {lic.estado === 'suspendida' && <button onClick={() => cambiarEstado(lic.id, 'activa')} className="px-3 py-1.5 bg-green-500/20 text-green-400 text-xs font-bold rounded-lg hover:bg-green-500/30">Reactivar</button>}
               {(lic.estado === 'expirada' || d <= 5) && <button onClick={() => renovar(lic)} className="px-3 py-1.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-lg hover:bg-yellow-500/30">Renovar (+{PLANES[lic.plan]?.meses || 1}m)</button>}
               {lic.contacto_telefono && <a href={`https://wa.me/${lic.contacto_telefono.replace(/[^0-9]/g, '')}`} target="_blank" className="px-3 py-1.5 bg-green-800/30 text-green-300 text-xs font-bold rounded-lg">WhatsApp</a>}
+              {lic.tienda_url && <a href={lic.tienda_url} target="_blank" className={`px-3 py-1.5 text-xs font-bold rounded-lg ${lic.tienda_activa ? 'bg-indigo-500/20 text-indigo-300' : 'bg-zinc-700/50 text-zinc-500 line-through'}`}>Tienda</a>}
             </div>
+
+            {editId === lic.id && <div className="mt-4 border-t border-zinc-800 pt-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                <label className="text-xs text-zinc-500">Nombre<input className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" value={ef.restaurante_nombre} onChange={e => setEf({ ...ef, restaurante_nombre: e.target.value })} /></label>
+                <label className="text-xs text-zinc-500">Plan<select className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" value={ef.plan} onChange={e => setEf({ ...ef, plan: e.target.value })}>{Object.entries(PLANES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select></label>
+                <label className="text-xs text-zinc-500">Monto RD$<input type="number" className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" value={ef.monto_rd} onChange={e => setEf({ ...ef, monto_rd: e.target.value })} /></label>
+                <label className="text-xs text-zinc-500">Inicio<input type="date" className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" value={ef.fecha_inicio} onChange={e => setEf({ ...ef, fecha_inicio: e.target.value })} /></label>
+                <label className="text-xs text-zinc-500">Vence<input type="date" className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" value={ef.fecha_fin} onChange={e => setEf({ ...ef, fecha_fin: e.target.value })} /></label>
+                <label className="text-xs text-zinc-500">Próximo cobro<input type="date" className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" value={ef.proximo_cobro} onChange={e => setEf({ ...ef, proximo_cobro: e.target.value })} /></label>
+                <label className="text-xs text-zinc-500">Día cobro<input type="number" min={1} max={28} className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" value={ef.dia_cobro} onChange={e => setEf({ ...ef, dia_cobro: e.target.value })} /></label>
+                <label className="text-xs text-zinc-500">Contacto<input className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" value={ef.contacto_nombre} onChange={e => setEf({ ...ef, contacto_nombre: e.target.value })} /></label>
+                <label className="text-xs text-zinc-500">WhatsApp<input className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" value={ef.contacto_telefono} onChange={e => setEf({ ...ef, contacto_telefono: e.target.value })} /></label>
+                <label className="text-xs text-zinc-500">Verificación<select className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" value={ef.verificado} onChange={e => setEf({ ...ef, verificado: e.target.value })}><option value="pendiente">Pendiente</option><option value="en_prueba">En prueba</option><option value="verificado">Verificado</option></select></label>
+                <label className="text-xs text-zinc-500">Link tienda<input placeholder="https://..." className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" value={ef.tienda_url} onChange={e => setEf({ ...ef, tienda_url: e.target.value })} /></label>
+                <label className="flex items-center gap-2 text-xs text-zinc-400 mt-5"><input type="checkbox" checked={ef.tienda_activa} onChange={e => setEf({ ...ef, tienda_activa: e.target.checked })} /> Tienda activa</label>
+                <label className="flex items-center gap-2 text-xs text-zinc-400 mt-5"><input type="checkbox" checked={ef.pagado} onChange={e => setEf({ ...ef, pagado: e.target.checked })} /> Pagado (mes actual)</label>
+              </div>
+              <label className="block text-xs text-zinc-500 mt-3">Notas internas<textarea className="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded p-2 text-white" rows={2} value={ef.notas_internas} onChange={e => setEf({ ...ef, notas_internas: e.target.value })} /></label>
+              <div className="flex gap-2 mt-3">
+                <button disabled={saving} onClick={() => guardarEdicion(lic.id)} className="px-5 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-500 disabled:opacity-50">{saving ? 'Guardando…' : 'Guardar'}</button>
+                <button onClick={() => setEditId(null)} className="px-5 py-2 bg-zinc-700 text-zinc-300 text-sm rounded-lg">Cancelar</button>
+              </div>
+            </div>}
           </div>
         ); })}
       </div>
