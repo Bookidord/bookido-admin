@@ -8,6 +8,28 @@ interface Licencia {
   contacto_nombre: string; contacto_telefono: string; dia_cobro: number;
   auto_renovar: boolean; hostname: string; ip_local: string; anydesk_id: string;
   historial_pagos: any[]; updated_at: string; created_at: string;
+  // Telemetría (server/telemetry.js → ros_licencias). Opcionales: pueden no existir aún.
+  app_version?: string; last_checkin?: string | null; telemetry_at?: string | null;
+  app_status?: string | null; printer_status?: string | null; printer_detail?: string | null;
+  print_queue_pending?: number | null; last_sale_at?: string | null; disk_free_mb?: number | null;
+}
+
+// Semáforo de salud (misma lógica que el VPS lib.php → tel_semaforo).
+// Frescura = telemetry_at (ping cada 15 min) con respaldo en last_checkin.
+const TEL = { RED_MIN: 30, AMBER_MIN: 20, QUEUE_MAX: 5 };
+function semaforo(lic: Licencia): { level: 'verde' | 'ambar' | 'rojo'; dot: string; label: string; reasons: string[] } {
+  const stamp = lic.telemetry_at || lic.last_checkin || null;
+  const ageMin = stamp ? (Date.now() - new Date(stamp).getTime()) / 60000 : null;
+  if (ageMin === null || ageMin > TEL.RED_MIN) {
+    return { level: 'rojo', dot: 'bg-red-400', label: 'SIN CONEXIÓN', reasons: [ageMin === null ? 'sin ping' : `sin ping hace ${Math.round(ageMin)} min`] };
+  }
+  const pending = lic.print_queue_pending ?? 0;
+  const reasons: string[] = [];
+  if (lic.printer_status === 'fail') reasons.push('impresora en fallo');
+  if (pending > TEL.QUEUE_MAX) reasons.push(`cola: ${pending} pendientes`);
+  if (ageMin > TEL.AMBER_MIN) reasons.push(`ping hace ${Math.round(ageMin)} min`);
+  if (reasons.length) return { level: 'ambar', dot: 'bg-amber-400', label: 'ATENCIÓN', reasons };
+  return { level: 'verde', dot: 'bg-emerald-400', label: 'OK', reasons: [] };
 }
 
 const PLANES: Record<string, { label: string; meses: number; precio: number }> = {
@@ -29,7 +51,7 @@ export default function LicenciasROS() {
     const { data } = await supabase.from('ros_licencias').select('*').order('created_at', { ascending: false });
     setLicencias(data || []); setLoading(false);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); const t = setInterval(load, 60000); return () => clearInterval(t); }, []);
 
   const diasRestantes = (fin: string) => Math.ceil((new Date(fin).getTime() - Date.now()) / 86400000);
 
@@ -95,10 +117,13 @@ export default function LicenciasROS() {
       </div>}
 
       <div className="space-y-3">
-        {licencias.map(lic => { const d = diasRestantes(lic.fecha_fin); return (
+        {licencias.map(lic => { const d = diasRestantes(lic.fecha_fin); const sem = semaforo(lic); return (
           <div key={lic.id} className="bg-zinc-900 border border-zinc-700 rounded-xl p-5">
             <div className="flex justify-between items-start">
-              <div><h3 className="text-lg font-bold text-white">{lic.restaurante_nombre}</h3><p className="text-xs text-zinc-600 font-mono mt-1">Key: {lic.license_key}</p></div>
+              <div className="flex items-start gap-2.5">
+                <span title={`${sem.label}${sem.reasons.length ? ' — ' + sem.reasons.join(' · ') : ''}`} className={`mt-1.5 w-3 h-3 shrink-0 rounded-full ${sem.dot} ${sem.level !== 'verde' ? 'animate-pulse' : ''}`} />
+                <div><h3 className="text-lg font-bold text-white">{lic.restaurante_nombre}</h3><p className="text-xs text-zinc-600 font-mono mt-1">Key: {lic.license_key}</p></div>
+              </div>
               <span className={`px-3 py-1 rounded-full text-xs font-bold ${ec[lic.estado] || 'bg-zinc-800 text-zinc-400'}`}>{lic.estado.toUpperCase()}</span>
             </div>
             <div className="grid grid-cols-4 gap-4 mt-4 text-sm">
@@ -107,7 +132,13 @@ export default function LicenciasROS() {
               <div><span className="text-zinc-500">Monto:</span> <span className="text-yellow-400 font-bold">RD${lic.monto_rd?.toLocaleString()}</span></div>
               <div><span className="text-zinc-500">Contacto:</span> <span className="text-white">{lic.contacto_telefono || '—'}</span></div>
             </div>
-            {lic.hostname && <div className="mt-3 text-xs text-zinc-600">PC: {lic.hostname} · IP: {lic.ip_local} · AnyDesk: {lic.anydesk_id || '—'} · Check: {lic.updated_at ? new Date(lic.updated_at).toLocaleString() : '—'}</div>}
+            {(lic.telemetry_at || lic.printer_status) && <div className="grid grid-cols-4 gap-4 mt-3 text-xs">
+              <div><span className="text-zinc-500">Impresora:</span> <span className={lic.printer_status === 'fail' ? 'text-red-400 font-bold' : lic.printer_status === 'ok' ? 'text-green-400 font-bold' : 'text-zinc-400'}>{lic.printer_status === 'fail' ? 'FALLO' : lic.printer_status === 'ok' ? 'OK' : (lic.printer_status || '—')}</span></div>
+              <div><span className="text-zinc-500">Cola:</span> <span className={`font-bold ${(lic.print_queue_pending ?? 0) > TEL.QUEUE_MAX ? 'text-yellow-400' : 'text-white'}`}>{lic.print_queue_pending ?? 0}</span></div>
+              <div><span className="text-zinc-500">Últ. venta:</span> <span className="text-white">{lic.last_sale_at || '—'}</span></div>
+              <div><span className="text-zinc-500">Disco:</span> <span className="text-white">{lic.disk_free_mb != null ? `${Math.round(lic.disk_free_mb / 1024)} GB` : '—'}</span></div>
+            </div>}
+            {lic.hostname && <div className="mt-3 text-xs text-zinc-600">PC: {lic.hostname} · IP: {lic.ip_local} · AnyDesk: {lic.anydesk_id || '—'} · Ping: {lic.telemetry_at ? new Date(lic.telemetry_at).toLocaleString() : (lic.updated_at ? new Date(lic.updated_at).toLocaleString() : '—')}</div>}
             <div className="flex gap-2 mt-4">
               {lic.estado === 'activa' && <button onClick={() => cambiarEstado(lic.id, 'suspendida')} className="px-3 py-1.5 bg-red-500/20 text-red-400 text-xs font-bold rounded-lg hover:bg-red-500/30">Suspender</button>}
               {lic.estado === 'suspendida' && <button onClick={() => cambiarEstado(lic.id, 'activa')} className="px-3 py-1.5 bg-green-500/20 text-green-400 text-xs font-bold rounded-lg hover:bg-green-500/30">Reactivar</button>}
