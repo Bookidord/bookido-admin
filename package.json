@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.112.3",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.47.10",
     "date-fns": "^4.1.0",

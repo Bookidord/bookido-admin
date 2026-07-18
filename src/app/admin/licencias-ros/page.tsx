@@ -286,7 +286,12 @@ export default function LicenciasROS() {
         const nivel = semaforo(verLic).level;
         const dias = uptime7d(eventos, nivel);
         const versiones = eventos.filter(e => e.tipo === 'version');
-        const barCls = (p: number | null) => p === null ? 'bg-zinc-700' : p >= 0.99 ? 'bg-emerald-500' : p >= 0.8 ? 'bg-amber-500' : 'bg-red-500';
+        // Umbrales calibrados para negocios con horario (no 24/7): un restaurante
+        // que cierra de noche apaga el POS, así que "uptime" real ronda 50-75%/día
+        // aunque todo funcione perfecto. Los umbrales anteriores (99%/80%) exigían
+        // básicamente operación 24/7 — todo cliente con horario normal salía en rojo
+        // TODOS los días, sin ninguna falla real (falso positivo estructural).
+        const barCls = (p: number | null) => p === null ? 'bg-zinc-700' : p >= 0.5 ? 'bg-emerald-500' : p >= 0.25 ? 'bg-amber-500' : 'bg-red-500';
         return (
           <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center overflow-y-auto p-4" onClick={() => setVerLic(null)}>
             <div className="bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-3xl my-8 p-6" onClick={e => e.stopPropagation()}>
